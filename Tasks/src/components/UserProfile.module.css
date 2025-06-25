@@ -1,0 +1,101 @@
+.profileContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #1f1c2c, #928dab);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+  }
+  
+  .card {
+    background-color: #2a2a40;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+    width: 400px;
+    color: white;
+    animation: fadeIn 0.8s ease;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .name {
+    font-size: 2rem;
+    margin-bottom: 5px;
+  }
+  
+  .xp {
+    font-size: 1rem;
+    color: #b8b8ff;
+  }
+  
+  .stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  
+  .statBox {
+    background-color: #3a3a5c;
+    padding: 15px;
+    border-radius: 15px;
+    text-align: center;
+    width: 45%;
+    transition: transform 0.2s ease;
+  }
+  
+  .statBox:hover {
+    transform: scale(1.05);
+    background-color: #4f4f7f;
+  }
+  
+  .statBox h2 {
+    margin: 0;
+    font-size: 1.8rem;
+    color: #ffd369;
+  }
+  
+  .taskSection {
+    margin-top: 10px;
+  }
+  
+  .taskSection h3 {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #444;
+    padding-bottom: 5px;
+  }
+  
+  .taskItem {
+    background-color: #393963;
+    margin-bottom: 8px;
+    padding: 10px 15px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.95rem;
+    transition: background-color 0.3s;
+  }
+  
+  .taskItem:hover {
+    background-color: #50507a;
+  }
+  
+  .status {
+    color: #00f7ff;
+    font-weight: bold;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(25px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
