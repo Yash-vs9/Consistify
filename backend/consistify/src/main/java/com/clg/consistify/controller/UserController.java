@@ -92,23 +92,16 @@ public class UserController {
         return ResponseEntity.ok(userDTOs);
     }
 
-    @GetMapping("/users/{username}/friends")
-    public ResponseEntity<List<String>> getFriends(@PathVariable String username, Authentication authentication) {
+    @GetMapping("/users/friends")
+    public ResponseEntity<List<String>> getFriends(Authentication authentication) {
         String jwtUsername = authentication.getName();
-
-        if (!username.equals(jwtUsername)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(List.of("Access denied"));
-        }
-
-        List<String> friends = userService.getFriendUsernames(username);
+        List<String> friends = userService.getFriendUsernames(jwtUsername);
         return ResponseEntity.ok(friends);
     }
-    @PostMapping("/users/{fromUserId}/send-request/{toUserId}")
-    public ResponseEntity<String> sendFriendRequest(
-            @PathVariable String fromUserId,
-            @PathVariable String toUserId) {
-        return userService.friendRequest(fromUserId, toUserId);
+    @PostMapping("/users/send-request/{toUserName}")
+    public ResponseEntity<String> sendFriendRequest(@PathVariable String toUserName,Authentication authentication) {
+        String fromUserId=authentication.getName();
+        return userService.friendRequest(fromUserId, toUserName);
     }
     //NOT VERIFIED YET
     @PostMapping("/users/{friendId}/accept-request")
