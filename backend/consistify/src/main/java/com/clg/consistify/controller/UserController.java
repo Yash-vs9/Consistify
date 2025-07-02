@@ -73,23 +73,27 @@ public class UserController {
                 .map(UserModel::getUsername)
                 .toList();
     }
-    @Cacheable("usersModel")
     @GetMapping("/users/model")
     public ResponseEntity<List<UserDTO>> getAllUsersModel() {
+        return ResponseEntity.ok(getAllUserDTOs());
+    }
+
+    @Cacheable("usersModel")
+    public List<UserDTO> getAllUserDTOs() {
         List<UserModel> users = userRepository.findAll();
 
-        List<UserDTO> userDTOs = users.stream()
+        return users.stream()
                 .map(user -> new UserDTO(
                         user.getUsername(),
                         user.getEmail(),
-                        user.getFriendRequests(), // already List<String>
-                        user.getFriends().stream()
+                        user.getFriendRequests() != null ? user.getFriendRequests() : List.of(),
+                        user.getFriends() != null
+                                ? user.getFriends().stream()
                                 .map(UserModel::getUsername)
                                 .toList()
+                                : List.of()
                 ))
                 .toList();
-
-        return ResponseEntity.ok(userDTOs);
     }
 
     @GetMapping("/users/friends")
