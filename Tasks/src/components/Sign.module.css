@@ -1,164 +1,115 @@
-/* Reset */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  body, html {
-    height: 100%;
-    width: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f0f4f8;
-  }
-  
-  /* Layout */
-  .container {
-    display: flex;
-    height: 100vh;
-    width: 100vw;
-    background: linear-gradient(to bottom, #e6f3fc, #bad7ef);
-    overflow: hidden;
-  }
-  
-  /* Panels */
-  .left, .right {
-    width: 50vw;
-    height: 100vh;
-    position: relative;
-    transition: transform 0.8s ease-in-out;
-  }
-  
-  .left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .right img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 20px 0 0 20px;
-    transition: border-radius 0.8s ease-in-out;
-  }
-  
-  /* Card Styles */
-  .login-container,
-  .register-container {
-    background: linear-gradient(135deg, #b4d4ef, #93c0e3);
-    padding: 35px;
-    border-radius: 25px;
-    box-shadow: 8px 8px 20px rgba(0, 0, 0, 0.15),
-                -8px -8px 20px rgba(255, 255, 255, 0.4);
-    width: 320px;
-    text-align: center;
-    backdrop-filter: blur(5px);
-  }
-  
-  /* Headings */
-  h2 {
-    color: #1e3e5d;
-    font-size: 26px;
-    margin-bottom: 25px;
-  }
-  
-  /* Input Fields */
-  .input-field {
-    background: #d1e6f7;
-    padding: 12px;
-    border-radius: 12px;
-    margin: 12px 0;
-    box-shadow: inset 3px 3px 6px #a4c4dd, inset -3px -3px 6px #effaff;
-  }
-  
-  .input-field input {
-    border: none;
-    background: transparent;
-    outline: none;
-    font-size: 16px;
-    color: #1e4873;
-    width: 100%;
-  }
-  
-  /* Options (e.g., Forgot Password) */
-  .options {
-    display: flex;
-    justify-content: space-between;
-    font-size: 14px;
-    color: #34495e;
-    margin-bottom: 20px;
-  }
-  
-  .options a {
-    text-decoration: none;
-    color: #315e8f;
-    transition: color 0.3s;
-  }
-  
-  .options a:hover {
-    color: #214266;
-  }
-  
-  /* Buttons */
-  button {
-    background: #4c7bb5;
-    color: #fff;
-    border: none;
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-size: 16px;
-    cursor: pointer;
-    width: 100%;
-    box-shadow: 4px 4px 10px #325a85, -4px -4px 10px #6ea1cf;
-    transition: 0.3s;
-  }
-  
-  button:hover {
-    box-shadow: 2px 2px 6px #325a85, -2px -2px 6px #6ea1cf;
-    background: #3b6ca8;
-  }
-  
-  /* Switch Prompt (Login/Register) */
-  .Switch {
-    margin-top: 5vh;
-    font-size: 14px;
-    color: #2c3e50;
-  }
-  
-  .Switch a {
-    text-decoration: none;
-    color: #315e8f;
-    font-weight: 500;
-    transition: color 0.3s;
-  }
-  
-  .Switch a:hover {
-    color: #1d3d66;
-  }
-  
-  /* Register Container Hidden by Default */
-  .register-container {
-    display: none;
-  }
-  
-  /* Active States for Toggle */
-  .active .left {
-    transform: translateX(100%);
-  }
-  
-  .active .right {
-    transform: translateX(-100%);
-  }
-  
-  .active .left .register-container {
-    display: block;
-  }
-  
-  .active .left .login-container {
-    display: none;
-  }
-  
-  .active .right img {
-    border-radius: 0 20px 20px 0;
-  }
+.signWrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(to bottom, #e6f3fc, #bad7ef);
+  transition: all 0.6s ease;
+  overflow: hidden;
+}
+
+.signLeft, .signRight {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signRight img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px 0 0 20px;
+  transition: border-radius 0.6s ease-in-out;
+}
+
+.loginBox, .registerBox {
+  background: linear-gradient(135deg, #b4d4ef, #93c0e3);
+  padding: 35px;
+  border-radius: 25px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+  width: 340px;
+  text-align: center;
+  display: none;
+}
+
+.loginBox {
+  display: block;
+}
+
+.active .loginBox {
+  display: none;
+}
+
+.active .registerBox {
+  display: block;
+}
+
+.inputGroup {
+  background: #d1e6f7;
+  padding: 12px;
+  border-radius: 12px;
+  margin: 12px 0;
+  box-shadow: inset 3px 3px 6px #a4c4dd, inset -3px -3px 6px #effaff;
+}
+
+.inputGroup input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: #1e4873;
+  width: 100%;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: #34495e;
+  margin-bottom: 20px;
+}
+
+.options a {
+  text-decoration: none;
+  color: #315e8f;
+  transition: color 0.3s;
+}
+
+.options a:hover {
+  color: #214266;
+}
+
+.primaryButton {
+  background: #4c7bb5;
+  color: white;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+  box-shadow: 4px 4px 10px #325a85, -4px -4px 10px #6ea1cf;
+  transition: 0.3s;
+}
+
+.primaryButton:hover {
+  background: #3b6ca8;
+}
+
+.switchText {
+  margin-top: 20px;
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.switchText span {
+  color: #315e8f;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.switchText span:hover {
+  color: #1d3d66;
+}

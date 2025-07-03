@@ -1,9 +1,6 @@
 package com.clg.consistify.controller;
 
-import com.clg.consistify.DTO.LoginBody;
-import com.clg.consistify.DTO.RegisterBody;
-import com.clg.consistify.DTO.TwoFriends;
-import com.clg.consistify.DTO.UserDTO;
+import com.clg.consistify.DTO.*;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.exception.UsernameAlreadyExistException;
 import com.clg.consistify.repository.UserRepository;
@@ -18,6 +15,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -138,5 +136,12 @@ public class UserController {
                 .map(UserModel::getUsername)
                 .toList();
         return ResponseEntity.ok(userNames);
+    }
+    @Async
+    @PostMapping("/email")
+    public void sendEmail(@RequestBody EmailDTO body){
+        System.out.println(Thread.currentThread().getName());
+        System.out.println("Sending email to: " + body.getEmail());
+        userService.sendWelcomeEmail(body.getEmail());
     }
 }

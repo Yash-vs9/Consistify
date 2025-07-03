@@ -15,6 +15,8 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,6 +36,10 @@ public class UserService {
     private UserRepository userRepository;
 
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
 
     private AuthenticationManager authenticationManager;
 
@@ -66,6 +72,17 @@ public class UserService {
         UserDetails userDetails = userDetailService.loadUserByUsername(savedUser.getUsername());
         String jwt = jwtUtil.generateToken(savedUser.getUsername());
         return jwt;
+    }
+
+    public void sendWelcomeEmail(String toEmail) {
+        toEmail = toEmail.trim().replaceAll("[\\r\\n]", "");
+
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("sub..");
+        message.setText("text..");
+        message.setFrom("yvksmr@gmail.com");
+        mailSender.send(message);
     }
 
     public String login(LoginBody body){
@@ -153,4 +170,5 @@ public class UserService {
 
         return toUser.getFriendRequests().contains(fromUsername);
     }
+
 }

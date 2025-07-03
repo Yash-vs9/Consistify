@@ -1,55 +1,40 @@
-import './App.css'
-import Sign from './components/Sign'
+// App.jsx
+import './App.css';
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from 'react-router-dom';
+
+import AppLayout from './AppLayout';
+
+import Sign from './components/Sign';
 import Friends from './components/Friends';
 import Home from './components/Home';
-import { BrowserRouter as Router, Routes, Route, createBrowserRouter, RouterProvider } from "react-router-dom";
 import ProjectHome from './components/project/ProjectHome';
 import FriendsList from './components/FriendsList';
 import UserProfile from './components/UserProfile';
 import Chat from './components/Chat';
-const router=createBrowserRouter([
+import Test from './components/Test';
+
+const router = createBrowserRouter([
   {
-    element:<Sign/>,
-    path:'/sign'
+    path: '/',
+    element: <AppLayout />, // ✅ Context provided to all routes
+    children: [
+      { path: 'sign', element: <Sign /> },
+      { path: 'home', element: <Home /> },
+      { path: ':username/friends', element: <Friends /> },
+      { path: 'project', element: <ProjectHome /> },
+      { path: 'profile', element: <UserProfile /> },
+      { path: 'test', element: <Test /> },
+      { path: ':username/list', element: <FriendsList /> },
+      { path: ':username/chat', element: <Chat /> },
+    ],
   },
-  {
-    element:<Home/>,
-    path:'/home'
-  },
-  // {
-  //   element:<Protected/>,
-  //   path:'/profile'
-  // },
-  {
-    element:<Friends/>,
-    path:'/:username/friends'
-  },
-  {
-    element:<ProjectHome/>,
-    path:'/project'
-  },
-  {
-    element:<UserProfile/>,
-    path:'/profile'
-  },
-  {
-    element:<FriendsList/>,
-    path:'/:username/list'
-  },
-  {
-    element:<Chat/>,
-    path:'/:username/chat'
-  }
-  
-])
+]);
+
 function App() {
-
-
-  return (
-    <>
-       <RouterProvider router={router}/>
-    </>
-  )
+  return <RouterProvider router={router} />;
 }
 
-export default App
+export default App;

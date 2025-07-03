@@ -55,7 +55,7 @@ const Friends = () => {
   useEffect(() => {
     const fetchFriends = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/users/${paramUsername}/friends`, {
+        const res = await fetch(`http://localhost:8080/users/friends`, {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -87,13 +87,13 @@ const Friends = () => {
       })
       .then((data) => setReq(data))
       .catch((error) => console.error('Error fetching requests:', error));
-  }, [paramUsername]);
+  }, []);
 
   const handleAddFriend = async (toUsername, e) => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:8080/users/${paramUsername}/send-request/${toUsername}`,
+        `http://localhost:8080/users/send-request/${toUsername}`,
         {
           method: 'POST',
           headers: {
@@ -119,7 +119,7 @@ const Friends = () => {
     e.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:8080/users/${paramUsername}/accept-request/${toUsername}`,
+        `http://localhost:8080/users/${toUsername}/accept-request`,
         {
           method: 'POST',
           headers: {
@@ -145,19 +145,35 @@ const Friends = () => {
     <div className={styles.friendRealWindow}>
       <div className={styles.friendWindow}>
         <h1>USERS</h1>
+  
+        {/* Friend Requests */}
         <div id="req" className={styles.reqWrapper}>
-          <button>Requests</button>
+          <h2>Requests</h2>
           <div className={styles.requestContainer}>
-            {req.map((request, index) => (
+            {req.length > 0 ? req.map((request, index) => (
               <div className={styles.requestItem} key={index}>
                 <span>{request}</span>
                 <button onClick={(e) => handleAddFriendReq(request, e)}>Accept</button>
               </div>
-            ))}
+            )) : <p>No requests</p>}
           </div>
         </div>
-
+  
+        {/* Friend List */}
+        <div className={styles.friendListWrapper}>
+          <h2>Your Friends</h2>
+          <div className={styles.friendListContainer}>
+            {friends.length > 0 ? friends.map((friend, index) => (
+              <div key={index} className={styles.friendItem}>
+                <span>{friend}</span>
+              </div>
+            )) : <p>You have no friends yet 😢</p>}
+          </div>
+        </div>
+  
+        {/* All Users */}
         <div className={styles.friendContainer}>
+          <h2>All Users</h2>
           {usernames.map((username, index) => (
             <div
               className={styles.usernames}
