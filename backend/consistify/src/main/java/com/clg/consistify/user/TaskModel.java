@@ -2,29 +2,39 @@ package com.clg.consistify.user;
 import jakarta.persistence.*;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "user_tasks")
 public class TaskModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long task_id;
     private String taskName;
     private Date startingDate;
     private Date lastDate;
+
+    public List<String> getCollaborators() {
+        return collaborators;
+    }
+
+    public void setCollaborators(List<String> collaborators) {
+        this.collaborators = collaborators;
+    }
+
     private String taskPriority;
+
+    @ElementCollection
+    @CollectionTable(name = "task_collaborators", joinColumns = @JoinColumn(name = "task_id"))
+    @Column(name = "collaborator")
+    private List<String> collaborators;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
 
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(long id) {
-        this.id = id;
-    }
+
 
     public String getTaskName() {
         return taskName;

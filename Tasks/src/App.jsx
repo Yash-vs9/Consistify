@@ -1,11 +1,8 @@
 // App.jsx
 import './App.css';
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import AppLayout from './AppLayout';
+
 
 import Sign from './components/Sign';
 import Friends from './components/Friends';
@@ -15,26 +12,27 @@ import FriendsList from './components/FriendsList';
 import UserProfile from './components/UserProfile';
 import Chat from './components/Chat';
 import Test from './components/Test';
-
-const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <AppLayout />, // ✅ Context provided to all routes
-    children: [
-      { path: 'sign', element: <Sign /> },
-      { path: 'home', element: <Home /> },
-      { path: ':username/friends', element: <Friends /> },
-      { path: 'project', element: <ProjectHome /> },
-      { path: 'profile', element: <UserProfile /> },
-      { path: 'test', element: <Test /> },
-      { path: ':username/list', element: <FriendsList /> },
-      { path: ':username/chat', element: <Chat /> },
-    ],
-  },
-]);
+import TaskList from './components/TaskList';
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+
+        <Routes>
+          <Route path="/sign" element={<Sign />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/:username/friends" element={<Friends />} />
+          <Route path="/project" element={<ProjectHome />} />
+          <Route path="/profile" element={<UserProfile />} />
+          <Route path="/test" element={<Test />} />
+          <Route path="/:username/list" element={<FriendsList />} />
+          <Route path="/:username/chat" element={<Chat />} />
+          <Route path="/tasks" element={<TaskList />} />
+
+        </Routes>
+
+    </BrowserRouter>
+  );
 }
 
 export default App;
