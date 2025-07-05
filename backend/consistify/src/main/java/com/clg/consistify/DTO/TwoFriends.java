@@ -1,23 +1,13 @@
 package com.clg.consistify.DTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class TwoFriends {
     private String fromUsername;
-
-    public String getFromUsername() {
-        return fromUsername;
-    }
-
-    public void setFromUsername(String fromUsername) {
-        this.fromUsername = fromUsername;
-    }
-
-    public String getToUsername() {
-        return toUsername;
-    }
-
-    public void setToUsername(String toUsername) {
-        this.toUsername = toUsername;
-    }
-
     private String toUsername;
 }
