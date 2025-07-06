@@ -26,7 +26,7 @@ public class UserModel {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "friend_id")
     )
-    @JsonIgnore  // Ignore this field during JSON serialization to prevent infinite recursion
+    @JsonIgnore
     private Set<UserModel> friends = new HashSet<>();
 
 

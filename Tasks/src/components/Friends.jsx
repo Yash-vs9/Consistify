@@ -1,28 +1,28 @@
 import React, { useEffect, useState } from 'react';
-import styles from './Friends.module.css'
-
 import { useNavigate, useParams } from 'react-router-dom';
 
-
 const Friends = () => {
+  const [usernames, setUsernames] = useState([]);
+  const [requests, setRequests] = useState([]);
+  const [friends, setFriends] = useState([]);
+  const [search, setSearch] = useState('');
+
+  const { username: paramUsername } = useParams();
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem('authToken');
+
   const getUsernameFromToken = (token) => {
     if (!token) return null;
     try {
-      const payloadBase64Url = token.split('.')[1];
-      const payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
-      const payloadJson = atob(payloadBase64);
-      const payload = JSON.parse(payloadJson);
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
       return payload.sub || payload.username || null;
-    } catch (e) {
-      console.error('Invalid token', e);
+    } catch {
       return null;
     }
   };
 
-  const token = localStorage.getItem('authToken');
   const usernameJWT = getUsernameFromToken(token);
-  const { username: paramUsername } = useParams(); 
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (paramUsername !== usernameJWT) {
@@ -30,160 +30,166 @@ const Friends = () => {
     }
   }, [paramUsername, usernameJWT, navigate]);
 
-  const [usernames, setUsernames] = useState([]);
-  const [req, setReq] = useState([]);
-  const [friends, setFriends] = useState([]);
-  const [param, setParam] = useState(paramUsername);
-  const [search, setSearch] = useState('');
+  const fetchUsers = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/users', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setUsernames(data);
+    } catch (err) {
+      console.error('Error fetching users:', err);
+    }
+  };
+
+  const fetchFriends = async () => {
+    try {
+      const res = await fetch('http://localhost:8080/users/friends', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setFriends(data);
+    } catch (err) {
+      console.error('Error fetching friends:', err);
+    }
+  };
+
+  const fetchRequests = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/users/requests/${paramUsername}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setRequests(data);
+    } catch (err) {
+      console.error('Error fetching requests:', err);
+    }
+  };
 
   useEffect(() => {
-    fetch('http://localhost:8080/users', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Failed to fetch users');
-        return response.json();
-      })
-      .then((data) => setUsernames(data))
-      .catch((error) => console.error('Error fetching users:', error));
-  }, [paramUsername]);
-
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const res = await fetch(`http://localhost:8080/users/friends`, {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        if (!res.ok) throw new Error('Failed to fetch');
-        const data = await res.json();
-        setFriends(data);
-      } catch (err) {
-        console.error('Error:', err);
-      }
-    };
-
-    if (paramUsername) fetchFriends();
+    fetchUsers();
+    fetchFriends();
+    fetchRequests();
   }, [paramUsername, token]);
 
-  useEffect(() => {
-    fetch(`http://localhost:8080/users/requests/${paramUsername}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('Failed to fetch friend requests');
-        return response.json();
-      })
-      .then((data) => setReq(data))
-      .catch((error) => console.error('Error fetching requests:', error));
-  }, []);
-
-  const handleAddFriend = async (toUsername, e) => {
-    e.preventDefault();
+  const handleAddFriend = async (toUsername) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/users/send-request/${toUsername}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        alert('Friend request sent!');
-      } else {
-        const errorMessage = await response.text();
-        alert(errorMessage);
-      }
-    } catch (error) {
-      console.error('Error sending request:', error);
+      const res = await fetch(`http://localhost:8080/users/send-request/${toUsername}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const msg = await res.text();
+      alert(msg);
+    } catch (err) {
       alert('Something went wrong');
     }
   };
 
-  const handleAddFriendReq = async (toUsername, e) => {
-    e.preventDefault();
+  const handleAcceptRequest = async (fromUsername) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/users/${toUsername}/accept-request`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        alert('Friend request accepted');
-      } else {
-        const errorMessage = await response.text();
-        alert(errorMessage);
-      }
-    } catch (error) {
-      console.error('Error accepting request:', error);
+      const res = await fetch(`http://localhost:8080/users/${fromUsername}/accept-request`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const msg = await res.text();
+      alert(msg);
+      fetchFriends();
+      fetchRequests();
+    } catch (err) {
       alert('Something went wrong');
     }
   };
 
   return (
-    <div className={styles.friendRealWindow}>
-      <div className={styles.friendWindow}>
-        <h1>USERS</h1>
-  
-        {/* Friend Requests */}
-        <div id="req" className={styles.reqWrapper}>
-          <h2>Requests</h2>
-          <div className={styles.requestContainer}>
-            {req.length > 0 ? req.map((request, index) => (
-              <div className={styles.requestItem} key={index}>
-                <span>{request}</span>
-                <button onClick={(e) => handleAddFriendReq(request, e)}>Accept</button>
-              </div>
-            )) : <p>No requests</p>}
+    <div className="min-h-screen bg-gradient-to-r from-indigo-900 to-slate-900 text-white font-sans flex justify-center items-start px-4 py-8 overflow-auto">
+      <div className="bg-gray-900 rounded-xl p-8 w-full max-w-4xl shadow-lg space-y-8">
+        <h1 className="text-3xl font-bold border-b-2 border-blue-600 pb-2">USERS</h1>
+
+        {/* Requests */}
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Requests</h2>
+          <div className="bg-slate-800 p-4 rounded-lg space-y-2">
+            {requests.length > 0 ? (
+              requests.map((reqUser, i) => (
+                <div
+                  key={i}
+                  className="flex justify-between items-center bg-slate-700 px-4 py-2 rounded-md"
+                >
+                  <span className="font-medium">{reqUser}</span>
+                  <button
+                    onClick={() => handleAcceptRequest(reqUser)}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded"
+                  >
+                    Accept
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p>No requests</p>
+            )}
           </div>
         </div>
-  
-        {/* Friend List */}
-        <div className={styles.friendListWrapper}>
-          <h2>Your Friends</h2>
-          <div className={styles.friendListContainer}>
-            {friends.length > 0 ? friends.map((friend, index) => (
-              <div key={index} className={styles.friendItem}>
-                <span>{friend}</span>
-              </div>
-            )) : <p>You have no friends yet 😢</p>}
+
+        {/* Friends List */}
+        <div className="bg-blue-100 text-slate-900 p-4 rounded-lg">
+          <h2 className="text-xl font-semibold mb-2">Your Friends</h2>
+          <div className="space-y-2">
+            {friends.length > 0 ? (
+              friends.map((friend, i) => (
+                <div
+                  key={i}
+                  className="bg-white text-gray-800 px-4 py-2 rounded-md shadow-sm font-medium"
+                >
+                  {friend}
+                </div>
+              ))
+            ) : (
+              <p>You have no friends yet 😢</p>
+            )}
           </div>
         </div>
-  
+
         {/* All Users */}
-        <div className={styles.friendContainer}>
-          <h2>All Users</h2>
-          {usernames.map((username, index) => (
-            <div
-              className={styles.usernames}
-              key={index}
-              style={{ '--order': index }}
-            >
-              <span>{username}</span>
-              <button onClick={(e) => handleAddFriend(username, e)} id="add">Add</button>
-            </div>
-          ))}
+        <div className="space-y-3">
+          <h2 className="text-xl font-semibold mb-2">All Users</h2>
+          {usernames
+            .filter((user) => user !== usernameJWT)
+            .map((username, i) => {
+              const isFriend = friends.includes(username);
+              const isRequested = requests.includes(username);
+              return (
+                <div
+                  key={i}
+                  className="flex justify-between items-center bg-gray-800 px-4 py-3 rounded-md shadow-sm animate-slideIn"
+                  style={{ animationDelay: `${i * 50}ms` }}
+                >
+                  <span className="font-semibold">{username}</span>
+                  <button
+                    onClick={() => handleAddFriend(username)}
+                    disabled={isFriend || isRequested}
+                    className={`${
+                      isFriend
+                        ? 'bg-gray-600 cursor-not-allowed'
+                        : isRequested
+                        ? 'bg-yellow-500'
+                        : 'bg-blue-500 hover:bg-blue-600'
+                    } text-white px-4 py-1 rounded transition`}
+                  >
+                    {isFriend ? 'Friend' : isRequested ? 'Requested' : 'Add'}
+                  </button>
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>
