@@ -12,6 +12,7 @@ import NotFound from './components/NotFound';
 import Chat from './components/Chat';
 import Dashboard from './components/Dashboard';
 import TaskList from './components/TaskList';
+import SidebarLayout from './components/pages/SidebarLayout';
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/:username/friends" element={<Friends />} />
           <Route path="/project" element={<ProjectHome />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={<SidebarLayout />} />
 
 
 

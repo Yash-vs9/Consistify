@@ -49,72 +49,71 @@ const Home = () => {
   }, []);
 
   return (
-    <div className="w-screen min-h-screen bg-[#020a13] text-white font-sans">
+    <div className="w-screen min-h-screen bg-[#020a13] text-white font-sans overflow-x-hidden relative">
+      {/* Particle Canvas */}
+      <canvas id="particlesCanvas" className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none" />
+
       {/* Navbar */}
-      <nav className="sticky top-0 z-10 w-full h-[7vh] flex justify-between items-center px-4 bg-white/5 backdrop-blur text-xl">
-        <a href={`/${usernameJWT}/friends`} className="hover:underline">
-          Add Friends
-        </a>
-        <img src="rectangle-list-regular.svg" alt="icon" className="h-6" />
-        <p>Consistify</p>
-        <a href="/sign" className="bg-blue-600 px-4 py-2 rounded hover:bg-blue-800 transition">Go to Sign</a>
+      <nav className="sticky top-0 z-10 w-full h-[7vh] flex justify-around items-center px-4 bg-white/10 backdrop-blur-lg text-xl shadow-md animate-fadeInDown">
+        <p className="font-bold text-cyan-400 tracking-wider animate-pulse text-2xl">Consistify</p>
+        <div className="flex space-x-4">
+        <a
+  href="/dashboard"
+  className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:scale-105 hover:shadow-lg hover:from-cyan-400 hover:to-blue-500 transition duration-300"
+>
+  🚀 Dashboard
+</a>
+<a
+  href="/sign"
+  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-5 py-2 rounded-lg shadow-md hover:scale-105 hover:shadow-lg hover:from-purple-400 hover:to-pink-400 transition duration-300"
+>
+  🔐 Sign In
+</a>
+        </div>
       </nav>
 
-      {/* Welcome Box */}
-     
-
-      {/* Canvas for particles */}
-      <canvas id="particlesCanvas" className="fixed top-0 left-0 w-full h-full z-0" />
-
-      <hr className="h-2 w-full bg-black/80 border-none m-0" />
-
-      {/* Sections */}
-      <section className="flex w-full h-screen">
-        <div className="w-1/2 flex justify-center items-center bg-[#11121a]">
-          <div className="text-5xl bg-[#1c1f2b] text-white p-10 rounded-lg relative">
-            <div className="absolute inset-0 rounded-lg bg from-pink-500 via-green-400 to-blue-400 blur-xl opacity-40 animate-spin-slow" />
-            What exactly is Consistify?
+      {/* Section 1: What is Consistify */}
+      <section className="flex w-full h-screen items-center relative z-10">
+        <div className="w-1/2 flex justify-center items-center bg-[#11121a] animate-fadeInLeft">
+          <div className="text-5xl bg-[#1c1f2b] text-white p-10 rounded-lg relative overflow-hidden shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-green-400 to-blue-400 blur-2xl opacity-30 animate-spin-slow rounded-xl" />
+            <span className="relative z-10">What exactly is Consistify?</span>
           </div>
         </div>
-        <div className="w-1/2 flex justify-center items-center bg-[#11121a]">
-          <div className="text-lg text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-teal-400 bg-clip-text p-6">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsam ullam doloremque aliquam molestiae libero...
+        <div className="w-1/2 flex justify-center items-center bg-[#11121a] animate-fadeInRight">
+          <p className="text-lg text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-teal-400 bg-clip-text p-6 leading-loose">
+            Consistify is your productivity ecosystem – combining task tracking, leveling systems, and a personal AI assistant to keep you consistent.
+          </p>
+        </div>
+      </section>
+
+      {/* Section 2: Features */}
+      <section className="flex w-full h-screen items-center relative z-10">
+        <div className="w-1/2 flex justify-center items-center bg-[#11121a] animate-fadeInLeft">
+          <ul className="text-lg text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-teal-400 bg-clip-text p-6 space-y-4 font-bold">
+            <li className="hover:text-pink-400 transition">🚀 Leveling up system</li>
+            <li className="hover:text-pink-400 transition">🤖 New AI Chatbot</li>
+            <li className="hover:text-pink-400 transition">🧑‍🤝‍🧑 Leveling with friends</li>
+            <li className="hover:text-pink-400 transition">🏆 Ranks for every level</li>
+            <li className="hover:text-pink-400 transition">🔐 Secure user data</li>
+            <li className="hover:text-pink-400 transition">🎯 Gamified dashboard</li>
+          </ul>
+        </div>
+        <div className="w-1/2 flex justify-center items-center bg-[#11121a] animate-fadeInRight">
+          <div className="text-5xl bg-[#1c1f2b] text-white p-10 rounded-lg relative overflow-hidden shadow-lg">
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-green-400 to-blue-400 blur-2xl opacity-30 animate-spin-slow rounded-xl" />
+            <span className="relative z-10">What's new in Consistify?</span>
           </div>
         </div>
       </section>
 
-      <hr className="h-2 w-full bg-black/80 border-none m-0" />
-
-      <section className="flex w-full h-screen">
-        <div className="w-1/2 flex justify-center items-center bg-[#11121a]">
-          <div className="text-lg text-transparent bg-gradient-to-r from-pink-500 via-purple-500 to-teal-400 bg-clip-text p-6">
-            <ul className="space-y-2 font-bold">
-              <li className="hover:text-pink-400 transition">Leveling up system</li>
-              <li className="hover:text-pink-400 transition">New AI Chatbot</li>
-              <li className="hover:text-pink-400 transition">Leveling up with friends</li>
-              <li className="hover:text-pink-400 transition">Ranks for every level</li>
-              <li className="hover:text-pink-400 transition">Something</li>
-              <li className="hover:text-pink-400 transition">Something</li>
-            </ul>
-          </div>
-        </div>
-        <div className="w-1/2 flex justify-center items-center bg-[#11121a]">
-          <div className="text-5xl bg-[#1c1f2b] text-white p-10 rounded-lg relative">
-            <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-pink-500 via-green-400 to-blue-400 blur-xl opacity-40 animate-spin-slow" />
-            What's new in Consistify?
-          </div>
-        </div>
-      </section>
-
-      <hr className="h-2 w-full bg-black/80 border-none m-0" />
-
-      {/* Footer slider */}
-      <footer className="w-full h-[50vh] flex justify-center items-center bg-[#020a13]">
+      {/* Footer */}
+      <footer className="w-full h-[50vh] flex justify-center items-center bg-[#020a13] relative z-10">
         <div className="flex space-x-12">
           {[1, 2, 3, 4, 5].map((num) => (
             <div
               key={num}
-              className={`h-48 w-48 rounded-full bg-blue-600 flex justify-center items-center transition-all duration-300 hover:scale-110 hover:bg-gradient-to-br ${
+              className={`h-48 w-48 rounded-full flex justify-center items-center transition-all duration-300 hover:scale-110 hover:bg-gradient-to-br shadow-md ${
                 num === 1
                   ? 'from-yellow-400 to-pink-500'
                   : num === 2
@@ -124,7 +123,7 @@ const Home = () => {
                   : num === 4
                   ? 'from-blue-600 to-blue-900'
                   : 'from-gray-700 to-gray-900'
-              }`}
+              } bg-blue-600`}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

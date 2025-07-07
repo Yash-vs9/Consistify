@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTasks } from '../features/taskSlice/taskSlice';
 import TaskCard from './TaskCard';
+import LoadingPage from './LoadingPage';
 
 const TaskList = () => {
   const dispatch = useDispatch();
@@ -13,7 +14,7 @@ const TaskList = () => {
 
   if (loading) return <p className="text-white text-center text-lg">Loading tasks...</p>;
   if (error) return <p className="text-white text-center text-lg">Error: {error}</p>;
-  if (tasks.length === 0) return <p className="text-gray-400 text-center text-base">No tasks found.</p>;
+  if (tasks.length === 0) return     <LoadingPage/>
 
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6 p-8 bg-blue-900 min-h-screen">

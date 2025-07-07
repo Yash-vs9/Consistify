@@ -151,7 +151,7 @@ public class UserService {
         userRepository.save(fromUser);
         userRepository.save(toUser);
     }
-    @Cacheable(value = "friends",key = "#username")
+
     public List<String> getFriendUsernames(String username) {
         UserModel user = userRepository.findByUsername(username).orElseThrow();
         return user.getFriends()

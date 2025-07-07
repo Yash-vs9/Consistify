@@ -39,9 +39,9 @@ const Chat = () => {
             receiverName: chatPartner,
           }),
         });
-
+  
         if (!response.ok) throw new Error("Failed to fetch messages");
-
+  
         const allMsgs = await response.json();
         const formatted = allMsgs
           .map((msg) => ({
@@ -54,14 +54,18 @@ const Chat = () => {
             timestamp: new Date(msg.timestamp),
           }))
           .sort((a, b) => a.timestamp - b.timestamp);
-
+  
         setMessages(formatted);
       } catch (error) {
         console.error("Error fetching messages:", error.message);
       }
     };
-
-    fetchMessages();
+  
+    fetchMessages(); // Initial fetch
+  
+    const intervalId = setInterval(fetchMessages, 3000); // ⏱️ Poll every 3 seconds
+  
+    return () => clearInterval(intervalId); // ✅ Clean up on unmount
   }, [currentUser, chatPartner]);
 
   const handleSend = async () => {
