@@ -6,12 +6,14 @@ const Friends = () => {
   const [requests, setRequests] = useState([]);
   const [friends, setFriends] = useState([]);
   const [search, setSearch] = useState('');
-
+  const [error, setError] = useState(null);
   const { username: paramUsername } = useParams();
   const navigate = useNavigate();
 
   const token = localStorage.getItem('authToken');
-
+  if(!token){
+    alert("Login")
+  }
   const getUsernameFromToken = (token) => {
     if (!token) return null;
     try {
@@ -21,9 +23,13 @@ const Friends = () => {
       return null;
     }
   };
+  
 
   const usernameJWT = getUsernameFromToken(token);
-
+  const goToChat=(e,username)=>{
+    e.preventDefault();
+    navigate(`/${username}/chat`)
+  }
   useEffect(() => {
     if (paramUsername !== usernameJWT) {
       navigate('/home');
@@ -41,6 +47,8 @@ const Friends = () => {
       setUsernames(data);
     } catch (err) {
       console.error('Error fetching users:', err);
+      setError('Could not load users');
+
     }
   };
 
@@ -55,6 +63,7 @@ const Friends = () => {
       setFriends(data);
     } catch (err) {
       console.error('Error fetching friends:', err);
+      setError(true)
     }
   };
 
@@ -69,6 +78,8 @@ const Friends = () => {
       setRequests(data);
     } catch (err) {
       console.error('Error fetching requests:', err);
+      setError(true)
+
     }
   };
 
@@ -90,6 +101,8 @@ const Friends = () => {
       alert(msg);
     } catch (err) {
       alert('Something went wrong');
+      setError(true)
+
     }
   };
 
@@ -107,11 +120,21 @@ const Friends = () => {
       fetchRequests();
     } catch (err) {
       alert('Something went wrong');
+      setError(true)
+
     }
   };
+  if(error){
+    return <div className="text-red-500 text-center mt-10">{error}</div>;
 
+  }
+  if(usernames.length==0){
+    return (
+      <div className='text-xl bg-black-900'>Loading...</div>
+    )
+  }
   return (
-    <div className="min-h-screen bg-gradient-to-r from-indigo-900 to-slate-900 text-white font-sans flex justify-center items-start px-4 py-8 overflow-auto">
+    <div className="min-h-screen bg-blue-900 text-white font-sans flex justify-center items-start px-4 py-8 overflow-auto">
       <div className="bg-gray-900 rounded-xl p-8 w-full max-w-4xl shadow-lg space-y-8">
         <h1 className="text-3xl font-bold border-b-2 border-blue-600 pb-2">USERS</h1>
 
@@ -174,6 +197,9 @@ const Friends = () => {
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
                   <span className="font-semibold">{username}</span>
+                  <button onClick={(e)=>{goToChat(e,username)}} className='absolute left-[65vw] bg-green-400 hover:bg-green-500 hover:scale-105 transition duration-300 rounded px-4 py-1'>Chat</button>
+                  <button  className='absolute left-[56vw] bg-cyan-400 hover: hover:scale-105 transition duration-300 rounded px-4 py-1'>Profile</button>
+
                   <button
                     onClick={() => handleAddFriend(username)}
                     disabled={isFriend || isRequested}
@@ -183,7 +209,7 @@ const Friends = () => {
                         : isRequested
                         ? 'bg-yellow-500'
                         : 'bg-blue-500 hover:bg-blue-600'
-                    } text-white px-4 py-1 rounded transition`}
+                    } text-white px-4 py-1 rounded transition hover:scale-105 transition duration-300`}
                   >
                     {isFriend ? 'Friend' : isRequested ? 'Requested' : 'Add'}
                   </button>

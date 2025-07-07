@@ -1,52 +1,145 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../../index.css';
+import { fetchFriends } from '../../features/friendSlice/friendSlice';
+
+import { useDispatch, useSelector } from 'react-redux';
 
 const ProjectHome = () => {
+  const token = localStorage.getItem('authToken');
+  if(!token){
+    alert("Login")
+  }
+  const [taskName, setTaskName] = useState('');
+  const [startingDate, setStartingDate] = useState('');
+  const [lastDate, setLastDate] = useState('');
+  const [taskPriority, setTaskPriority] = useState('');
+  const [collaborators, setCollaborators] = useState([]);
+
+  const dispatch = useDispatch();
+  const friends = useSelector((state) => state.friend.friends);
+  const error = useSelector((state) => state.friend.error);
+  const status = useSelector((state) => state.friend.status);
+
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filteredFriends, setFilteredFriends] = useState([]);
+
+  useEffect(() => {
+    if (status === 'idle' && token) {
+      dispatch(fetchFriends(token));
+    }
+  }, [dispatch, token, status]);
+  
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setFilteredFriends(
+      friends.filter((friend) =>
+        friend.toLowerCase().includes(value.toLowerCase())
+      )
+    );
+  };
+  const handleSelect = (friend) => {
+    setSearchTerm('');
+    setFilteredFriends([]);
+    // Avoid duplicates
+    if (!collaborators.find((f) => f.id === friend.id)) {
+      setCollaborators([...collaborators, friend]);
+    }
+  };
+
   return (
     <div className="bg-[#11121a] min-h-screen w-full flex flex-col items-center justify-center px-6 py-8">
       <h1 className="text-white text-2xl font-bold mb-4 self-start ml-10">PROJECT</h1>
 
       <div className="bg-[#202230] h-[80vh] w-[80vw] flex border-2 border-white rounded-lg overflow-hidden shadow-lg">
+        
         {/* Left Section */}
-        <div className="w-1/2 px-8 py-6 flex flex-col justify-evenly text-lg text-[aliceblue] font-serif gap-4 bg-[#202230]">
-          {['Name', 'Name', 'Description'].map((label, idx) => (
-            <div key={idx} className="flex flex-col">
-              <label className="mb-1">{label}</label>
-              <input
-                type="text"
-                className="w-full h-10 bg-[#202230] font-mono text-[aliceblue] text-base outline-none border-b-4 border-white focus:ring-0"
-              />
-            </div>
-          ))}
+        <div className="w-1/2 px-8 py-6 flex flex-col justify-evenly text-lg text-[aliceblue] font-serif gap-4">
+          <label>
+            Task Name
+            <input
+              type="text"
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              className="mt-1 p-2 rounded bg-[#2b2d3a] text-white w-full"
+            />
+          </label>
 
-          {/* Task Priority (Radio Buttons) */}
-          <div className="flex flex-col gap-2">
-            <label className="mb-1">Task Priority</label>
-            <div className="flex gap-6">
-              <label className="flex items-center gap-2">
-                <input type="radio" name="priority" value="High" className="w-5 h-5 accent-cyan-500" />
-                High
+          <label>
+            Starting Date
+            <input
+              type="date"
+              value={startingDate}
+              onChange={(e) => setStartingDate(e.target.value)}
+              className="mt-1 p-2 rounded bg-[#2b2d3a] text-white w-full"
+            />
+          </label>
+
+          <label>
+            Last Date
+            <input
+              type="date"
+              value={lastDate}
+              onChange={(e) => setLastDate(e.target.value)}
+              className="mt-1 p-2 rounded bg-[#2b2d3a] text-white w-full"
+            />
+          </label>
+
+          <label>Task Priority</label>
+          <div className="flex gap-4 text-sm">
+            {['High', 'Medium', 'Low'].map((level) => (
+              <label key={level} className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name="priority"
+                  value={level}
+                  onChange={(e) => setTaskPriority(e.target.value)}
+                  className="accent-cyan-500"
+                />
+                {level}
               </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="priority" value="Medium" className="w-5 h-5 accent-cyan-500" />
-                Medium
-              </label>
-              <label className="flex items-center gap-2">
-                <input type="radio" name="priority" value="Low" className="w-5 h-5 accent-cyan-500" />
-                Low
-              </label>
-            </div>
+            ))}
           </div>
         </div>
 
         {/* Right Section */}
-        <div className="w-1/2 bg-[rgba(238,229,217,0.737)] flex flex-col items-center justify-center gap-6 font-sans px-6 py-8">
-          <h1 className="text-xl text-black font-semibold">Add Collaborators</h1>
+        <div className="w-1/2 px-8 py-6 text-white space-y-4">
+          <h1 className="text-xl font-semibold">Add Collaborators</h1>
+
           <input
             type="text"
-            placeholder="Search From Friend List"
-            className="h-10 w-3/4 bg-[#202230] text-white text-center font-mono border-2 border-white rounded outline-none"
+            value={searchTerm}
+            onChange={handleChange}
+            placeholder="Search from friend list"
+            className="h-10 w-full bg-[#2b2d3a] text-white text-center font-mono border-2 border-white rounded outline-none"
           />
+
+          {searchTerm && filteredFriends.length > 0 && (
+            <ul className="bg-[#2a2c3a] border border-white rounded text-white shadow-lg max-h-70 overflow-y">
+              {filteredFriends.map((friend) => (
+                <li
+                  key={friend}
+                  onClick={() => handleSelect(friend)}
+                  className="px-4 py-2 h-9 cursor-pointer hover:bg-[#4b4e63] transition"
+                >
+                  {friend}
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {collaborators.length > 0 && (
+            <div className="text-sm mt-2">
+              <p className="font-semibold">Selected Collaborators:</p>
+              <ul className="list-disc list-inside text-cyan-400">
+                {collaborators.map((friend) => (
+                  <li key={friend}>{friend}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <button className="bg-[#202230] text-white px-6 py-2 rounded border border-white hover:bg-[#648bce] transition">
             Add
           </button>

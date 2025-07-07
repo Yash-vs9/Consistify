@@ -19,6 +19,30 @@ export const fetchTasks = createAsyncThunk(
         return response.json()
     }
 )
+export const createTask = createAsyncThunk(
+    'task/createTask',
+    async (taskData, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem("authToken") || null;
+        const response = await fetch('http://localhost:8080/task/create', {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(taskData),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to create task');
+        }
+  
+        return await response.json();
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+  )
 const initialState = {
     tasks: [],
     status: 'idle'
@@ -48,6 +72,16 @@ const taskSlice = createSlice({
             .addCase(fetchTasks.rejected, (state) => {
                 state.status = 'failed'
             })
+            .addCase(createTask.pending, (state) => {
+                state.status = 'loading';
+              })
+              .addCase(createTask.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                state.tasks.push(action.payload);
+              })
+              .addCase(createTask.rejected, (state) => {
+                state.status = 'failed';
+              })
     }
 
 })
