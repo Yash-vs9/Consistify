@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../../index.css';
 import { fetchFriends } from '../../features/friendSlice/friendSlice';
-
+import { createTask } from '../../features/taskSlice/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const ProjectHome = () => {
@@ -23,6 +23,25 @@ const ProjectHome = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredFriends, setFilteredFriends] = useState([]);
 
+  const createTaskButton=(async (e)=>{
+    e.preventDefault()
+    const data={
+      taskName:taskName,
+      startingDate:startingDate,
+      lastDate:lastDate,
+      taskPriority:taskPriority,
+      collaborators:collaborators
+    }
+    try{
+      const res=await dispatch(createTask(data)).unwrap()
+      console.log(res)
+    }
+    catch(err){
+      console.log(err)
+    }
+  })
+    
+  
   useEffect(() => {
     if (status === 'idle' && token) {
       dispatch(fetchFriends(token));
@@ -43,7 +62,7 @@ const ProjectHome = () => {
     setSearchTerm('');
     setFilteredFriends([]);
     // Avoid duplicates
-    if (!collaborators.find((f) => f.id === friend.id)) {
+    if (!collaborators.find((f) => f === friend)) {
       setCollaborators([...collaborators, friend]);
     }
   };
@@ -130,7 +149,7 @@ const ProjectHome = () => {
           )}
 
           {collaborators.length > 0 && (
-            <div className="text-sm mt-2">
+            <div className="text-sm mt-2 h-[10vh]">
               <p className="font-semibold">Selected Collaborators:</p>
               <ul className="list-disc list-inside text-cyan-400">
                 {collaborators.map((friend) => (
@@ -140,7 +159,7 @@ const ProjectHome = () => {
             </div>
           )}
 
-          <button className="bg-[#202230] text-white px-6 py-2 rounded border border-white hover:bg-[#648bce] transition">
+          <button className="bg-[#202230] text-white px-6 py-2 rounded border border-white hover:bg-[#648bce] transition" onClick={(e)=>createTaskButton(e)}>
             Add
           </button>
         </div>
