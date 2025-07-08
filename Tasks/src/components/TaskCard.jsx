@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { log } from 'three/tsl';
 import { fetchTasks } from '../features/taskSlice/taskSlice';
+import { toast } from "react-toastify";
 
 import { deleteTask } from '../features/taskSlice/taskSlice';
 const TaskCard = ({ task }) => {
@@ -22,17 +23,21 @@ const TaskCard = ({ task }) => {
   };
 
   const usernameJWT = getUsernameFromToken(token);
+
   const navigate = useNavigate();
   const dispatch=useDispatch()
   const handleDelete=(async(e)=>{
+    
     e.preventDefault()
     try{
       const res=await dispatch(deleteTask(task.taskName)).unwrap()
       dispatch(fetchTasks()); 
+      toast.success("Task Deleted Successfully")
       console.log(res);
       
     }
     catch(err){
+      toast.error("Server Error Right now")
       console.log(err);
       
     }

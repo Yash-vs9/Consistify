@@ -18,16 +18,29 @@ const TaskList = () => {
   if (tasks.length === 0) return <LoadingPage />;
 
   return (
-    <div className="min-h-screen bg-blue-900 text-white grid grid-cols-[260px_1fr]">
+    <div className="flex min-h-screen bg-[#0d0f1a] text-white">
       {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Task Grid */}
-      <main className="p-8 grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
-        {tasks.map((task, index) => (
-          <TaskCard key={index} task={task} />
-        ))}
-      </main>
+      {/* Glowing Background & Task Grid */}
+      <div className="flex-1 px-6 py-10 relative overflow-hidden">
+        {/* 🌌 Background Glows like ProjectHome */}
+        <div className="absolute w-[400px] h-[400px] bg-cyan-500/20 blur-3xl rounded-full top-20 left-20 animate-pulse z-0" />
+        <div className="absolute w-[500px] h-[500px] bg-blue-600/20 blur-3xl rounded-full bottom-20 right-20 animate-pulse z-0" />
+
+        {/* Task Grid Container */}
+
+          <h1 className="text-4xl font-bold mb-8 bg-gradient-to-r from-cyan-400 to-blue-500 text-transparent bg-clip-text text-center">
+            Your Tasks
+          </h1>
+
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-6">
+            {tasks.map((task, index) => (
+              <TaskCard key={index} task={task} />
+            ))}
+          </div>
+
+      </div>
     </div>
   );
 };
