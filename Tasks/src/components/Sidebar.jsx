@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
 
-const Sidebar = ({ usernameJWT }) => {
+const Sidebar = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [collapsed, setCollapsed] = useState(false); // ✅ New state
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('Login');
+  }
 
+  const getUsernameFromToken = (token) => {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return payload.sub || payload.username || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const usernameJWT = getUsernameFromToken(token);
   const toggleMenu = (menu) => {
     setOpenMenu(openMenu === menu ? null : menu);
   };

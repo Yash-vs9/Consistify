@@ -16,6 +16,7 @@ export const fetchTasks = createAsyncThunk(
         if (!response.ok) {
             throw new Error('Network response was not ok')
         }
+
         return response.json()
     }
 )
@@ -43,6 +44,53 @@ export const createTask = createAsyncThunk(
       }
     }
   )
+  export const editTask = createAsyncThunk(
+    'task/editTask',
+    async (updatedTask, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem("authToken") || null;
+        const response = await fetch(`http://localhost:8080/task/edit`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updatedTask),
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to update task');
+        }
+  
+        return await response.text(); // return updated task
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+  );
+  
+  export const deleteTask = createAsyncThunk(
+    'task/deleteTask',
+    async (taskId, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem("authToken") || null;
+        const response = await fetch(`http://localhost:8080/task/delete`, {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to delete task');
+        }
+  
+        return taskId;
+      } catch (error) {
+        return rejectWithValue(error.message);
+      }
+    }
+  );
 const initialState = {
     tasks: [],
     status: 'idle'
@@ -58,6 +106,12 @@ const taskSlice = createSlice({
         },
         removeTask(state, action) {
             state.tasks = state.tasks.filter(task => task.id !== action.payload)
+        },
+        updateTask(state, action) {
+            const index = state.tasks.findIndex(task => task.taskName === action.payload.oldName);
+            if (index !== -1) {
+                state.tasks[index] = action.payload;
+            }
         }
     },
     extraReducers: (builder) => {
@@ -82,8 +136,34 @@ const taskSlice = createSlice({
               .addCase(createTask.rejected, (state) => {
                 state.status = 'failed';
               })
+              .addCase(editTask.pending, (state) => {
+                state.status = 'loading';
+              })
+              .addCase(editTask.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                const updated = action.payload;
+                const index = state.tasks.findIndex((task) => task.id === updated.id);
+                if (index !== -1) {
+                  state.tasks[index] = updated;
+                }
+              })
+              .addCase(editTask.rejected, (state) => {
+                state.status = 'failed';
+              })
+              
+              .addCase(deleteTask.pending, (state) => {
+                state.status = 'loading';
+              })
+              .addCase(deleteTask.fulfilled, (state, action) => {
+                state.status = 'succeeded';
+                const id = action.payload;
+                state.tasks = state.tasks.filter(task => task.id !== id);
+              })
+              .addCase(deleteTask.rejected, (state) => {
+                state.status = 'failed';
+              })
     }
 
 })
-export const { addTask, removeTask } = taskSlice.actions
+export const { addTask, removeTask,updateTask } = taskSlice.actions
 export default taskSlice.reducer

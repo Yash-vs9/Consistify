@@ -13,7 +13,8 @@ import Chat from './components/Chat';
 import Dashboard from './components/Dashboard';
 import TaskList from './components/TaskList';
 import SidebarLayout from './components/pages/SidebarLayout';
-
+import TaskEditPage from './components/TaskEditPage';
+import Test from './components/Test';
 function App() {
   return (
     <BrowserRouter>
@@ -24,6 +25,9 @@ function App() {
           <Route path="/:username/friends" element={<Friends />} />
           <Route path="/project" element={<ProjectHome />} />
           <Route path="/dashboard" element={<SidebarLayout />} />
+          <Route path="/1" element={<Test />} />
+
+          <Route path="/task/edit/:param" element={<TaskEditPage/>} />
 
 
 

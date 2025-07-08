@@ -2,6 +2,7 @@ package com.clg.consistify.controller;
 
 import com.clg.consistify.DTO.TaskDTO;
 import com.clg.consistify.DTO.TaskResponseDTO;
+import com.clg.consistify.DTO.TaskUpdateDTO;
 import com.clg.consistify.services.TaskService;
 import com.clg.consistify.user.TaskModel;
 import org.springframework.http.HttpStatus;
@@ -31,5 +32,14 @@ public class TaskController {
     public ResponseEntity<List<TaskResponseDTO>> getAllTask(){
         return ResponseEntity.ok(taskService.getTaskModel());
     }
-
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> deletebytaskid(@RequestBody TaskDTO taskDTO){
+        taskService.deletebyuserId(taskDTO.getTaskName());
+        return ResponseEntity.ok("Task deleted Successfully. ");
+    }
+    @PutMapping("/edit")
+    public ResponseEntity<String> editusertask(@RequestBody TaskUpdateDTO taskUpdateDTO){
+        taskService.updateTask(taskUpdateDTO);
+        return ResponseEntity.ok("Task Updated Successfully");
+    }
 }

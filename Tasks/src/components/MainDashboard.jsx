@@ -1,27 +1,38 @@
-// components/MainDashboard.jsx
 import React from 'react';
+import Cubes from '../../Cubes/Cubes/Cubes';
 
 const MainDashboard = () => {
   return (
     <main className="p-10 space-y-6 bg-[#0f1117]">
-      <section className="bg-[#1b1d26] border border-[#2c2f3a] rounded-xl p-6 shadow-sm hover:shadow-md transition">
-        <h2 className="text-2xl font-semibold mb-2">Welcome Back 👋</h2>
-        <p className="text-gray-400">
-          This is your dashboard. You can manage your folders, projects, and personal productivity here.
-        </p>
-      </section>
+      <div className="h-screen bg-[#0f0f1c]">
+  <div className="relative right-[10vw] w-full max-w-[600px] mx-auto h-[600px]">
+    <Cubes
+      gridSize={12}
+      cubeSize={60}
+      cellGap={10}
+      maxAngle={60}
+      radius={8}
+      borderStyle="2px dashed #0ea5e9" // cyan-500
+      faceColor="#1e293b"              // slate-800
+      rippleColor="#67e8f9"            // cyan-300
+      rippleSpeed={1.5}
+      autoAnimate={true}
+      rippleOnClick={true}
+    />
 
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {[...Array(4)].map((_, i) => (
-          <div
-            key={i}
-            className="bg-[#1b1d26] border border-[#2c2f3a] rounded-xl p-6 hover:shadow-md transition"
-          >
-            <h3 className="text-xl font-medium mb-1">Card {i + 1}</h3>
-            <p className="text-gray-400 text-sm">Some quick information or summary goes here.</p>
-          </div>
-        ))}
-      </section>
+    {/* Heading */}
+    <div className="absolute left-[18vw] top-[10vh] text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-400 drop-shadow-[0_0_25px_rgba(34,211,238,0.4)]">
+      Consistify
+    </div>
+
+    {/* Subheading */}
+    <div className="absolute left-[18vw] top-[24vh] text-4xl font-semibold text-transparent bg-clip-text bg-gradient-to-r from-cyan-200 to-blue-300 drop-shadow-[0_0_15px_rgba(34,211,238,0.3)]">
+      Managing Your Workspace Perfectly
+    </div>
+  </div>
+</div>
+
+      
     </main>
   );
 };
