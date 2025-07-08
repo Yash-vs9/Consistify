@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { editTask } from '../features/taskSlice/taskSlice';
+import { toast } from "react-toastify";
+
 import { useNavigate, useParams } from 'react-router-dom';
 const TaskEditPage = () => {
     const {param}=useParams()
@@ -32,9 +34,11 @@ const TaskEditPage = () => {
           }
             const result = await dispatch(editTask(data)).unwrap(); 
             console.log("Success:", result);
+            toast.success("Task updated Successfully")
             navigate("/tasks")
 
           } catch (error) {
+            toast.error("Failed to Update Task -> "+error)
             console.error("Failed to update task:", error);
 
           }

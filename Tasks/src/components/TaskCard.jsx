@@ -1,9 +1,42 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { log } from 'three/tsl';
+import { fetchTasks } from '../features/taskSlice/taskSlice';
 
+import { deleteTask } from '../features/taskSlice/taskSlice';
 const TaskCard = ({ task }) => {
-  const navigate = useNavigate();
+  const token = localStorage.getItem('authToken');
+  if (!token) {
+    alert('Login');
+  }
 
+  const getUsernameFromToken = (token) => {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return payload.sub || payload.username || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const usernameJWT = getUsernameFromToken(token);
+  const navigate = useNavigate();
+  const dispatch=useDispatch()
+  const handleDelete=(async(e)=>{
+    e.preventDefault()
+    try{
+      const res=await dispatch(deleteTask(task.taskName)).unwrap()
+      dispatch(fetchTasks()); 
+      console.log(res);
+      
+    }
+    catch(err){
+      console.log(err);
+      
+    }
+  })
   const start = new Date(task.startingDate);
   const end = new Date(task.lastDate);
   const diffInDays = Math.round((end - start) / (1000 * 60 * 60 * 24));
@@ -50,8 +83,10 @@ const TaskCard = ({ task }) => {
           Edit
         </button>
         <button
+          onClick={(e)=>handleDelete(e)}
           className="bg-red-500 hover:bg-red-600 text-sm px-4 py-1 rounded-lg transition-colors duration-150"
         >
+
           Delete
         </button>
       </div>

@@ -32,7 +32,6 @@ const MainDashboard = () => {
   </div>
 </div>
 
-      
     </main>
   );
 };

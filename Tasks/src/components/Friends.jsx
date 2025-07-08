@@ -158,7 +158,7 @@ const Friends = () => {
           </div>
 
           {/* Friends List */}
-          <div className="bg-blue-100 text-slate-900 p-4 rounded-lg">
+          <div className="bg-slate-700 text-slate-900 p-4 rounded-lg">
             <h2 className="text-xl font-semibold mb-2">Your Friends</h2>
             <div className="space-y-2">
               {friends.length > 0 ? (

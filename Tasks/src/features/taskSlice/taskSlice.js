@@ -33,9 +33,12 @@ export const createTask = createAsyncThunk(
           },
           body: JSON.stringify(taskData),
         });
-  
         if (!response.ok) {
-          throw new Error('Failed to create task');
+
+          const data = await response.json(); // ✅ parses JSON body
+          const errorText = data.error; // read error body
+          console.log(errorText)
+          throw new Error(errorText || 'Something went wrong');
         }
   
         return await response.json();
@@ -71,21 +74,22 @@ export const createTask = createAsyncThunk(
   
   export const deleteTask = createAsyncThunk(
     'task/deleteTask',
-    async (taskId, { rejectWithValue }) => {
+    async (taskName, { rejectWithValue }) => {
       try {
         const token = localStorage.getItem("authToken") || null;
-        const response = await fetch(`http://localhost:8080/task/delete`, {
+        const response = await fetch(`http://localhost:8080/task/delete/${taskName}`, {
           method: 'DELETE',
           headers: {
             Authorization: `Bearer ${token}`,
           },
+
         });
   
         if (!response.ok) {
           throw new Error('Failed to delete task');
         }
   
-        return taskId;
+        return response.text()
       } catch (error) {
         return rejectWithValue(error.message);
       }

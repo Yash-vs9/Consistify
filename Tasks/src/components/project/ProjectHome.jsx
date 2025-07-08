@@ -3,6 +3,9 @@ import '../../index.css';
 import { fetchFriends } from '../../features/friendSlice/friendSlice';
 import { createTask } from '../../features/taskSlice/taskSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from "react-toastify";
+import { useNavigate } from 'react-router-dom';
+
 
 const ProjectHome = () => {
   const token = localStorage.getItem('authToken');
@@ -14,7 +17,7 @@ const ProjectHome = () => {
   const [lastDate, setLastDate] = useState('');
   const [taskPriority, setTaskPriority] = useState('');
   const [collaborators, setCollaborators] = useState([]);
-
+  const navigate=useNavigate()
   const dispatch = useDispatch();
   const friends = useSelector((state) => state.friend.friends);
   const error = useSelector((state) => state.friend.error);
@@ -35,9 +38,14 @@ const ProjectHome = () => {
     try{
       const res=await dispatch(createTask(data)).unwrap()
       console.log(res)
+      toast.success('Task created!');
+      navigate("/tasks")
+
     }
     catch(err){
       console.log(err)
+      toast.error('Failed to create task -> '+err);
+
     }
   })
     

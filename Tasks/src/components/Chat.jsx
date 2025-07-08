@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-
+import Sidebar from "./Sidebar";
 const Chat = () => {
   const getUsernameFromToken = (token) => {
     if (!token) return null;
@@ -115,6 +115,7 @@ const Chat = () => {
   return (
     <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center p-6">
       <div className="text-3xl font-bold mb-6">CHAT</div>
+      
 
       <div className="flex flex-col space-y-3 overflow-y-auto h-[70vh] w-[46vw] rounded-xl border border-cyan-400 bg-gradient-to-br from-gray-900 via-indigo-900 to-gray-800 p-5 shadow-lg scrollbar-thin scrollbar-thumb-cyan-500 scrollbar-track-gray-700">
                   {messages.map((msg, index) => (

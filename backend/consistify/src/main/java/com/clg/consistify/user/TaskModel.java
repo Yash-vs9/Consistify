@@ -1,5 +1,7 @@
 package com.clg.consistify.user;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -10,8 +12,12 @@ public class TaskModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long task_id;
+
+    @NotBlank(message = "Task name is required")
     private String taskName;
+    @NotNull(message = "Starting date is required")
     private Date startingDate;
+    @NotNull(message = "Last date is required")
     private Date lastDate;
 
     public List<String> getCollaborators() {

@@ -3,6 +3,7 @@ package com.clg.consistify.services;
 import com.clg.consistify.DTO.TaskDTO;
 import com.clg.consistify.DTO.TaskResponseDTO;
 import com.clg.consistify.DTO.TaskUpdateDTO;
+import com.clg.consistify.exception.TaskAlreadyExistException;
 import com.clg.consistify.repository.TaskRepository;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.TaskModel;
@@ -29,32 +30,41 @@ public class TaskService {
         this.userRepository = userRepository;
     }
 
-    public void createTask(TaskDTO body) {
+    public TaskResponseDTO createTask(TaskDTO body) {
         String username = getLoggedInUsername();
         UserModel user = getUserByUsername(username);
 
-        // ✅ Check for duplicate task name
+
         boolean taskExists = user.getTasks()
                 .stream()
                 .anyMatch(task -> task.getTaskName().equalsIgnoreCase(body.getTaskName()));
 
         if (taskExists) {
-            throw new IllegalArgumentException("Task with the same name already exists.");
+            throw new TaskAlreadyExistException("Task already exist with this name.");
+        }
+        if (body.getStartingDate() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enter all fields.");
         }
 
-        // ✅ Validate starting date is today or in the future
+        if (body.getLastDate() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Enter all fields.");
+        }
+
+
         LocalDate startDate = toLocalDate(body.getStartingDate());
         LocalDate today = LocalDate.now();
         if (startDate.isBefore(today)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Starting date cannot be in the past.");
         }
 
-        // ✅ Validate lastDate is not before starting date
+
         LocalDate endDate = toLocalDate(body.getLastDate());
         if (endDate.isBefore(startDate)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Last date must be after or same as starting date.");
         }
-
+        if(body.getTaskPriority()==null){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Enter all fields");
+        }
         TaskModel task = new TaskModel();
         task.setTaskName(body.getTaskName());
         task.setTaskPriority(body.getTaskPriority());
@@ -65,6 +75,8 @@ public class TaskService {
 
         user.getTasks().add(task);
         userRepository.save(user);
+        return new TaskResponseDTO(task);
+
     }
 
 
@@ -100,6 +112,8 @@ public class TaskService {
         if (taskOptional.isPresent()) {
             TaskModel taskToDelete = taskOptional.get();
             user.getTasks().remove(taskToDelete);
+            userRepository.save(user);
+
 
         } else {
             throw new IllegalArgumentException("Task not found or not authorized to delete.");
