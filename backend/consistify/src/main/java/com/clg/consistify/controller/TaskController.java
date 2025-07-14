@@ -40,12 +40,17 @@ public class TaskController {
     @DeleteMapping("/delete/{taskName}")
     public ResponseEntity<String> deletebytaskid(@PathVariable String taskName){
         String userName= SecurityContextHolder.getContext().getAuthentication().getName();
-        taskService.deletebyuserId(taskName);
+        taskService.deleteByUserName(taskName);
         return ResponseEntity.ok("Task deleted Successfully. ");
     }
     @PutMapping("/edit")
     public ResponseEntity<String> editusertask(@Valid @RequestBody TaskUpdateDTO taskUpdateDTO){
         taskService.updateTask(taskUpdateDTO);
         return ResponseEntity.ok("Task Updated Successfully");
+    }
+    @GetMapping("/get/{taskName}")
+    public ResponseEntity<TaskResponseDTO> findTaskByName(@PathVariable String taskName){
+        TaskResponseDTO task= taskService.getTaskByName(taskName);
+        return ResponseEntity.ok(task);
     }
 }

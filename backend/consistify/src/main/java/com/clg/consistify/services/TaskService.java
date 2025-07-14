@@ -4,12 +4,14 @@ import com.clg.consistify.DTO.TaskDTO;
 import com.clg.consistify.DTO.TaskResponseDTO;
 import com.clg.consistify.DTO.TaskUpdateDTO;
 import com.clg.consistify.exception.TaskAlreadyExistException;
+import com.clg.consistify.exception.TaskNotFoundException;
 import com.clg.consistify.repository.TaskRepository;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.TaskModel;
 import com.clg.consistify.user.UserModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -91,8 +93,9 @@ public class TaskService {
     }
 
     public List<String> taskNames() {
-        String username = getLoggedInUsername();
-        UserModel user = getUserByUsername(username);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         return user.getTasks()
                 .stream()
@@ -100,9 +103,11 @@ public class TaskService {
                 .collect(Collectors.toList());
     }
 
-    public void deletebyuserId(String deletetaskname) {
-        String username = getLoggedInUsername();
-        UserModel user = getUserByUsername(username);
+    public void deleteByUserName(String deletetaskname) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
 
         Optional<TaskModel> taskOptional = user.getTasks()
                 .stream()
@@ -121,15 +126,16 @@ public class TaskService {
     }
 
     public void updateTask(TaskUpdateDTO dto) {
-        String username = getLoggedInUsername();
-        UserModel user = getUserByUsername(username);
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         // 1. Find the task using old task name
         TaskModel task = user.getTasks()
                 .stream()
                 .filter(t -> t.getTaskName().equalsIgnoreCase(dto.getOldtaskName()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Task with the old name not found"));
+                .orElseThrow(() -> new TaskAlreadyExistException("Task with the old name not found"));
 
         // 2. Check if another task with the new name already exists (avoid duplicate names)
         if (dto.getNewtaskName() != null && !dto.getNewtaskName().equalsIgnoreCase(dto.getOldtaskName())) {
@@ -137,14 +143,27 @@ public class TaskService {
                     .stream()
                     .anyMatch(t -> t.getTaskName().equalsIgnoreCase(dto.getNewtaskName()));
             if (exists) {
-                throw new IllegalArgumentException("Another task with the new name already exists.");
+                throw new TaskAlreadyExistException("Another task with the new name already exists.");
             }
-            task.setTaskName(dto.getNewtaskName());
+            if(dto.getNewtaskName().equals("")){
+                task.setTaskName(dto.getOldtaskName());
+            }
+            else{
+                task.setTaskName(dto.getNewtaskName());
+
+            }
         }
+
 
         // 3. Update other fields
         if (dto.getTaskPriority() != null) {
-            task.setTaskPriority(dto.getTaskPriority());
+            if(!dto.getTaskPriority().equals("")){
+                task.setTaskPriority(dto.getTaskPriority());
+            }
+            else{
+                task.setTaskPriority("Not selected");
+            }
+
         }
 
         if (dto.getStartingDate() != null) {
@@ -171,6 +190,23 @@ public class TaskService {
         }
 
         taskRepository.save(task);
+    }
+    public TaskResponseDTO getTaskByName(String taskName){
+        String userName=SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user=userRepository.findByUsername(userName)
+                .orElseThrow( ()-> new UsernameNotFoundException("Username not found"));
+        TaskModel task=user.getTasks()
+                .stream()
+                .filter((t)->t.getTaskName().equals(taskName))
+                .findFirst()
+                .orElseThrow(()-> new TaskNotFoundException("Task not found"));
+        TaskResponseDTO getTask=new TaskResponseDTO();
+        getTask.setTaskName(task.getTaskName());
+        getTask.setTaskPriority(task.getTaskPriority());
+        getTask.setLastDate(task.getLastDate());
+        getTask.setStartingDate(task.getStartingDate());
+        getTask.setCollaborators(task.getCollaborators());
+        return getTask;
     }
 
 

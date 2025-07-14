@@ -2,6 +2,13 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+
+
+
+
+
+
+
   const navigate = useNavigate();
 
   const getUsernameFromToken = (token) => {

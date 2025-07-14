@@ -4,19 +4,57 @@ import { fetchTasks } from '../features/taskSlice/taskSlice';
 import TaskCard from './TaskCard';
 import LoadingPage from './LoadingPage';
 import Sidebar from './Sidebar';
-
+import { div } from 'three/tsl';
+import Bot from './Bot';
 const TaskList = () => {
-  const dispatch = useDispatch();
-  const { tasks, loading, error } = useSelector((state) => state.task);
 
   useEffect(() => {
+      const scripts = [
+        'https://cdn.botpress.cloud/webchat/v2.2/inject.js',
+        '/script.js',
+        '/script2.js',
+      ];
+      const loadedScripts = scripts.map((src) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        document.body.appendChild(script);
+        return script;
+      });
+      return () => {
+        loadedScripts.forEach((script) => {
+          document.body.removeChild(script);
+        });
+      };
+    }, []);
+
+
+
+
+  const dispatch = useDispatch();
+  const { tasks, status, error } = useSelector((state) => state.task);
+
+  
+  useEffect(() => {
     dispatch(fetchTasks());
-  }, [dispatch]);
+  }, [dispatch]); 
 
-  if (loading) return <p className="text-white text-center text-lg">Loading tasks...</p>;
-  if (error) return <p className="text-white text-center text-lg">Error: {error}</p>;
-  if (tasks.length === 0) return <LoadingPage />;
+  
 
+  if (status === 'loading') return <LoadingPage />;
+if (status === 'failed') return <p className="text-white text-center text-lg">Error: {error}</p>;
+if (status === 'succeeded' && tasks.length === 0) return (
+  <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0d0f1a] via-[#0e111f] to-[#050610] text-white">
+    <div className='absolute left-0'>
+    <Sidebar />
+
+
+    </div>
+
+    <h1 className="text-3xl font-bold mb-4">No Tasks Found</h1>
+    <p className="text-gray-400">Start by creating a new task!</p>
+  </div>
+);
   return (
     <div className="flex min-h-screen bg-[#0d0f1a] text-white">
       {/* Sidebar */}

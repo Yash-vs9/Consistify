@@ -20,6 +20,10 @@ public class TaskUpdateDTO {
         this.oldtaskName=oldtaskName;
     }
 
+    public TaskUpdateDTO() {
+
+    }
+
     public String getNewtaskName() {
         return newtaskName;
     }

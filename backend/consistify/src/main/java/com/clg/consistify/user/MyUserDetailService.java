@@ -2,6 +2,7 @@ package com.clg.consistify.user;
 
 import com.clg.consistify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +19,7 @@ public class MyUserDetailService implements UserDetailsService {
         Optional<UserModel> user= userRepository.findByUsername(username);
         if(user.isPresent()){
             UserModel userObj=user.get();
+
             return User.builder()
                     .username(userObj.getUsername())
                     .password(userObj.getPassword())

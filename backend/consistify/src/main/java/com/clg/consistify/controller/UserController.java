@@ -105,11 +105,11 @@ public class UserController {
         String fromUserId=authentication.getName();
         return userService.friendRequest(fromUserId, toUserName);
     }
-    //NOT VERIFIED YET
+
     @PostMapping("/users/{friendId}/accept-request")
     public ResponseEntity<?> acceptFriendRequest(@PathVariable String friendId, Authentication authentication) {
         String currentUserId = authentication.getName(); // 
-        //HasReqFrom is in service
+
         if (!userService.hasRequestFrom(friendId, currentUserId)) {
             return ResponseEntity.badRequest().body("No such friend request found");
         }

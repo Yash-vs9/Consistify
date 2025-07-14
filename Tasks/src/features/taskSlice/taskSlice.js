@@ -62,7 +62,11 @@ export const createTask = createAsyncThunk(
         });
   
         if (!response.ok) {
-          throw new Error('Failed to update task');
+
+          const data = await response.json(); // ✅ parses JSON body
+          const errorText = data.error; // read error body
+          console.log(errorText)
+          throw new Error(errorText || 'Something went wrong');
         }
   
         return await response.text(); // return updated task

@@ -1,6 +1,7 @@
 package com.clg.consistify.DTO;
 
 import com.clg.consistify.user.TaskModel;
+import org.springframework.data.redis.stream.Task;
 
 import java.util.Date;
 import java.util.List;
@@ -11,12 +12,26 @@ public class TaskResponseDTO {
     private Date startingDate;
     private Date lastDate;
     private List<String> collaborators;
+    private String userName;
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public TaskResponseDTO(TaskModel task) {
         this.taskName = task.getTaskName();
         this.taskPriority = task.getTaskPriority();
         this.startingDate = task.getStartingDate();
         this.lastDate = task.getLastDate();
         this.collaborators = task.getCollaborators();
+        this.userName=task.getUser().getUsername();
+
+    }
+    public TaskResponseDTO(){
 
     }
     public String getTaskName() {

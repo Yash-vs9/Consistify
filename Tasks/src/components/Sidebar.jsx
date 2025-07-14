@@ -31,7 +31,7 @@ const Sidebar = () => {
     { label: 'Home', icon: '🏠', href: '/home' },
     { label: 'Dashboard', icon: '📊', href: '/dashboard' },
     { label: 'Friends', icon: '🫂', href: `/${usernameJWT}/friends` },
-    { label: 'Create', icon: '䷀', href: '/project' },
+    { label: ' Create', icon: '䷀', href: '/project' },
     { label: 'Tasks', icon: '✉️', href: '/tasks' },
     { label: 'Calendar', icon: '📅', href: 'calendar' },
     { label: 'Profile', icon: '👤', href: 'profile' },

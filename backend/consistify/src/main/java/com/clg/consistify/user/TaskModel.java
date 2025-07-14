@@ -14,6 +14,7 @@ public class TaskModel {
     private Long task_id;
 
     @NotBlank(message = "Task name is required")
+    @Column(unique = true)
     private String taskName;
     @NotNull(message = "Starting date is required")
     private Date startingDate;

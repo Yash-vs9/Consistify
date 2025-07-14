@@ -54,6 +54,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
     }
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<Map<String,String>> handleTaskNotFoundException(TaskNotFoundException exception){
+        return new ResponseEntity<>(Map.of("error",exception.getMessage()),HttpStatus.BAD_REQUEST);
+    }
 
 
 }

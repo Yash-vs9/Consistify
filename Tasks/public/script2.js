@@ -1,13 +1,27 @@
-import dotenv from 'dotenv';
-const url = process.env.BOTPRESS_KEY;
-dotenv.config();
 async function fetchAndInitializeBotpress() {
-  const response = await fetch(url);
+  const response = await fetch("https://files.bpcontent.cloud/2025/02/06/14/20250206142548-WJWVT1YO.json");
   const data = await response.json();
   const id = data.clientId;
 
   return id; // This is returned as a Promise
 }
+const fetchEmail=(async()=>{
+  const response=fetch("",{
+    method:"GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    }
+  })
+  if(!response.ok){
+    const errorData=(await response).json()
+    const err=errorData.error
+    console.log(err)
+  }
+  const data=await response.json()
+  return data
+})
+const email=fetchEmail()
 
 // const fetchLogin = async function (email, password) {
 //   const e = email;
@@ -44,12 +58,12 @@ async function initializeBot(email, password) {
     "clientId": cId,  // Use the fetched cId
     "user": {
       "data": {
-        "username": "asd", // Use the email from fetchLogin
-        "password": "sadas",// Use the password from fetchLogin
+        "useremail": email, // Use the email from fetchLogin
+        // Use the password from fetchLogin
       }
     }
   });
 }
 
 // Call the initialization function with your email and password
-initializeBot('user@example.com', 'password123');
+initializeBot(email);

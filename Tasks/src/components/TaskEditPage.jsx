@@ -1,21 +1,50 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { editTask } from '../features/taskSlice/taskSlice';
 import { toast } from "react-toastify";
 import Sidebar from './Sidebar';
 import { useNavigate, useParams } from 'react-router-dom';
-
+import { fetchTasks } from '../features/taskSlice/taskSlice';
+import { log } from 'three/tsl';
+import LoadingPage from './LoadingPage';
 const TaskEditPage = () => {
   const { param } = useParams();
-  const [taskName, setTaskName] = useState("");
+  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+    const { tasks, status, error } = useSelector((state) => state.task);
+
+    
+    
+    
+    const [taskName, setTaskName] = useState("");
   const [startingDate, setStartingDate] = useState("");
   const [endingDate, setEndingDate] = useState("");
   const [priority, setPriority] = useState("");
   const [collaborators, setCollaborators] = useState([]);
 
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  // Fetch tasks once
+  useEffect(() => {
+    dispatch(fetchTasks());
+  }, [dispatch]);
 
+  // Set form values when tasks are loaded
+  useEffect(() => {
+    if (status === "succeeded" && tasks.length > 0) {
+      const task = tasks.find((task) => task.taskName === param);
+      if (task) {
+        setTaskName(task.taskName);
+        console.log(task)
+        setPriority(task.taskPriority);
+        // set collaborators if available
+      }
+    }
+  }, [tasks, status, param]);
+
+
+  
+  
   const handleClick = async (e) => {
     e.preventDefault();
     const data = {
@@ -28,9 +57,6 @@ const TaskEditPage = () => {
     };
 
     try {
-      if (!taskName || !startingDate || !endingDate || !priority) {
-        throw new Error("Missing required task fields");
-      }
 
       const result = await dispatch(editTask(data)).unwrap();
       toast.success("Task updated Successfully");
@@ -40,6 +66,10 @@ const TaskEditPage = () => {
       console.error("Failed to update task:", error);
     }
   };
+  if(status==="loading"){
+    return <LoadingPage />;
+
+  }
 
   return (
     <div className="min-h-screen flex bg-gradient-to-b from-[#0d0d1c] via-[#0f0f1c] to-[#050510] text-white font-[Poppins]">
@@ -53,7 +83,7 @@ const TaskEditPage = () => {
       <div className="flex-1 flex items-center justify-center px-6 py-12 relative">
         <div className="w-full max-w-3xl bg-[#111222] rounded-2xl border border-cyan-700 shadow-[0_0_30px_#0ff3] p-10 relative z-10">
           <h1 className="text-4xl font-extrabold text-center text-cyan-400 tracking-widest mb-10 neon-glow">
-            EDIT TASK
+            edit
           </h1>
 
           <form className="space-y-8">
