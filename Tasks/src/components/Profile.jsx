@@ -1,5 +1,5 @@
 import React from 'react';
-import './Profile.css'; // 🟡 custom styles here
+import './Profile.css'; 
 
 const Profile = () => {
   const xp = 99;
@@ -11,8 +11,8 @@ const Profile = () => {
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[#0f1117] overflow-hidden px-6 py-10 text-white">
+      <h1 className='absolute top-10 text-4xl'>PAGE NOT FUNCTIONAL YET</h1>
 
-      {/* 🌌 Animated floating blobs outside the box */}
       <div className="blob blob1"></div>
       <div className="blob blob2"></div>
 

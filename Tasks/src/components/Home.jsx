@@ -37,9 +37,9 @@ const Home = () => {
 
   useEffect(() => {
     const scripts = [
-      'https://cdn.botpress.cloud/webchat/v2.2/inject.js',
+
       '/script.js',
-      '/script2.js',
+
     ];
     const loadedScripts = scripts.map((src) => {
       const script = document.createElement('script');

@@ -30,7 +30,7 @@ function App() {
       />
         <Routes>
           <Route path="/sign" element={<Sign />} />
-          <Route path="/home" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/:username/friends" element={<Friends />} />
           <Route path="/project" element={<ProjectHome />} />
           <Route path="/dashboard" element={<SidebarLayout />} />

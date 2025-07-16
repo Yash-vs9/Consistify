@@ -28,12 +28,12 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { label: 'Home', icon: '🏠', href: '/home' },
+    { label: 'Home', icon: '🏠', href: '/' },
     { label: 'Dashboard', icon: '📊', href: '/dashboard' },
     { label: 'Friends', icon: '🫂', href: `/${usernameJWT}/friends` },
     { label: ' Create', icon: '䷀', href: '/project' },
     { label: 'Tasks', icon: '✉️', href: '/tasks' },
-    { label: 'Calendar', icon: '📅', href: 'calendar' },
+
     { label: 'Profile', icon: '👤', href: 'profile' },
   ];
 

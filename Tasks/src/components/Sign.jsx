@@ -18,7 +18,7 @@ const Sign = () => {
     try {
       const name = await loginUser(loginEmail, loginPassword);
       setName(name);
-      navigate(`/home`);
+      navigate(`/`);
     } catch (error) {
       alert('Login failed');
     }
@@ -28,7 +28,7 @@ const Sign = () => {
     e.preventDefault();
     try {
       const name1 = await signData(username, registerEmail, registerPassword);
-      if (name1) navigate(`/home`);
+      if (name1) navigate(`/`);
     } catch (error) {
       alert('Registration failed');
     }
@@ -39,8 +39,8 @@ const Sign = () => {
       {/* Left Panel */}
       <div className="w-1/2 flex items-center justify-center">
         {/* Login Form */}
-        <div className={`bg-slate-700 p-8 rounded-2xl shadow-xl w-[340px] text-center transition-all duration-500 ${active ? 'hidden' : 'block'}`}>
-          <h2 className="text-2xl font-semibold text-[#1e4873] mb-4">Sign In</h2>
+        <div className={`bg-slate-400 p-8 rounded-2xl shadow-xl w-[340px] text-center transition-all duration-500 ${active ? 'hidden' : 'block'}`}>
+          <h2 className="text-2xl font-semibold text-[#496b8d] mb-4">Sign In</h2>
           <form onSubmit={handleLogin}>
             <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
               <input
@@ -74,7 +74,7 @@ const Sign = () => {
         </div>
 
         {/* Register Form */}
-        <div className={`bg-slate-700 p-8 rounded-2xl shadow-xl w-[340px] text-center transition-all duration-500 ${active ? 'block' : 'hidden'}`}>
+        <div className={`bg-slate-400 p-8 rounded-2xl shadow-xl w-[340px] text-center transition-all duration-500 ${active ? 'block' : 'hidden'}`}>
           <h2 className="text-2xl font-semibold text-[#1e4873] mb-4">Sign Up</h2>
           <form onSubmit={registerSubmit}>
             <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
