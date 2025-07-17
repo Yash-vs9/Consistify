@@ -6,6 +6,9 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ['Poppins', 'sans-serif'],
+      },
       animation: {
         fadeIn: 'fadeIn 1s ease-out',
         fadeInUp: 'fadeInUp 1s ease-out',

@@ -1,11 +1,17 @@
 import React from 'react';
 import Cubes from '../../Cubes/Cubes/Cubes';
-
+import Bot from './Bot';
 const MainDashboard = () => {
+  const token=localStorage.getItem('authToken')
+  if(token==null){
+    return <div>Login first</div>
+  }
   return (
+
     <main className="p-10 space-y-6 bg-[#0f1117]">
+      <Bot></Bot>
       <div className="h-screen bg-[#0f0f1c]">
-  <div className="relative right-[10vw] w-full max-w-[600px] mx-auto h-[600px]">
+  <div className=" relative right-[10vw] w-full max-w-[600px] mx-auto h-[600px]">
     <Cubes
       gridSize={12}
       cubeSize={60}

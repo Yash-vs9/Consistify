@@ -75,7 +75,11 @@ public class UserController {
     public ResponseEntity<List<UserDTO>> getAllUsersModel() {
         return ResponseEntity.ok(getAllUserDTOs());
     }
-
+    @GetMapping("/getUser")
+    public ResponseEntity<UserDTO> findUser(){
+        UserDTO user=userService.getUser();
+        return ResponseEntity.ok(user);
+    }
     @Cacheable("usersModel")
     public List<UserDTO> getAllUserDTOs() {
         List<UserModel> users = userRepository.findAll();

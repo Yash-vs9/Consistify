@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import LoadingPage from './LoadingPage';
+import { Pencil, MessageCircle ,UserCircle,UserPlus} from 'lucide-react';
 
 const Friends = () => {
   const [usernames, setUsernames] = useState([]);
@@ -125,19 +126,18 @@ const Friends = () => {
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-[#0f1117] text-white font-[Poppins]">
       {/* Sidebar */}
       <Sidebar usernameJWT={usernameJWT} />
-  
+
       {/* Friends Page */}
       <main className="p-10 overflow-y-auto">
         <div className="bg-gray-900 rounded-xl p-8 w-full shadow-lg space-y-8 border border-cyan-400/30 relative overflow-hidden">
-          
           {/* 🌟 Internal Glow Effects */}
           <div className="absolute w-[300px] h-[300px] bg-cyan-400/20 blur-2xl rounded-full top-10 left-10 animate-pulse z-0" />
           <div className="absolute w-[300px] h-[300px] bg-blue-500/20 blur-2xl rounded-full bottom-10 right-10 animate-pulse z-0" />
-  
-          {/* Content on top of glows */}
+
+          {/* Content */}
           <div className="relative z-10 space-y-8">
             <h1 className="text-3xl font-bold border-b-2 border-blue-600 pb-2">USERS</h1>
-  
+
             {/* Requests */}
             <div>
               <h2 className="text-xl font-semibold mb-2">Requests</h2>
@@ -162,7 +162,7 @@ const Friends = () => {
                 )}
               </div>
             </div>
-  
+
             {/* Friends List */}
             <div className="bg-slate-700 text-slate-900 p-4 rounded-lg">
               <h2 className="text-xl font-semibold mb-2">Your Friends</h2>
@@ -181,50 +181,64 @@ const Friends = () => {
                 )}
               </div>
             </div>
-  
+
             {/* All Users */}
             <div className="space-y-3">
               <h2 className="text-xl font-semibold mb-2">All Users</h2>
-              {usernames
-                .filter((user) => user !== usernameJWT)
-                .map((username, i) => {
-                  const isFriend = friends.includes(username);
-                  const isRequested = requests.includes(username);
-                  return (
-                    <div
-                      key={i}
-                      className="flex justify-between items-center bg-gray-800 px-4 py-3 rounded-md shadow-sm animate-slideIn relative"
-                      style={{ animationDelay: `${i * 50}ms` }}
-                    >
-                      <span className="font-semibold">{username}</span>
-  
-                      <button
-                        onClick={(e) => goToChat(e, username)}
-                        className="absolute left-[61vw] bg-green-400 hover:bg-green-500 hover:scale-105 transition duration-300 rounded px-4 py-1"
-                      >
-                        Chat
-                      </button>
-  
-                      <button className="absolute left-[54vw] bg-cyan-400 hover:scale-105 transition duration-300 rounded px-4 py-1">
-                        Profile
-                      </button>
-  
-                      <button
-                        onClick={() => handleAddFriend(username)}
-                        disabled={isFriend || isRequested}
-                        className={`${
-                          isFriend
-                            ? 'bg-gray-600 cursor-not-allowed'
-                            : isRequested
-                            ? 'bg-yellow-500'
-                            : 'bg-blue-500 hover:bg-blue-600'
-                        } text-white px-4 py-1 rounded hover:scale-105 transition duration-300`}
-                      >
-                        {isFriend ? 'Friend' : isRequested ? 'Requested' : 'Add'}
-                      </button>
-                    </div>
-                  );
-                })}
+            
+{usernames
+  .filter((user) => user !== usernameJWT)
+  .map((username, i) => {
+    const isFriend = friends.includes(username);
+    const isRequested = requests.includes(username);
+    return (
+      <div
+        key={i}
+        className="flex justify-between items-center bg-gray-800 px-4 py-3 rounded-md shadow-sm animate-slideIn"
+        style={{ animationDelay: `${i * 50}ms` }}
+      >
+        {/* Username */}
+        <span className="font-semibold">{username}</span>
+
+        {/* Icons */}
+        <div className="flex gap-3 items-center">
+          {/* Profile Icon */}
+          <button
+            onClick={() => navigate(`/profile/${username}`)}
+            title="View Profile"
+            className="p-2 rounded-full bg-cyan-500 hover:bg-cyan-600 transition hover:scale-105"
+          >
+            <UserCircle size={20} className="text-white" />
+          </button>
+
+          {/* Chat Icon */}
+          <button
+            onClick={(e) => goToChat(e, username)}
+            title="Chat"
+            className="p-2 rounded-full bg-green-500 hover:bg-green-600 transition hover:scale-105"
+          >
+            <MessageCircle size={20} className="text-white" />
+          </button>
+
+          {/* Add/Friend Icon */}
+          <button
+            onClick={() => handleAddFriend(username)}
+            disabled={isFriend || isRequested}
+            title={isFriend ? "Already Friends" : isRequested ? "Request Sent" : "Add Friend"}
+            className={`p-2 rounded-full transition hover:scale-105 ${
+              isFriend
+                ? 'bg-gray-600 cursor-not-allowed'
+                : isRequested
+                ? 'bg-yellow-500'
+                : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+          >
+            <UserPlus size={20} className="text-white" />
+          </button>
+        </div>
+      </div>
+    );
+  })}
             </div>
           </div>
         </div>

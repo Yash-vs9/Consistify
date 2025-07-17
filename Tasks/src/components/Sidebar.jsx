@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-
+import {
+  Home,
+  LayoutDashboard,
+  Users,
+  PlusCircle,
+  ListChecks,
+  User,
+} from 'lucide-react';
 const Sidebar = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [collapsed, setCollapsed] = useState(false); // ✅ New state
@@ -28,13 +35,12 @@ const Sidebar = () => {
   };
 
   const navItems = [
-    { label: 'Home', icon: '🏠', href: '/' },
-    { label: 'Dashboard', icon: '📊', href: '/dashboard' },
-    { label: 'Friends', icon: '🫂', href: `/${usernameJWT}/friends` },
-    { label: ' Create', icon: '䷀', href: '/project' },
-    { label: 'Tasks', icon: '✉️', href: '/tasks' },
-
-    { label: 'Profile', icon: '👤', href: 'profile' },
+    { label: 'Home', icon: <Home className="w-5 h-5" />, href: '/' },
+    { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, href: '/dashboard' },
+    { label: 'Friends', icon: <Users className="w-5 h-5" />, href: `/${usernameJWT}/friends` },
+    { label: 'Create', icon: <PlusCircle className="w-5 h-5" />, href: '/project' },
+    { label: 'Tasks', icon: <ListChecks className="w-5 h-5" />, href: '/tasks' },
+    { label: 'Profile', icon: <User className="w-5 h-5" />, href: '/profile' },
   ];
 
   return (
@@ -61,17 +67,20 @@ const Sidebar = () => {
 
       {/* Nav Items */}
       <ul className="space-y-1 text-sm">
-        {navItems.map((item) => (
-          <li key={item.label}>
-            <a
-              href={item.href}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1d1f29] transition"
-            >
-              <span className="text-lg">{item.icon}</span>
-              {!collapsed && item.label}
-            </a>
-          </li>
-        ))}
+        {/* Nav Items */}
+<ul className="space-y-1 text-sm">
+  {navItems.map((item) => (
+    <li key={item.label}>
+      <a
+        href={item.href}
+        className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#1d1f29] transition"
+      >
+        <span className="text-lg">{item.icon}</span>
+        {!collapsed && <span className="font-poppins">{item.label}</span>}
+      </a>
+    </li>
+  ))}
+</ul>
       </ul>
     </aside>
   );

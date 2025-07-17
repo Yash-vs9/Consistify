@@ -1,8 +1,7 @@
 package com.clg.consistify.utils;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.clg.consistify.exception.InvalidTokenException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -33,10 +32,19 @@ public class JwtUtils {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-                .setSigningKey(SECRET_KEY.getBytes())
-                .parseClaimsJws(token)
-                .getBody();
+        try{
+            return Jwts.parser()
+                    .setSigningKey(SECRET_KEY.getBytes())
+                    .parseClaimsJws(token)
+                    .getBody();
+        }
+        catch(ExpiredJwtException e){
+            throw  new InvalidTokenException("Your Session has Expired, Login again");
+        }
+        catch (JwtException e){
+            throw new InvalidTokenException("Invalid token. Please log in.");
+        }
+
     }
 
     private Boolean isTokenExpired(String token) {

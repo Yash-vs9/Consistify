@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import logo from '../assets/DeWatermark.ai_1739087600948.png';
 import { signData, loginUser } from './api';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,92 +34,80 @@ const Sign = () => {
   };
 
   return (
-    <div className={`flex h-screen w-screen bg-gradient-to-b from-[#e6f3fc] to-[#bad7ef] transition-all duration-500 overflow-hidden`}>
-      {/* Left Panel */}
-      <div className="w-1/2 flex items-center justify-center">
-        {/* Login Form */}
-        <div className={`bg-slate-400 p-8 rounded-2xl shadow-xl w-[340px] text-center transition-all duration-500 ${active ? 'hidden' : 'block'}`}>
-          <h2 className="text-2xl font-semibold text-[#496b8d] mb-4">Sign In</h2>
-          <form onSubmit={handleLogin}>
-            <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
-              <input
-                type="email"
-                placeholder="Email"
-                required
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                className="bg-transparent w-full outline-none text-[#1e4873] text-base"
-              />
-            </div>
-            <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                className="bg-transparent w-full outline-none text-[#1e4873] text-base"
-              />
-            </div>
-            <div className="flex justify-between text-sm text-[#34495e] mb-4">
-              <label><input type="checkbox" className="mr-1" /> Remember Me</label>
-              <a href="#" className="text-[#315e8f] hover:text-[#214266]">Forgot Password?</a>
-            </div>
-            <button type="submit" className="w-full bg-[#4c7bb5] text-white py-3 rounded-xl shadow-md hover:bg-[#3b6ca8] transition">Sign In</button>
-            <div className="text-sm mt-4 text-[#2c3e50]">
-              New to our site? <span className="text-[#315e8f] font-medium cursor-pointer hover:text-[#1d3d66]" onClick={() => setActive(true)}>Create account</span>
-            </div>
-          </form>
+    <div className="relative flex items-center justify-center min-h-screen bg-[#111827] font-poppins px-4 overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute w-[400px] h-[400px] bg-cyan-500/20 blur-3xl rounded-full top-10 left-10 animate-pulse z-0" />
+      <div className="absolute w-[500px] h-[500px] bg-blue-600/20 blur-3xl rounded-full bottom-10 right-10 animate-pulse z-0" />
+  
+      {/* Sign-in / Register Box */}
+      <div className="w-full max-w-md p-8 bg-[#1f2937] rounded-2xl shadow-lg z-10">
+        <h2 className="text-2xl font-semibold text-white text-center mb-6">
+          {active ? 'Create an Account' : 'Welcome Back'}
+        </h2>
+  
+        <form onSubmit={active ? registerSubmit : handleLogin} className="space-y-4">
+          {active && (
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full px-4 py-2 rounded-lg bg-[#374151] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+            />
+          )}
+          <input
+            type="email"
+            placeholder="Email"
+            value={active ? registerEmail : loginEmail}
+            onChange={(e) =>
+              active ? setRegisterEmail(e.target.value) : setLoginEmail(e.target.value)
+            }
+            required
+            className="w-full px-4 py-2 rounded-lg bg-[#374151] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={active ? registerPassword : loginPassword}
+            onChange={(e) =>
+              active ? setRegisterPassword(e.target.value) : setLoginPassword(e.target.value)
+            }
+            required
+            className="w-full px-4 py-2 rounded-lg bg-[#374151] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+  
+          <button
+            type="submit"
+            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg font-semibold transition"
+          >
+            {active ? 'Register' : 'Sign In'}
+          </button>
+        </form>
+  
+        <div className="text-sm text-gray-400 text-center mt-4">
+          {active ? (
+            <>
+              Already have an account?{' '}
+              <button
+                className="text-cyan-400 hover:underline"
+                onClick={() => setActive(false)}
+              >
+                Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              New here?{' '}
+              <button
+                className="text-cyan-400 hover:underline"
+                onClick={() => setActive(true)}
+              >
+                Create account
+              </button>
+            </>
+          )}
         </div>
-
-        {/* Register Form */}
-        <div className={`bg-slate-400 p-8 rounded-2xl shadow-xl w-[340px] text-center transition-all duration-500 ${active ? 'block' : 'hidden'}`}>
-          <h2 className="text-2xl font-semibold text-[#1e4873] mb-4">Sign Up</h2>
-          <form onSubmit={registerSubmit}>
-            <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
-              <input
-                placeholder="Username"
-                required
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="bg-transparent w-full outline-none text-[#1e4873] text-base"
-              />
-            </div>
-            <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
-              <input
-                type="email"
-                placeholder="Email"
-                required
-                value={registerEmail}
-                onChange={(e) => setRegisterEmail(e.target.value)}
-                className="bg-transparent w-full outline-none text-[#1e4873] text-base"
-              />
-            </div>
-            <div className="bg-[#d1e6f7] p-3 rounded-xl shadow-inner mb-4">
-              <input
-                type="password"
-                placeholder="Password"
-                required
-                value={registerPassword}
-                onChange={(e) => setRegisterPassword(e.target.value)}
-                className="bg-transparent w-full outline-none text-[#1e4873] text-base"
-              />
-            </div>
-            <button type="submit" className="w-full bg-[#4c7bb5] text-white py-3 rounded-xl shadow-md hover:bg-[#3b6ca8] transition">Register</button>
-            <div className="text-sm mt-4 text-[#2c3e50]">
-              Already have an account? <span className="text-[#315e8f] font-medium cursor-pointer hover:text-[#1d3d66]" onClick={() => setActive(false)}>Login</span>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      {/* Right Panel with Logo */}
-      <div className="w-1/2 h-full">
-        <img
-          src={logo}
-          alt="Logo"
-          className="w-full h-full object-cover rounded-l-3xl transition-all duration-500"
-        />
       </div>
     </div>
   );

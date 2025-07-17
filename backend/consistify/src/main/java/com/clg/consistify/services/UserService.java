@@ -2,6 +2,7 @@ package com.clg.consistify.services;
 
 import com.clg.consistify.DTO.LoginBody;
 import com.clg.consistify.DTO.RegisterBody;
+import com.clg.consistify.DTO.UserDTO;
 import com.clg.consistify.exception.UserAlreadyExistException;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.exception.UsernameAlreadyExistException;
@@ -20,8 +21,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,6 +103,18 @@ public class UserService {
         UserDetails userDetails = userDetailService.loadUserByUsername(username);
         String jwt = jwtUtil.generateToken(userDetails.getUsername());
         return jwt;
+    }
+    @Transactional(readOnly = true)
+    public UserDTO getUser(){
+        String username= SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user=userRepository.findByUsername(username)
+                .orElseThrow(()-> new UsernameNotFoundException("User not found"));
+        UserDTO getUser=new UserDTO();
+        getUser.setXp(user.getXp());
+        getUser.setUsername(username);
+        getUser.setEmail(user.getEmail());
+        getUser.setFriends(user.getFriends().stream().map(UserModel::getUsername).toList());
+        return getUser;
     }
     @Transactional
     public ResponseEntity<String> friendRequest(String fromUsername, String toUsername) {

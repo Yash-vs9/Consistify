@@ -1,5 +1,7 @@
 package com.clg.consistify.DTO;
 
+import org.springframework.security.core.userdetails.User;
+
 import java.util.List;
 
 public class UserDTO {
@@ -8,6 +10,27 @@ public class UserDTO {
     private List<String> friends;
     private String email;
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setFriends(List<String> friends) {
+        this.friends = friends;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    private String xp;
+
+    public String getXp() {
+        return xp;
+    }
+
+    public void setXp(String xp) {
+        this.xp = xp;
+    }
 
     public List<String> getFriendRequests() {
         return friendRequests;
@@ -16,7 +39,9 @@ public class UserDTO {
     public void setFriendRequests(List<String> friendRequests) {
         this.friendRequests = friendRequests;
     }
+    public UserDTO(){
 
+    }
     public UserDTO(String username,String email, List<String> req, List<String> friends) {
         this.username = username;
         this.friendRequests = req;

@@ -17,6 +17,7 @@ import TaskList from './components/TaskList';
 import SidebarLayout from './components/pages/SidebarLayout';
 import TaskEditPage from './components/TaskEditPage';
 import Test from './components/Test';
+import Bot from './components/Bot';
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +36,7 @@ function App() {
           <Route path="/project" element={<ProjectHome />} />
           <Route path="/dashboard" element={<SidebarLayout />} />
           <Route path="/1" element={<Test />} />
+          <Route path="/bot" element={<Bot />} />
 
           <Route path="/task/edit/:param" element={<TaskEditPage/>} />
           <Route path="/profile" element={<Profile/>} />

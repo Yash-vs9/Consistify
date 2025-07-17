@@ -1,25 +1,47 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 const token= localStorage.getItem("authToken") || null
+
+
 export const fetchTasks = createAsyncThunk(
-    'task/fetchTasks',
-    async () => {
+  'task/fetchTasks',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('authToken');
 
-        const response = await fetch('http://localhost:8080/task/getModel',{
-            method:'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        }
-        )
-        if (!response.ok) {
-            throw new Error('Network response was not ok')
-        }
+      const response = await fetch('http://localhost:8080/task/getModel', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
 
-        return response.json()
+      if (!response.ok) {
+
+        
+        // Try to parse error if it's JSON
+        let errorMsg = 'Unknown error';
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.message || errorMsg;
+        } catch (jsonErr) {
+          errorMsg = `HTTP Error: ${response.status}`;
+        }
+        console.log(errorMsg);
+        
+        return rejectWithValue(errorMsg);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+
+      // Network or parsing error
+      return rejectWithValue(err.message || 'Unexpected error occurred');
     }
-)
+  }
+);
 export const createTask = createAsyncThunk(
     'task/createTask',
     async (taskData, { rejectWithValue }) => {
