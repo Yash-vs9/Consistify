@@ -18,6 +18,7 @@ import SidebarLayout from './components/pages/SidebarLayout';
 import TaskEditPage from './components/TaskEditPage';
 import Test from './components/Test';
 import Bot from './components/Bot';
+import Calendar from './components/Calendar';
 function App() {
   return (
     <BrowserRouter>
@@ -40,6 +41,7 @@ function App() {
 
           <Route path="/task/edit/:param" element={<TaskEditPage/>} />
           <Route path="/profile" element={<Profile/>} />
+          <Route path="/calendar" element={<Calendar/>} />
 
 
 

@@ -6,6 +6,7 @@ import {
   PlusCircle,
   ListChecks,
   User,
+  CalendarDays
 } from 'lucide-react';
 const Sidebar = () => {
   const [openMenu, setOpenMenu] = useState(null);
@@ -40,6 +41,8 @@ const Sidebar = () => {
     { label: 'Friends', icon: <Users className="w-5 h-5" />, href: `/${usernameJWT}/friends` },
     { label: 'Create', icon: <PlusCircle className="w-5 h-5" />, href: '/project' },
     { label: 'Tasks', icon: <ListChecks className="w-5 h-5" />, href: '/tasks' },
+    { label: 'Schedule', icon: <CalendarDays className="w-5 h-5" />, href: '/calendar' },
+
     { label: 'Profile', icon: <User className="w-5 h-5" />, href: '/profile' },
   ];
 

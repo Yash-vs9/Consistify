@@ -28,7 +28,7 @@ export const fetchTasks = createAsyncThunk(
         } catch (jsonErr) {
           errorMsg = `HTTP Error: ${response.status}`;
         }
-        console.log(errorMsg);
+
         
         return rejectWithValue(errorMsg);
       }

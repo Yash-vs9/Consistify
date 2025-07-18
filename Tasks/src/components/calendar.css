@@ -1,0 +1,53 @@
+/* Dark base */
+.fc {
+    background-color: #0f172a; /* Tailwind's bg-gray-950 */
+    color: white;
+    border-radius: 1rem;
+    padding: 1rem;
+  }
+  
+  /* Header toolbar */
+  .fc-toolbar-title {
+    font-size: 1.5rem;
+    color: #22d3ee; /* cyan-400 */
+  }
+  
+  .fc-button {
+    background-color: #06b6d4; /* cyan-500 */
+    border: none;
+    color: black;
+    font-weight: bold;
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .fc-button:hover {
+    background-color: #0891b2; /* cyan-600 */
+  }
+  
+  .fc-button:disabled {
+    background-color: #334155; /* gray-700 */
+    color: #cbd5e1; /* gray-300 */
+  }
+  
+  /* Day grid cells */
+  .fc-daygrid-day-number {
+    color: #cbd5e1; /* Tailwind's text-gray-300 */
+    font-weight: 500;
+  }
+  
+  /* Events */
+  .fc-event {
+    background-color: #06b6d4 !important; /* cyan-500 */
+    color: black;
+    border: none;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    padding: 2px 4px;
+  }
+  
+  /* Today highlight */
+  .fc-day-today {
+    background-color: #1e293b !important; /* Tailwind's bg-gray-800 */
+    border: 1px solid #22d3ee;
+  }

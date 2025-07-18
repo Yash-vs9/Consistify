@@ -5,8 +5,10 @@ import LoadingPage from './LoadingPage';
 import { fetchTasks } from '../features/taskSlice/taskSlice';
 import { fetchUser } from '../features/userSlice/userSlice';
 import { Pencil, X } from 'lucide-react';
+import ErrorPage from './ErrorPage';
 
 const Profile = () => {
+  const [err,setError]=useState("")
   const token = localStorage.getItem('authToken');
   if (!token) alert('Login');
 
@@ -39,16 +41,28 @@ const Profile = () => {
   const profilePicUrl = '../src/assets/DeWatermark.ai_1739087600948.png';
 
   useEffect(() => {
-    dispatch(fetchTasks(usernameJWT));
-    dispatch(fetchUser());
-  }, []);
+    const fetchData = async () => {
+      try {
+        await dispatch(fetchTasks(usernameJWT)).unwrap();
+        await dispatch(fetchUser()).unwrap();
+      } catch (e) {
+        console.log( e);
+        setError(e);
+      }
+    };
+  
+    fetchData();
+  }, [dispatch, usernameJWT]);
 
   const xp = 99;
   const xpPercent = Math.min((xp % 1000) / 10, 100);
-
+  if(err){
+    return <ErrorPage message={err}/>
+  }
   if (userStatus === 'loading' || !user?.username) {
     return <LoadingPage />;
   }
+
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-[#0f1117] overflow-hidden px-6 py-10 text-white">

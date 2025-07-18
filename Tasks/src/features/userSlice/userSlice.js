@@ -17,8 +17,9 @@ export const fetchUser = createAsyncThunk(
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to fetch user");
+        const errorText = await response.json();
+        console.log(errorText.message)
+        throw new Error(errorText.message || "Failed to fetch user");
       }
 
       const data = await response.json();
