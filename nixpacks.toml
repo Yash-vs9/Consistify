@@ -1,0 +1,12 @@
+[phases.setup]
+nixpkgs = ["nodejs_18", "openjdk17", "maven"]
+
+[phases.build]
+cmds = [
+  "cd Tasks && npm install && npm run build",
+  "cp -r Tasks/build/* backend/consistify/src/main/resources/static",
+  "cd backend/consistify && ./mvnw clean package"
+]
+
+[start]
+cmd = "java -jar backend/consistify/target/consistify-0.0.1-SNAPSHOT.jar"
