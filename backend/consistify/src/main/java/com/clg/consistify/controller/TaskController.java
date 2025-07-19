@@ -25,7 +25,8 @@ public class TaskController {
     }
     @PostMapping("/create")
     public ResponseEntity<TaskResponseDTO> createTask(@Valid @RequestBody TaskDTO body) {
-        TaskResponseDTO createdTask = taskService.createTask(body);
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        TaskResponseDTO createdTask = taskService.createTask(body,username);
         System.out.println(body);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
     }
@@ -35,7 +36,8 @@ public class TaskController {
     }
     @GetMapping("/getModel")
     public ResponseEntity<List<TaskResponseDTO>> getAllTask(){
-        return ResponseEntity.ok(taskService.getTaskModel());
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        return ResponseEntity.ok(taskService.getTaskModel(username));
     }
     @DeleteMapping("/delete/{taskName}")
     public ResponseEntity<String> deletebytaskid(@PathVariable String taskName){

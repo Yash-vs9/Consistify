@@ -9,11 +9,14 @@ import com.clg.consistify.repository.TaskRepository;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.TaskModel;
 import com.clg.consistify.user.UserModel;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
@@ -31,9 +34,9 @@ public class TaskService {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
     }
+    @CacheEvict(value = "TaskModels", key = "#username")
+    public TaskResponseDTO createTask(TaskDTO body,String username) {
 
-    public TaskResponseDTO createTask(TaskDTO body) {
-        String username = getLoggedInUsername();
         UserModel user = getUserByUsername(username);
 
 
@@ -80,11 +83,17 @@ public class TaskService {
         return new TaskResponseDTO(task);
 
     }
-
-
-    public List<TaskResponseDTO> getTaskModel() {
-        String username = getLoggedInUsername();
+    @Transactional
+    @Cacheable(value = "TaskModels", key = "#username")
+    public List<TaskResponseDTO> getTaskModel(String username) {
         UserModel user = getUserByUsername(username);
+        System.out.println("DB calling idk why");
+        System.out.println("DB calling idk why");
+
+        System.out.println("DB calling idk why");
+
+        System.out.println("DB calling idk why");
+
 
         return user.getTasks()
                 .stream()
