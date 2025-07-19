@@ -1,6 +1,5 @@
 import React from 'react';
 import Cubes from '../../Cubes/Cubes/Cubes';
-import Bot from './Bot';
 const MainDashboard = () => {
   const token=localStorage.getItem('authToken')
   if(token==null){
@@ -9,7 +8,6 @@ const MainDashboard = () => {
   return (
 
     <main className="p-10 space-y-6 bg-[#0f1117]">
-      <Bot></Bot>
       <div className="h-screen bg-[#0f0f1c]">
   <div className=" relative right-[10vw] w-full max-w-[600px] mx-auto h-[600px]">
     <Cubes
