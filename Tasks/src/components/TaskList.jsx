@@ -6,28 +6,25 @@ import LoadingPage from "./LoadingPage";
 import Sidebar from "./Sidebar";
 import ErrorPage from "./ErrorPage";
 import { div } from "three/tsl";
-import Bot from "./Bot";
+import BotpressWidget from "./BotpressWidget";
 const TaskList = () => {
+  const token = localStorage.getItem('authToken');
+
+  if (!token) alert('Please login to continue.');
+
+  const getUsernameFromToken = (token) => {
+    if (!token) return null;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return payload.sub || payload.username || null;
+    } catch {
+      return null;
+    }
+  };
+
+  const usernameJWT = getUsernameFromToken(token);
   const [err, setError] = useState("");
-  useEffect(() => {
-    const scripts = [
-      "https://cdn.botpress.cloud/webchat/v2.2/inject.js",
-      "/script.js",
-      "/script2.js",
-    ];
-    const loadedScripts = scripts.map((src) => {
-      const script = document.createElement("script");
-      script.src = src;
-      script.async = true;
-      document.body.appendChild(script);
-      return script;
-    });
-    return () => {
-      loadedScripts.forEach((script) => {
-        document.body.removeChild(script);
-      });
-    };
-  }, []);
+  
 
   const dispatch = useDispatch();
   const { tasks, status, error } = useSelector((state) => state.task);
@@ -80,6 +77,7 @@ const TaskList = () => {
     <div className="flex min-h-screen bg-[#0d0f1a] text-white">
       {/* Sidebar */}
       <Sidebar />
+      <BotpressWidget username={usernameJWT}></BotpressWidget>
 
       {/* Glowing Background & Task Grid */}
       <div className="flex-1 px-6 py-10 relative overflow-hidden">
