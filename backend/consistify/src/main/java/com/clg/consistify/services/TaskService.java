@@ -9,6 +9,8 @@ import com.clg.consistify.repository.TaskRepository;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.TaskModel;
 import com.clg.consistify.user.UserModel;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
@@ -29,7 +31,8 @@ import java.util.stream.Collectors;
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
-
+    @Autowired
+    private CacheManager cacheManager;
     public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
@@ -127,13 +130,13 @@ public class TaskService {
             TaskModel taskToDelete = taskOptional.get();
             user.getTasks().remove(taskToDelete);
             userRepository.save(user);
-
+        cacheManager.getCache("TaskModels").evict(username);
 
         } else {
             throw new IllegalArgumentException("Task not found or not authorized to delete.");
         }
     }
-
+    @CacheEvict(value = "TaskModels", key = "#username")
     public void updateTask(TaskUpdateDTO dto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserModel user = userRepository.findByUsername(username)

@@ -4,6 +4,7 @@ import com.clg.consistify.DTO.*;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.exception.UsernameAlreadyExistException;
 import com.clg.consistify.repository.UserRepository;
+import com.clg.consistify.services.ExternalApiService;
 import com.clg.consistify.services.UserService;
 import com.clg.consistify.user.MyUserDetailService;
 import com.clg.consistify.user.UserModel;
@@ -27,6 +28,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173",allowCredentials = "true")
@@ -37,13 +41,14 @@ public class UserController {
     @Autowired
     private JwtUtils jwtUtil;
 
-
+    private ExternalApiService externalApiService;
     private final MyUserDetailService userDetailService;
 
     private final UserRepository userRepository;
 
 
-    public UserController(PasswordEncoder passwordEncoder, MyUserDetailService userDetailService, UserRepository userRepository, UserService userService) {
+    public UserController(PasswordEncoder passwordEncoder, ExternalApiService externalApiService, MyUserDetailService userDetailService, UserRepository userRepository, UserService userService) {
+        this.externalApiService = externalApiService;
         this.userDetailService = userDetailService;
         this.userRepository = userRepository;
         this.userService = userService;
@@ -147,5 +152,12 @@ public class UserController {
         System.out.println(Thread.currentThread().getName());
         System.out.println("Sending email to: " + body.getEmail());
         userService.sendWelcomeEmail(body.getEmail());
+    }
+    @GetMapping("/quote")
+    public ResponseEntity<QuoteDTO> quote() throws ExecutionException, InterruptedException {
+
+        Future<QuoteDTO> future= externalApiService.dailyQuote();
+        QuoteDTO quote=future.get();
+        return ResponseEntity.ok(quote);
     }
 }
