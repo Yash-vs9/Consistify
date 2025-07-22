@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import SplashCursor from '../../../SplashCursor/SplashCursor';
 import Sidebar from '../../../components/Sidebar';

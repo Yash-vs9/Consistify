@@ -109,7 +109,9 @@ const TaskList: React.FC = () => {
         <p className="text-gray-400">Start by creating a new task!</p>
       </div>
     );
-
+  if(tasks==null){
+    return <LoadingPage/>
+  }
   return (
     <div className="flex min-h-screen bg-[#0d0f1a] text-white">
       <Sidebar />

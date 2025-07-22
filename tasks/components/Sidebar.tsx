@@ -48,7 +48,7 @@ const Sidebar = () => {
   const navItems = [
     { label: 'Home', icon: <Home className="w-5 h-5" />, href: '/' },
     { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, href: '/dashboard' },
-    { label: 'Friends', icon: <Users className="w-5 h-5" />, href: username ? `/${username}/friends` : '#' },
+    { label: 'Friends', icon: <Users className="w-5 h-5" />, href: username ? `/users` : '#' },
     { label: 'Create', icon: <PlusCircle className="w-5 h-5" />, href: '/create' },
     { label: 'Tasks', icon: <ListChecks className="w-5 h-5" />, href: '/tasks' },
     { label: 'Schedule', icon: <CalendarDays className="w-5 h-5" />, href: '/calendar' },
