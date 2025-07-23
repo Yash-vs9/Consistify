@@ -29,10 +29,6 @@ const Sign: React.FC = () => {
       email: loginEmail,
       password: loginPassword,
     };
-    const token=localStorage.getItem('authToken')
-  if(token==null){
-    return <div>Login first</div>
-  }
     try {
       const response = await fetch("http://localhost:8080/login", {
         method: "POST",

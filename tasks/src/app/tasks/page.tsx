@@ -5,7 +5,7 @@ import TaskCard from "../../../components/TaskCard";
 import LoadingPage from "../../../components/LoadingPage";
 import Sidebar from "../../../components/Sidebar";
 import ErrorPage from "../../../components/ErrorPage";
-
+import BotpressWidget from "components/BotpressWidget";
 interface Task {
   taskName: string;
   taskPriority: string;
@@ -126,6 +126,8 @@ const TaskList: React.FC = () => {
             <TaskCard key={task.taskName} task={task} onTaskUpdate={handleTaskChange} />
           ))}
         </div>
+        <BotpressWidget username={usernameJWT}/>
+        
       </div>
     </div>
   );
