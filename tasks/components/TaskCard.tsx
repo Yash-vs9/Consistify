@@ -1,9 +1,10 @@
 
 import { useRouter } from 'next/navigation';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { toast } from 'react-toastify';
+import LoadingPage from './LoadingPage';
 
 
 interface Task {
@@ -23,6 +24,7 @@ interface TaskCardProps {
 const TaskCard: React.FC<TaskCardProps> = ({ task ,onTaskUpdate}) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
   const router=useRouter()
+  const [loading,setLoading]=useState<boolean>(false)
   const getUsernameFromToken = (token: string | null): string | null => {
     if (!token) return null;
     try {
@@ -40,6 +42,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task ,onTaskUpdate}) => {
   const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     try{
+      setLoading(true)
       const response=await fetch(`http://localhost:8080/task/delete/${task.taskName}`,{
         method:"DELETE",
         headers:{
@@ -48,13 +51,16 @@ const TaskCard: React.FC<TaskCardProps> = ({ task ,onTaskUpdate}) => {
       })
       if(!response.ok){
         const errData=await response.json()
+        throw new Error(errData.error)
       }
+      setLoading(false)
       const data=await response.text()
       console.log(data)
       toast.success("Task Deleted Successfully")
       onTaskUpdate()
     }
     catch(e){
+      setLoading(false)
       toast.error("Error "+e)
       console.log(e)
     }
@@ -65,8 +71,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task ,onTaskUpdate}) => {
   const start = new Date(task.startingDate);
   const end = new Date(task.lastDate);
   const diffInDays = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-
-  return (
+  if(loading) return <div className='w-[20vw] h-[42vh]'><LoadingPage></LoadingPage></div>
+  return (  
     <div className="relative w-[20vw] h-[42vh] p-6 rounded-2xl shadow-2xl 
       backdrop-blur-xl border border-cyan-500/10 
       bg-gradient-to-br from-gray-900/70 via-gray-950/70 to-gray-900/70 

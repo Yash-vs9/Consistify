@@ -12,6 +12,7 @@ const Friends: React.FC = () => {
   const [requests, setRequests] = useState<string[]>([]);
   const [friends, setFriends] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading,setLoading]=useState<boolean>(true)
 
   // Safely access localStorage (only on client side)
   const token =
@@ -99,11 +100,14 @@ const Friends: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchUsers();
-    fetchFriends();
-    fetchRequests();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!token) return;
+    setError(null);
+    setLoading(true);
+    Promise.all([fetchUsers(), fetchFriends(), fetchRequests()])
+      .catch(() => setError("Failed to load some data."))
+      .finally(() => setLoading(false));
   }, [token]);
+  
 
   const handleAddFriend = async (toUsername: string) => {
     if (!token) return;
@@ -146,7 +150,7 @@ const Friends: React.FC = () => {
       <div className="text-red-500 text-center mt-10 font-semibold">{error}</div>
     );
   if (usernames.length === 0) return <LoadingPage />;
-
+  if(loading) return <LoadingPage/>
   return (
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-[#0f1117] text-white font-poppins">
       {usernameJWT && <Sidebar />}

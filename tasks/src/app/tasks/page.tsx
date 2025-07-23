@@ -126,7 +126,7 @@ const TaskList: React.FC = () => {
             <TaskCard key={task.taskName} task={task} onTaskUpdate={handleTaskChange} />
           ))}
         </div>
-        <BotpressWidget username={usernameJWT}/>
+        <BotpressWidget username={usernameJWT as string}/>
         
       </div>
     </div>

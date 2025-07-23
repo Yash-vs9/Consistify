@@ -19,6 +19,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
@@ -121,9 +122,10 @@ public class UserController {
         userService.acceptRequest(friendId, currentUserId);
         return ResponseEntity.ok("Friend request accepted");
     }
-    @GetMapping("/users/requests/{userId}")
-    public ResponseEntity<List<String>> seeRequests(@PathVariable String userId){
-        Optional<UserModel> OptUser=userRepository.findByUsername(userId);
+    @GetMapping("/users/requests")
+    public ResponseEntity<List<String>> seeRequests(){
+        String username= SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<UserModel> OptUser=userRepository.findByUsername(username);
 
         if(OptUser.isPresent()){
             UserModel user=OptUser.get();

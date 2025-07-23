@@ -69,14 +69,16 @@ const ProjectHome: React.FC = () => {
             body:JSON.stringify(data)
         })
         if(!response.ok){
-            const errData=await response.text()
-            throw new Error (errData)
+            const errData=await response.json()
+            const err=errData.error;
+            throw new Error (err)
         }
         console.log(await response.json())
         toast.success("Task Created successfully")
         router.push("/tasks")
     }
     catch(e){
+      toast.error(""+e)
         console.log(e)
     }
   };
