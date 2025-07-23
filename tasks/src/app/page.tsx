@@ -18,7 +18,7 @@ const Home: React.FC = () => {
       script.async = true;
       document.body.appendChild(script);
       return script;
-    });
+    },[]);
 
     return () => {
       loadedScripts.forEach((script) => {
