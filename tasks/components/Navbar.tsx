@@ -24,7 +24,7 @@ const Navbar = () => {
           href="/"
           className="text-cyan-400 text-2xl font-bold tracking-wide hover:text-cyan-300 transition-all"
         >
-          Task<span className="text-white">Tracker</span>
+          C<span className="text-white">onsistify</span>
         </Link>
 
         {/* Desktop Links */}
