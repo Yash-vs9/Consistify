@@ -19,7 +19,7 @@ const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "succeeded" | "failed">("idle");
   const [error, setError] = useState<string | null>(null);
-
+  const [loading,setLoading]=useState<boolean>(false)
   // 🔐 Extract username from token
   const getUsernameFromToken = (token: string | null): string | null => {
     if (!token) return null;
@@ -78,7 +78,7 @@ const TaskList: React.FC = () => {
 
   // 📣 Task refresh method to be passed to TaskCard
   const handleTaskChange = () => {
-    // Refresh logic — refetch tasks
+    setLoading(true)
     if (token) {
       fetch("http://localhost:8080/task/getModel", {
         method: "GET",
@@ -88,9 +88,13 @@ const TaskList: React.FC = () => {
       })
         .then((res) => {
           if (!res.ok) return res.text().then((err) => Promise.reject(err));
+          setLoading(false)
           return res.json();
         })
         .then((data: Task[]) => setTasks(data))
+        .then(()=>{
+          setLoading(false)
+        })
         .catch((err) => {
           setError(err.message || "Failed to update task list.");
         });
@@ -100,6 +104,7 @@ const TaskList: React.FC = () => {
   if (error) return <ErrorPage message={error} />;
   if (status === "loading") return <LoadingPage />;
   if (status === "succeeded" && tasks.length === 0)
+    if(loading) return <LoadingPage/>
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0d0f1a] via-[#0e111f] to-[#050610] text-white">
         <div className="absolute left-0">

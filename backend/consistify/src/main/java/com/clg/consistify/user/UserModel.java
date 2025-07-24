@@ -20,6 +20,8 @@ public class UserModel {
     private String xp;
     @ElementCollection
     private List<String> friendRequests = new ArrayList<>();
+
+
     @ManyToMany
     @JoinTable(
             name = "user_friends",
@@ -29,7 +31,8 @@ public class UserModel {
     @JsonIgnore
     private Set<UserModel> friends = new HashSet<>();
 
-
+    @OneToMany(mappedBy = "user")
+    private List<QueryModel> queries=new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TaskModel> tasks = new ArrayList<>();
@@ -126,5 +129,14 @@ public class UserModel {
 
     public void setTasks(List<TaskModel> tasks) {
         this.tasks = tasks;
+    }
+
+
+    public List<QueryModel> getQueries() {
+        return queries;
+    }
+
+    public void setQueries(List<QueryModel> queries) {
+        this.queries = queries;
     }
 }

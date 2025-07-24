@@ -41,12 +41,12 @@ const BotpressWidget = ({ username }: BotpressWidgetProps) => {
           additionalStylesheetUrl: '/botcss.css' // ✅ Make sure it's accessible
         }
       });
-      window.botpress.onEvent((event: any) => {
-        if (event.type === 'custom' && event.payload?.type === 'xp_result') {
-          console.log('🧠 XP Result Received:', event.payload.value);
-          if (onXPResult) onXPResult(event.payload.value); // Send data to parent
-        }
-      });
+      // window.botpress.onEvent((event: any) => {
+      //   if (event.type === 'custom' && event.payload?.type === 'xp_result') {
+      //     console.log('🧠 XP Result Received:', event.payload.value);
+      //     if (onXPResult) onXPResult(event.payload.value); // Send data to parent
+      //   }
+      // });
     };
 
     return () => {

@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 const ProjectHome: React.FC = () => {
 
-
+  const [isDisabled,SetIsDisabled]=useState<boolean>(false)
   const [taskName, setTaskName] = useState<string>('');
   const [startingDate, setStartingDate] = useState<string>('');
   const [lastDate, setLastDate] = useState<string>('');
@@ -58,6 +58,7 @@ const ProjectHome: React.FC = () => {
 
   const createTaskButton = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
+    SetIsDisabled(true)
     const data = { taskName, startingDate, lastDate, taskPriority, collaborators };
     try{
         const response=await fetch("http://localhost:8080/task/create",{
@@ -75,11 +76,13 @@ const ProjectHome: React.FC = () => {
         }
         console.log(await response.json())
         toast.success("Task Created successfully")
+
         router.push("/tasks")
     }
     catch(e){
       toast.error(""+e)
         console.log(e)
+        SetIsDisabled(false)
     }
   };
 
@@ -204,6 +207,7 @@ const ProjectHome: React.FC = () => {
             )}
 
             <button
+              disabled={isDisabled}
               className="bg-cyan-600 text-white px-6 py-2 rounded border border-white hover:bg-cyan-500 transition w-full mt-4"
               onClick={createTaskButton}
             >

@@ -71,7 +71,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task ,onTaskUpdate}) => {
   const start = new Date(task.startingDate);
   const end = new Date(task.lastDate);
   const diffInDays = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
-  if(loading) return <div className='w-[20vw] h-[42vh]'><LoadingPage></LoadingPage></div>
+
   return (  
     <div className="relative w-[20vw] h-[42vh] p-6 rounded-2xl shadow-2xl 
       backdrop-blur-xl border border-cyan-500/10 

@@ -1,6 +1,8 @@
+"use client"
 import React from 'react';
 import { AlertTriangle } from 'lucide-react';
-import router from "next/router"
+import router, { useRouter } from "next/navigation"
+
 
 
 interface ErrorPageProps {
@@ -8,7 +10,7 @@ interface ErrorPageProps {
 }
 
 const ErrorPage: React.FC<ErrorPageProps> = ({ message }) => {
-
+  const router=useRouter()
 
   return (
     <div className="min-h-screen bg-gray-950 flex flex-col justify-center items-center text-white px-4">
