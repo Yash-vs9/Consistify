@@ -23,6 +23,7 @@ export default function Home() {
   }
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
+
     e.preventDefault();
     if (!form.title.trim() || !form.description.trim()) return;
 

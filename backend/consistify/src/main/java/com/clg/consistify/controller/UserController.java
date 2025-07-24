@@ -12,6 +12,8 @@ import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -65,9 +67,9 @@ public class UserController {
     }
     @Cacheable("users")
     @GetMapping("/users")
-    public List<String> getAllUsers() {
+    public List<String> getAllUsers(@RequestParam int pageNo) {
         System.out.println("💡 Getting data from DB... (Not cache)");
-        return userRepository.findAll()
+        return userRepository.findAll(PageRequest.of(pageNo,5,Sort.by("id")))
                 .stream()
                 .map(UserModel::getUsername)
                 .toList();

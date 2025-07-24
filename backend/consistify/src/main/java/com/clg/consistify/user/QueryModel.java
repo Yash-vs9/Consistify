@@ -2,6 +2,9 @@ package com.clg.consistify.user;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="query")
 public class QueryModel {
@@ -11,6 +14,7 @@ public class QueryModel {
     private String name;
     private String description;
     private String status;
+    private List<String> skillsRequired=new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
@@ -53,5 +57,13 @@ public class QueryModel {
 
     public void setUser(UserModel user) {
         this.user = user;
+    }
+
+    public List<String> getSkillsRequired() {
+        return skillsRequired;
+    }
+
+    public void setSkillsRequired(List<String> skillsRequired) {
+        this.skillsRequired = skillsRequired;
     }
 }
