@@ -14,6 +14,10 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(FieldNullException.class)
+    public ResponseEntity<String> handleFieldNullException(FieldNullException ex){
+        return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<Map<String, String>> handleInvalidToken(InvalidTokenException ex) {
         Map<String, String> errorBody = new HashMap<>();

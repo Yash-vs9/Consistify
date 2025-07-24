@@ -1,3 +1,4 @@
+<<<<<<< HEAD:Tasks/src/components/Friends.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
@@ -14,6 +15,24 @@ const Friends = () => {
   const token = localStorage.getItem('authToken');
 
   if (!token) alert('Please login to continue.');
+=======
+"use client"
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import Sidebar from "components/Sidebar";
+import LoadingPage from "components/LoadingPage";
+import { Pencil, MessageCircle, UserCircle, UserPlus ,ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "react-toastify";
+
+const Friends: React.FC = () => {
+  const router = useRouter();
+  const [pageNo,setPageNo]=useState<number>(1);
+  const [usernames, setUsernames] = useState<string[]>([]);
+  const [requests, setRequests] = useState<string[]>([]);
+  const [friends, setFriends] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading,setLoading]=useState<boolean>(true)
+>>>>>>> 6ff8aa9 (added pagable in users fetching):tasks/src/app/users/page.tsx
 
   const getUsernameFromToken = (token) => {
     if (!token) return null;
@@ -31,6 +50,7 @@ const Friends = () => {
     e.preventDefault();
     navigate(`/${username}/chat`);
   };
+<<<<<<< HEAD:Tasks/src/components/Friends.jsx
 
   useEffect(() => {
     if (paramUsername !== usernameJWT) navigate('/home');
@@ -45,8 +65,63 @@ const Friends = () => {
       setUsernames(data);
     } catch {
       setError('Failed to load users.');
+=======
+  const fetchLeftPage = async () => {
+    const newPage = pageNo - 1;
+    if (newPage < 0) return; // Optional: Prevent going below page 0
+    try {
+      const response = await fetch(`http://localhost:8080/users?pageNo=${newPage}`, {
+        method:"GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const errData = await response.text();
+        throw new Error(errData);
+      }
+      const data = await response.json();
+      setUsernames(data);
+      setPageNo(newPage); // Now update state after success
+    } catch (e) {
+      toast.error("Error: " + e);
+>>>>>>> 6ff8aa9 (added pagable in users fetching):tasks/src/app/users/page.tsx
     }
   };
+  
+  const fetchRightPage = async () => {
+    const newPage = pageNo + 1;
+    try {
+      const response = await fetch(`http://localhost:8080/users?pageNo=${newPage}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!response.ok) {
+        const errData = await response.text();
+        throw new Error(errData);
+      }
+      const data = await response.json();
+      setUsernames(data);
+      setPageNo(newPage); // Now update state after success
+    } catch (e) {
+      toast.error("Error: " + e);
+    }
+  };
+
+  // const fetchUsers = async () => {
+  //   if (!token) return;
+  //   try {
+  //     const res = await fetch("http://localhost:8080/users", {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     if (!res.ok) throw new Error("Failed to fetch users");
+  //     const data: string[] = await res.json();
+  //     setUsernames(data);
+  //   } catch {
+  //     setError("Failed to load users.");
+  //   }
+  // };
 
   const fetchFriends = async () => {
     try {
@@ -56,7 +131,12 @@ const Friends = () => {
       const data = await res.json();
       setFriends(data);
     } catch {
+<<<<<<< HEAD:Tasks/src/components/Friends.jsx
       setError('Failed to load friends.');
+=======
+
+      setError("Failed to load friends.");
+>>>>>>> 6ff8aa9 (added pagable in users fetching):tasks/src/app/users/page.tsx
     }
   };
 
@@ -73,10 +153,21 @@ const Friends = () => {
   };
 
   useEffect(() => {
+<<<<<<< HEAD:Tasks/src/components/Friends.jsx
     fetchUsers();
     fetchFriends();
     fetchRequests();
   }, [paramUsername, token]);
+=======
+    if (!token) return;
+    setError(null);
+    setLoading(true);
+    Promise.all([fetchLeftPage(), fetchFriends(), fetchRequests()])
+      .catch(() => setError("Failed to load some data."))
+      .finally(() => setLoading(false));
+  }, [token]);
+  
+>>>>>>> 6ff8aa9 (added pagable in users fetching):tasks/src/app/users/page.tsx
 
   const handleAddFriend = async (toUsername) => {
     try {
@@ -106,9 +197,18 @@ const Friends = () => {
     }
   };
 
+<<<<<<< HEAD:Tasks/src/components/Friends.jsx
   if (error) return <div className="text-red-500 text-center mt-10">{error}</div>;
   if (usernames.length === 0) return <LoadingPage />;
 
+=======
+  if (error)
+    return (
+      <div className="text-red-500 text-center mt-10 font-semibold">{error}</div>
+    );
+
+  if(loading) return <LoadingPage/>
+>>>>>>> 6ff8aa9 (added pagable in users fetching):tasks/src/app/users/page.tsx
   return (
     <div className="min-h-screen grid grid-cols-[260px_1fr] bg-[#0f1117] text-white font-poppins">
       <Sidebar usernameJWT={usernameJWT} />
@@ -169,6 +269,23 @@ const Friends = () => {
           <section className="space-y-4">
             <h2 className="text-xl font-semibold">Discover Users</h2>
             <div className="grid gap-4">
+            <div className="flex items-center gap-4">
+  {/* Left Arrow */}
+  <button onClick={fetchLeftPage} className="p-2 rounded bg-gray-800 hover:bg-gray-700 text-white">
+    <ChevronLeft size={20} />
+  </button>
+
+  {/* Page Buttons */}
+  
+
+  {/* Right Arrow */}
+  <button onClick={fetchRightPage} className="p-2 rounded bg-gray-800 hover:bg-gray-700 text-white">
+    <ChevronRight size={20} />
+  </button>
+  <span className="p-1 bg-cyan-600 rounded w-20 font-mono transition-all duration-200 hover:scale-105 hover:bg-cyan-700">
+  Page: {pageNo}
+</span></div>
+              
               {usernames
                 .filter((u) => u !== usernameJWT)
                 .map((username, i) => {

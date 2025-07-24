@@ -130,13 +130,13 @@ public class TaskService {
             TaskModel taskToDelete = taskOptional.get();
             user.getTasks().remove(taskToDelete);
             userRepository.save(user);
-        cacheManager.getCache("TaskModels").evict(username);
+            cacheManager.getCache("TaskModels").evict(username);
 
         } else {
             throw new IllegalArgumentException("Task not found or not authorized to delete.");
         }
     }
-    @CacheEvict(value = "TaskModels", key = "#username")
+
     public void updateTask(TaskUpdateDTO dto) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserModel user = userRepository.findByUsername(username)
@@ -202,6 +202,8 @@ public class TaskService {
         }
 
         taskRepository.save(task);
+        cacheManager.getCache("TaskModels").evict(username);
+
     }
     public TaskResponseDTO getTaskByName(String taskName){
         String userName=SecurityContextHolder.getContext().getAuthentication().getName();
