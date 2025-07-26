@@ -152,4 +152,8 @@ public class UserController {
         System.out.println("Sending email to: " + body.getEmail());
         userService.sendWelcomeEmail(body.getEmail());
     }
+    @GetMapping("/profile")
+    public Object[] findProfile(){
+        return userService.gettingProfile();
+    }
 }

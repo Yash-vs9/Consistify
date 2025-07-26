@@ -1,6 +1,7 @@
 "use client"
 import BotpressWidgetHeadless from "components/BotpressWidgetHeadless";
 import { useState, ChangeEvent, FormEvent } from "react";
+
 type Query = {
   id: number;
   title: string;
@@ -9,6 +10,8 @@ type Query = {
 };
 
 export default function Home() {
+
+  
   const [queries, setQueries] = useState<Query[]>([]);
   const [form, setForm] = useState({
     title: "",
@@ -21,6 +24,8 @@ export default function Home() {
   ) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
+
+
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     const sendXPRequest = () => {
@@ -133,6 +138,7 @@ export default function Home() {
         <section>
           <h2 className="text-lg font-semibold text-gray-700 dark:text-blue-200 mb-3">
             Recent Queries
+
           </h2>
           <ul>
             {queries.length === 0 && (

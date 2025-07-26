@@ -6,6 +6,9 @@ import LoadingPage from "../../../components/LoadingPage";
 import Sidebar from "../../../components/Sidebar";
 import ErrorPage from "../../../components/ErrorPage";
 import BotpressWidget from "components/BotpressWidget";
+
+
+
 interface Task {
   taskName: string;
   taskPriority: string;
@@ -15,6 +18,7 @@ interface Task {
 }
 
 const TaskList: React.FC = () => {
+
   const [token, setToken] = useState<string>("");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [status, setStatus] = useState<"idle" | "loading" | "succeeded" | "failed">("idle");
@@ -32,6 +36,14 @@ const TaskList: React.FC = () => {
   };
 
   const usernameJWT = getUsernameFromToken(token);
+
+  // pages/api/ask.js
+
+
+
+
+
+
 
   // ✅ Read localStorage in `useEffect` safely
   useEffect(() => {

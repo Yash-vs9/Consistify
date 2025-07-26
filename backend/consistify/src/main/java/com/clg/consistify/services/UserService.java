@@ -1,6 +1,7 @@
 package com.clg.consistify.services;
 
 import com.clg.consistify.DTO.LoginBody;
+import com.clg.consistify.DTO.ProfileDTO;
 import com.clg.consistify.DTO.RegisterBody;
 import com.clg.consistify.DTO.UserDTO;
 import com.clg.consistify.exception.UserAlreadyExistException;
@@ -76,7 +77,13 @@ public class UserService {
         String jwt = jwtUtil.generateToken(savedUser.getUsername());
         return jwt;
     }
-
+    public Object[] gettingProfile(){
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user=userRepository.findByUsername(username)
+                .orElseThrow(()-> new UserNotFoundException("User not found"));
+        Long id=user.getId();
+        return userRepository.getProfile(id);
+    }
     public void sendWelcomeEmail(String toEmail) {
         toEmail = toEmail.trim().replaceAll("[\\r\\n]", "");
 
