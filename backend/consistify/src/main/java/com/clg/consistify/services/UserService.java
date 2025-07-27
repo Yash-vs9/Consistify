@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 @Service
 public class UserService {
@@ -75,15 +77,17 @@ public class UserService {
         UserModel savedUser = userRepository.save(user);
         UserDetails userDetails = userDetailService.loadUserByUsername(savedUser.getUsername());
         String jwt = jwtUtil.generateToken(savedUser.getUsername());
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                sendWelcomeEmail(savedUser.getEmail());
+            } catch (Exception e) {
+                System.err.println("Failed to send welcome email: " + e.getMessage());
+            }
+        });
         return jwt;
     }
-    public Object[] gettingProfile(){
-        String username=SecurityContextHolder.getContext().getAuthentication().getName();
-        UserModel user=userRepository.findByUsername(username)
-                .orElseThrow(()-> new UserNotFoundException("User not found"));
-        Long id=user.getId();
-        return userRepository.getProfile(id);
-    }
+
     public void sendWelcomeEmail(String toEmail) {
         toEmail = toEmail.trim().replaceAll("[\\r\\n]", "");
 
@@ -91,8 +95,15 @@ public class UserService {
         message.setTo(toEmail);
         message.setSubject("sub..");
         message.setText("text..");
-        message.setFrom("yvksmr@gmail.com");
+        message.setFrom("yvksmr@gmail.com.com");
         mailSender.send(message);
+    }
+    public Object[] gettingProfile(){
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user=userRepository.findByUsername(username)
+                .orElseThrow(()-> new UserNotFoundException("User not found"));
+        Long id=user.getId();
+        return userRepository.getProfile(id);
     }
 
     public String login(LoginBody body){
