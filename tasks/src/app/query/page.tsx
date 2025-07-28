@@ -1,6 +1,6 @@
 "use client"
 import BotpressWidgetHeadless from "components/BotpressWidgetHeadless";
-import { useState, ChangeEvent, FormEvent } from "react";
+import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 
 type Query = {
   id: number;
@@ -13,6 +13,7 @@ export default function Home() {
 
   
   const [queries, setQueries] = useState<Query[]>([]);
+  const [token,setToken]=useState<string>("")
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -27,37 +28,72 @@ export default function Home() {
 
 
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    const sendXPRequest = () => {
-    if (typeof window !== 'undefined' && window.botpress) {
-      console.log("trigger");
-      window.botpress.sendEvent({
-        type: 'trigger',
-        channel: 'web',
-        payload: {
-          type: 'xp_request',
-          tasks: [
-            { name: 'DSA', description: 'arrays and sorting' },
-            { name: 'UI Design', description: 'responsive layout' },
-            { name: 'Website Development',description: 'responsive page and full workable'}
-          ]
+//   function handleSubmit(e: FormEvent<HTMLFormElement>) {
+//     const sendXPRequest = () => {
+//     if (typeof window !== 'undefined' && window.botpress) {
+//       console.log("trigger");
+//       window.botpress.sendEvent({
+//         type: 'trigger',
+//         channel: 'web',
+//         payload: {
+//           type: 'xp_request',
+//           tasks: [
+//             { name: 'DSA', description: 'arrays and sorting' },
+//             { name: 'UI Design', description: 'responsive layout' },
+//             { name: 'Website Development',description: 'responsive page and full workable'}
+//           ]
+//         }
+//       });
+//     } else {
+//       console.warn('Botpress not ready');
+//     }
+//   };
+//     sendXPRequest()
+//     e.preventDefault();
+//     if (!form.title.trim() || !form.description.trim()) return;
+
+//     setQueries([
+//       { ...form, id: Date.now() },
+//       ...queries,
+//     ]);
+
+//     setForm({ title: "", description: "", category: "General" });
+//   }
+  useEffect(()=>{
+    const storedToken=localStorage.getItem("authToken")
+    setToken(storedToken as string)
+  })
+  const handleSubmit=(async(e: FormEvent<HTMLFormElement>)=>{
+    const body={
+      queryName:form.title,
+      description:form.description
+
+    }
+    e.preventDefault()
+    if(!token) return
+    
+    try{
+      const response=await fetch("http://localhost:8080/query/create",
+        {
+          method:"POST",
+          headers:{
+            Authorization:`Bearer ${token}`,
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify(body)
         }
-      });
-    } else {
-      console.warn('Botpress not ready');
-    }
-  };
-    sendXPRequest()
-    e.preventDefault();
-    if (!form.title.trim() || !form.description.trim()) return;
-
-    setQueries([
-      { ...form, id: Date.now() },
-      ...queries,
-    ]);
-
-    setForm({ title: "", description: "", category: "General" });
-  }
+      )
+      if(!response.ok){
+        const errData=await response.text()
+        throw new Error(errData)
+      }
+      const data=response.text()
+      console.log(data)
+    }
+    catch(e){
+      console.log(e)
+    }
+  })
 
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 transition-all">

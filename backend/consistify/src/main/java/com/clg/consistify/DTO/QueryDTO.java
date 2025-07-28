@@ -3,7 +3,7 @@ package com.clg.consistify.DTO;
 public class QueryDTO {
     private String queryName;
     private String description;
-    private String status;
+    private String status="PENDING";
     private String username;
 
     public String getQueryName() {
