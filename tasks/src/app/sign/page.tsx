@@ -1,11 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-
 import { useRouter } from "next/navigation";
 
 const Sign: React.FC = () => {
-  
   const [active, setActive] = useState<boolean>(false);
   const [name, setName] = useState<string>("");
   const [loginEmail, setLoginEmail] = useState<string>("");
@@ -13,18 +11,12 @@ const Sign: React.FC = () => {
   const [registerEmail, setRegisterEmail] = useState<string>("");
   const [registerPassword, setRegisterPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false); // <<<< ADDED
   const router = useRouter();
-  interface loginData {
-    email: string;
-    password: string;
-  }
-  interface registerData {
-    username: string;
-    email: string;
-    password: string;
-  }
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true); // <<<< ADDED
     const loginData = {
       email: loginEmail,
       password: loginPassword,
@@ -32,27 +24,26 @@ const Sign: React.FC = () => {
     try {
       const response = await fetch("http://localhost:8080/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
       });
-      console.log("hit")
-      if(!response.ok){
-        const errorData=await response.text();
-        throw new Error(errorData)
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData);
       }
       const data = await response.json();
-      localStorage.setItem('authToken',data.token)
+      localStorage.setItem("authToken", data.token);
       router.push("/dashboard");
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false); // <<<< ADDED
     }
   };
 
   const registerSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    setIsLoading(true); // <<<< ADDED
     const registerData = {
       username: username,
       email: registerEmail,
@@ -61,20 +52,20 @@ const Sign: React.FC = () => {
     try {
       const response = await fetch("http://localhost:8080/register", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-          },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registerData),
       });
-      if(!response.ok){
-        const errorData=await response.text();
-        throw new Error(errorData)
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(errorData);
       }
       const data = await response.json();
-      localStorage.setItem('authToken',data.token)
+      localStorage.setItem("authToken", data.token);
       router.push("/dashboard");
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false); // <<<< ADDED
     }
   };
 
@@ -131,9 +122,41 @@ const Sign: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-2 rounded-lg font-semibold transition"
+            className={`w-full ${
+              isLoading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-cyan-600 hover:bg-cyan-700"
+            } text-white py-2 rounded-lg font-semibold transition`}
+            disabled={isLoading}
           >
-            {active ? "Register" : "Sign In"}
+            {isLoading ? (
+              <span className="flex items-center justify-center">
+                <svg
+                  className="animate-spin mr-2 h-5 w-5 text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8z"
+                  />
+                </svg>
+                Loading...
+              </span>
+            ) : active ? (
+              "Register"
+            ) : (
+              "Sign In"
+            )}
           </button>
         </form>
 
@@ -144,6 +167,7 @@ const Sign: React.FC = () => {
               <button
                 className="text-cyan-400 hover:underline"
                 onClick={() => setActive(false)}
+                disabled={isLoading}
               >
                 Sign in
               </button>
@@ -154,6 +178,7 @@ const Sign: React.FC = () => {
               <button
                 className="text-cyan-400 hover:underline"
                 onClick={() => setActive(true)}
+                disabled={isLoading}
               >
                 Create account
               </button>
