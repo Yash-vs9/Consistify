@@ -17,7 +17,7 @@ public class UserModel {
     private String username;
     private String email;
     private String password;
-    private String xp;
+    private String rank;
     @ElementCollection
     private List<String> friendRequests = new ArrayList<>();
 
@@ -91,12 +91,12 @@ public class UserModel {
         this.password = password;
     }
 
-    public String getXp() {
-        return xp;
+    public String getRank() {
+        return rank;
     }
 
-    public void setXp(String xp) {
-        this.xp = xp;
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 
     public List<String> getFriendRequests() {

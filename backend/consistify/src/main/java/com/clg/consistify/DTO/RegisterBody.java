@@ -9,7 +9,7 @@ public class RegisterBody {
     private String email;
     private String password;
     private String role = "USER";
-    private String xp = "E";
+    private String rank = "E";
     private Set<UserModel> friends = null;
 
     // Getters and setters
@@ -45,12 +45,12 @@ public class RegisterBody {
         this.role = role;
     }
 
-    public String getXp() {
-        return xp;
+    public String getRank() {
+        return rank;
     }
 
-    public void setXp(String xp) {
-        this.xp = xp;
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 
     public Set<UserModel> getFriends() {

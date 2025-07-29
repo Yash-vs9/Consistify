@@ -1,21 +1,17 @@
 package com.clg.consistify.services;
 
 import com.clg.consistify.DTO.LoginBody;
-import com.clg.consistify.DTO.ProfileDTO;
 import com.clg.consistify.DTO.RegisterBody;
 import com.clg.consistify.DTO.UserDTO;
 import com.clg.consistify.exception.UserAlreadyExistException;
 import com.clg.consistify.exception.UserNotFoundException;
-import com.clg.consistify.exception.UsernameAlreadyExistException;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.MyUserDetailService;
 import com.clg.consistify.user.UserModel;
 import com.clg.consistify.utils.JwtUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -24,17 +20,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 
 @Service
 public class UserService {
@@ -71,7 +63,7 @@ public class UserService {
         user.setUsername(body.getUsername());
         user.setEmail(body.getEmail());
         user.setPassword(passwordEncoder.encode(body.getPassword()));
-        user.setXp(body.getXp());
+        user.setRank(body.getRank());
         user.setRole(body.getRole());
 
         UserModel savedUser = userRepository.save(user);
@@ -128,7 +120,7 @@ public class UserService {
         UserModel user=userRepository.findByUsername(username)
                 .orElseThrow(()-> new UsernameNotFoundException("User not found"));
         UserDTO getUser=new UserDTO();
-        getUser.setXp(user.getXp());
+        getUser.setRank(user.getRank());
         getUser.setUsername(username);
         getUser.setEmail(user.getEmail());
         getUser.setFriends(user.getFriends().stream().map(UserModel::getUsername).toList());

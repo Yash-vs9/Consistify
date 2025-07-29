@@ -1,7 +1,5 @@
 package com.clg.consistify.DTO;
 
-import org.springframework.security.core.userdetails.User;
-
 import java.util.List;
 
 public class UserDTO {
@@ -22,14 +20,14 @@ public class UserDTO {
         this.email = email;
     }
 
-    private String xp;
+    private String rank;
 
-    public String getXp() {
-        return xp;
+    public String getRank() {
+        return rank;
     }
 
-    public void setXp(String xp) {
-        this.xp = xp;
+    public void setRank(String rank) {
+        this.rank = rank;
     }
 
     public List<String> getFriendRequests() {
