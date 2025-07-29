@@ -18,6 +18,16 @@ public class UserModel {
     private String email;
     private String password;
     private String rank;
+    private int xp;
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
+    }
+
     @ElementCollection
     private List<String> friendRequests = new ArrayList<>();
 

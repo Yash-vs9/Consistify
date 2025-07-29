@@ -25,17 +25,20 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
 public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final UserService userService;
     @Autowired
     private CacheManager cacheManager;
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, UserService userService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
+        this.userService = userService;
     }
     @CacheEvict(value = "TaskModels", key = "#username")
     public TaskResponseDTO createTask(TaskDTO body,String username) {
@@ -82,7 +85,15 @@ public class TaskService {
         task.setUser(user);
 
         user.getTasks().add(task);
+
+
         userRepository.save(user);
+        CompletableFuture.runAsync(() -> {
+            int updatedXp = user.getXp() + 50;
+            user.setXp(updatedXp);
+            userService.evaluateRank();
+            userRepository.save(user); // Save updated XP and rank separately
+        });
         return new TaskResponseDTO(task);
 
     }

@@ -9,6 +9,7 @@ import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.MyUserDetailService;
 import com.clg.consistify.user.UserModel;
 import com.clg.consistify.utils.JwtUtils;
+import com.clg.consistify.utils.XpRankEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Service
-public class UserService {
+public class UserService extends XpRankEvaluator {
     @Autowired
     private UserRepository userRepository;
 
@@ -65,6 +66,7 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(body.getPassword()));
         user.setRank(body.getRank());
         user.setRole(body.getRole());
+        user.setXp(body.getXp());
 
         UserModel savedUser = userRepository.save(user);
         UserDetails userDetails = userDetailService.loadUserByUsername(savedUser.getUsername());
@@ -196,4 +198,12 @@ public class UserService {
         return toUser.getFriendRequests().contains(fromUsername);
     }
 
+    @Override
+    public void evaluateRank() {
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        UserModel user=userRepository.findByUsername(username)
+                .orElseThrow(()->new UserNotFoundException("User not found"));
+        user.setRank(calculateRank(user.getXp()));
+        userRepository.save(user);
+    }
 }

@@ -10,6 +10,16 @@ public class RegisterBody {
     private String password;
     private String role = "USER";
     private String rank = "E";
+    private int xp=0;
+
+    public int getXp() {
+        return xp;
+    }
+
+    public void setXp(int xp) {
+        this.xp = xp;
+    }
+
     private Set<UserModel> friends = null;
 
     // Getters and setters
