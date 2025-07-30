@@ -38,12 +38,15 @@ const BotpressWidget = ({ username }: BotpressWidgetProps) => {
         configuration: {
           botName: 'Task Manager',
           themeMode: 'dark',
-          color: '#06b6d4',
+          color: '#3B82F6',
+          variant:"solid",
+          botAvatar:"https://files.bpcontent.cloud/2025/07/19/14/20250719143105-QZGOT5K7.png",
+          fabImage:"https://files.bpcontent.cloud/2025/07/19/14/20250719143024-AI9MUICL.png",
           fontFamily: 'Inter',
           radius: 2,
           showPoweredBy: false,
-          additionalStylesheetUrl: '/botcss.css',
-        },
+          additionalStylesheetUrl: "https://files.bpcontent.cloud/2025/07/19/11/20250719113152-PW8IQ19Y.css",
+        }
       });
     };
 

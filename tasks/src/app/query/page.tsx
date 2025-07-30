@@ -1,5 +1,5 @@
 "use client"
-import BotpressWidgetHeadless from "components/BotpressWidgetHeadless";
+
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 
 type Query = {
@@ -194,7 +194,7 @@ export default function Home() {
           </ul>
         </section>
       </main>
-      <BotpressWidgetHeadless username="consistify@gmail.com"/>
+
     </div>
   );
 }
