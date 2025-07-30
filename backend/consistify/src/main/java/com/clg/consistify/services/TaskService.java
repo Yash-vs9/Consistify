@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -40,6 +42,9 @@ public class TaskService {
         this.userRepository = userRepository;
         this.userService = userService;
     }
+    @Autowired
+    @Lazy
+    private TaskService self;
     @CacheEvict(value = "TaskModels", key = "#username")
     public TaskResponseDTO createTask(TaskDTO body,String username) {
 
@@ -88,14 +93,15 @@ public class TaskService {
 
 
         userRepository.save(user);
-        CompletableFuture.runAsync(() -> {
-            int updatedXp = user.getXp() + 50;
-            user.setXp(updatedXp);
-            userService.evaluateRank();
-            userRepository.save(user); // Save updated XP and rank separately
-        });
+        self.updateXpAndRank(user);
         return new TaskResponseDTO(task);
 
+    }
+    public void updateXpAndRank(UserModel user) {
+        int updatedXp = user.getXp() + 50;
+        user.setXp(updatedXp);
+        userService.evaluateRank(user);
+        userRepository.save(user);
     }
     @Transactional
     @Cacheable(value = "TaskModels", key = "#username")

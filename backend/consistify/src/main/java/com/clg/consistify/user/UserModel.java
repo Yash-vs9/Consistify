@@ -18,7 +18,7 @@ public class UserModel {
     private String email;
     private String password;
     private String rank;
-    @Column(nullable = false, columnDefinition = "int default 0")
+    @Column(nullable = false)
     private int xp = 0;
 
     public int getXp() {

@@ -199,11 +199,8 @@ public class UserService extends XpRankEvaluator {
     }
 
     @Override
-    public void evaluateRank() {
-        String username=SecurityContextHolder.getContext().getAuthentication().getName();
-        UserModel user=userRepository.findByUsername(username)
-                .orElseThrow(()->new UserNotFoundException("User not found"));
+    public void evaluateRank(UserModel user) {
         user.setRank(calculateRank(user.getXp()));
-        userRepository.save(user);
+
     }
 }

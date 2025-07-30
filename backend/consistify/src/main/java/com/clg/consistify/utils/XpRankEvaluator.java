@@ -1,5 +1,7 @@
 package com.clg.consistify.utils;
 
+import com.clg.consistify.user.UserModel;
+
 public abstract class XpRankEvaluator {
     protected String calculateRank(int xp){
         if (xp > 5000) {
@@ -16,5 +18,5 @@ public abstract class XpRankEvaluator {
             return "E";
         }
     }
-    public abstract void evaluateRank();
+    public abstract void evaluateRank(UserModel user);
 }
