@@ -1,13 +1,13 @@
 package com.clg.consistify.DTO.BotBody;
 
-public class BotTaskBody {
+public class BotSkillBody {
     String name="react problem";
     String description="how to use lazy";
 
     public String getName() {
         return name;
     }
-    public BotTaskBody(String name,String description){
+    public BotSkillBody(String name, String description){
         this.description=description;
         this.name=name;
     }
