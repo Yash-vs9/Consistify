@@ -1,8 +1,8 @@
 package com.clg.consistify.DTO.BotBody;
 
-public class BotpressBody {
+public class BotpressSkillBody {
     String type="xp_request";
-    PayloadDTO payload;
+    PayloadSkillDTO payload;
     String conversationId="12345";
 
     public String getType() {
@@ -13,11 +13,11 @@ public class BotpressBody {
         this.type = type;
     }
 
-    public PayloadDTO getPayload() {
+    public PayloadSkillDTO getPayload() {
         return payload;
     }
 
-    public void setPayload(PayloadDTO payload) {
+    public void setPayload(PayloadSkillDTO payload) {
         this.payload = payload;
     }
 

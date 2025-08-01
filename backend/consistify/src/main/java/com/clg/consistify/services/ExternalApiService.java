@@ -1,10 +1,9 @@
 package com.clg.consistify.services;
 
-import com.clg.consistify.DTO.BotBody.BotTaskBody;
-import com.clg.consistify.DTO.BotBody.BotpressBody;
-import com.clg.consistify.DTO.BotBody.PayloadDTO;
+import com.clg.consistify.DTO.BotBody.*;
 import com.clg.consistify.DTO.QuoteDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -59,24 +59,42 @@ public class ExternalApiService {
         System.out.println("Generated JWT: " + xUserKey);
         return xUserKey;
     }
-//    public CompletableFuture<List<String>> skillsProcessing(BotpressBody body) throws JsonProcessingException {
-//        if (body.getPayload() == null) {
-//            body.setPayload(new PayloadDTO()); // or just new PayloadDTO()
-//        }
-//        body.getPayload().getTasks().add(new BotTaskBody("Lazy not working","React"));
-//        body.getPayload().setUsername("y");
-//        ObjectMapper mapper = new ObjectMapper();
-//        System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
-//        return webClient.post()
-//                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/events")
-//                .header("x-user-key","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEyMzQ1IiwiaWF0IjoxNzUzODc0MDU4fQ.2NCxrnwsNUaDwzEGHAE6u64MnBV2IxLoK9kJ5V61-qo")
-//                .contentType(MediaType.APPLICATION_JSON) // ✅ sets Content-Type: application/json
-//                .bodyValue(body)
-//                .retrieve()
-//                .bodyToFlux(String.class)
-//                .collectList()
-//                .toFuture();
-//    }
+    public CompletableFuture<List<String>> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
+        String xUserKey=createUserKey();
+        if (body.getPayload() == null) {
+            body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
+        }
+        body.getPayload().getTasks().add(new BotSkillBody("Lazy not working","React"));
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
+        return webClient.post()
+                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/events")
+                .header("x-user-key",xUserKey)
+                .contentType(MediaType.APPLICATION_JSON) // ✅ sets Content-Type: application/json
+                .bodyValue(body)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .collectList()
+                .toFuture();
+    }
+    public CompletableFuture<List<String>> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
+        String xUserKey=createUserKey();
+        if (body.getPayload()==null){
+            body.setPayload(new PayloadDifficultyDTO());
+        }
+        body.getPayload().getTasks().add(new BotDifficultyBody("DSA",new Date(2025,8,1),new Date(2025,8,11)));
+        ObjectMapper mapper=new ObjectMapper();
+        System.out.println("Sending payload:\n"+mapper.writeValueAsString(body));
+        return webClient.post()
+                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/events")
+                .header("x-user-key",xUserKey)
+                .contentType(MediaType.APPLICATION_JSON) // ✅ sets Content-Type: application/json
+                .bodyValue(body)
+                .retrieve()
+                .bodyToFlux(String.class)
+                .collectList()
+                .toFuture();
+    }
     public CompletableFuture<List<String>> createBotUser(){
         String xUserKey=createUserKey();
         String username=SecurityContextHolder.getContext().getAuthentication().getName();
@@ -107,16 +125,25 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<List<String >> getMesage() throws ExecutionException, InterruptedException {
+    public CompletableFuture<JsonNode> getMessage() throws ExecutionException, InterruptedException, JsonProcessingException {
         String username="12345";
         String xUserKey=createUserKey();
-        CompletableFuture<List<String>> body= webClient.get()
+        CompletableFuture<List<String>> responseFuture= webClient.get()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages",username)
                 .header("x-user-key",xUserKey)
                 .retrieve()
                 .bodyToFlux(String.class)
                 .collectList()
                 .toFuture();
-        return body;
+        List<String> response= responseFuture.get();
+        if(response.isEmpty()){
+            throw new RuntimeException("Empty response from API");
+        }
+        String jsonResponse=response.get(0);
+        ObjectMapper mapper=new ObjectMapper();
+        JsonNode root=mapper.readTree(jsonResponse);
+        JsonNode firstPayload=root.path("messages").get(0).path("payload").path("text");
+        System.out.println(firstPayload);
+        return CompletableFuture.completedFuture(firstPayload);
     }
 }
