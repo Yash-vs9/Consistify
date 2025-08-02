@@ -1,9 +1,11 @@
 package com.clg.consistify.DTO.BotBody;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 public class BotpressSkillBody {
     String type="xp_request";
     PayloadSkillDTO payload;
-    String conversationId="12345";
+    String conversationId= SecurityContextHolder.getContext().getAuthentication().getName();
 
     public String getType() {
         return type;

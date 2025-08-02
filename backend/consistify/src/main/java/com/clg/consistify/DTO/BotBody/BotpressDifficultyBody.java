@@ -1,9 +1,11 @@
 package com.clg.consistify.DTO.BotBody;
 
+import org.springframework.security.core.context.SecurityContextHolder;
+
 public class BotpressDifficultyBody {
     String type="task_difficulty";
     PayloadDifficultyDTO payload;
-    String conversationId="12345";
+    String conversationId;
 
     public PayloadDifficultyDTO getPayload() {
         return payload;

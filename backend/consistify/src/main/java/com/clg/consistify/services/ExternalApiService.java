@@ -9,7 +9,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -31,6 +35,17 @@ public class ExternalApiService {
     }
     private final Random random = new Random(); // better to reuse
 
+    public String getCurrentUsername() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            throw new RuntimeException("User is not authenticated");
+            // Or throw your custom exception:
+            // throw new UnauthenticatedUserException("User is not authenticated");
+        }
+
+        return authentication.getName();
+    }
 
     public CompletableFuture<QuoteDTO> dailyQuote(){
         return webClient.get()
@@ -43,7 +58,7 @@ public class ExternalApiService {
                 .toFuture();
     }
     public String createUserKey() {
-        String username = "12345";
+        String username = getCurrentUsername();
         String YOUR_USER_ID = username;
         String YOUR_ENCRYPTION_KEY = "yLmN89pVwXrTqLzKbNdGeSyFbQmTcHuY"; // secret key
 
@@ -59,7 +74,7 @@ public class ExternalApiService {
         System.out.println("Generated JWT: " + xUserKey);
         return xUserKey;
     }
-    public CompletableFuture<List<String>> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
+    public void skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
         String xUserKey=createUserKey();
         if (body.getPayload() == null) {
             body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
@@ -67,7 +82,7 @@ public class ExternalApiService {
         body.getPayload().getTasks().add(new BotSkillBody("Lazy not working","React"));
         ObjectMapper mapper = new ObjectMapper();
         System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
-        return webClient.post()
+        CompletableFuture<List<String>> response= webClient.post()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/events")
                 .header("x-user-key",xUserKey)
                 .contentType(MediaType.APPLICATION_JSON) // ✅ sets Content-Type: application/json
@@ -76,6 +91,10 @@ public class ExternalApiService {
                 .bodyToFlux(String.class)
                 .collectList()
                 .toFuture();
+        if(response.isCancelled()){
+            throw new RuntimeException("Error while sending Query to Bot");
+        }
+
     }
     public CompletableFuture<List<String>> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
         String xUserKey=createUserKey();
@@ -97,7 +116,8 @@ public class ExternalApiService {
     }
     public CompletableFuture<List<String>> createBotUser(){
         String xUserKey=createUserKey();
-        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String username=getCurrentUsername();
         HashMap<String, String > map=new HashMap<>();
         map.put("name",username);
         return webClient.post()
@@ -111,7 +131,7 @@ public class ExternalApiService {
                 .toFuture();
     }
     public CompletableFuture<List<String>> createConversation(){
-        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        String username=getCurrentUsername();
         String xUserKey=createUserKey();
         HashMap<String,String> map=new HashMap<>();
         map.put("id",username);
@@ -125,7 +145,7 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<JsonNode> getMessage() throws ExecutionException, InterruptedException, JsonProcessingException {
+    public CompletableFuture<String> getMessage(String queryName) throws ExecutionException, InterruptedException, JsonProcessingException {
         String username="12345";
         String xUserKey=createUserKey();
         CompletableFuture<List<String>> responseFuture= webClient.get()
@@ -136,14 +156,17 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
         List<String> response= responseFuture.get();
+        System.out.println(response);
         if(response.isEmpty()){
             throw new RuntimeException("Empty response from API");
         }
         String jsonResponse=response.get(0);
         ObjectMapper mapper=new ObjectMapper();
         JsonNode root=mapper.readTree(jsonResponse);
-        JsonNode firstPayload=root.path("messages").get(0).path("payload").path("text");
-        System.out.println(firstPayload);
-        return CompletableFuture.completedFuture(firstPayload);
+        String  firstPayload=root.path("messages").get(0).path("payload").path("text").asText();
+        JsonNode extracted=mapper.readTree(firstPayload);
+        String dsaValue = extracted.get(queryName).asText();
+        System.out.println(dsaValue);
+        return CompletableFuture.completedFuture(dsaValue);
     }
 }

@@ -22,4 +22,6 @@ public class PayloadSkillDTO {
     public void setTasks(List<BotSkillBody> tasks) {
         this.tasks = tasks;
     }
+
+
 }

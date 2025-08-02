@@ -3,9 +3,9 @@ package com.clg.consistify.DTO.BotBody;
 import java.util.Date;
 
 public class BotDifficultyBody {
-    String name="DSA";
-    Date startingDate= new Date(2025,8,1);
-    Date lastDate=new Date(2025,8,11);
+    String name;
+    Date startingDate;
+    Date lastDate;
     public BotDifficultyBody(String name,Date startingDate,Date lastDate){
         this.name=name;
         this.lastDate=lastDate;

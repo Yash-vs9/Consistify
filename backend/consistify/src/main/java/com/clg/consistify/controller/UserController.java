@@ -4,6 +4,7 @@ import com.clg.consistify.DTO.*;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.exception.UsernameAlreadyExistException;
 import com.clg.consistify.repository.UserRepository;
+import com.clg.consistify.services.ExternalApiService;
 import com.clg.consistify.services.UserService;
 import com.clg.consistify.user.MyUserDetailService;
 import com.clg.consistify.user.UserModel;
@@ -44,11 +45,12 @@ public class UserController {
     private final MyUserDetailService userDetailService;
 
     private final UserRepository userRepository;
+    private final ExternalApiService externalApiService;
 
-
-    public UserController(PasswordEncoder passwordEncoder, MyUserDetailService userDetailService, UserRepository userRepository, UserService userService) {
+    public UserController(PasswordEncoder passwordEncoder, MyUserDetailService userDetailService, UserRepository userRepository, ExternalApiService externalApiService, UserService userService) {
         this.userDetailService = userDetailService;
         this.userRepository = userRepository;
+        this.externalApiService = externalApiService;
         this.userService = userService;
     }
 
@@ -58,6 +60,9 @@ public class UserController {
     @CacheEvict(value = "users",allEntries = true)
     public ResponseEntity<Map<String, String>> register(@RequestBody RegisterBody body) {
         String jwt = userService.register(body);
+        externalApiService.createBotUser();
+        externalApiService.createConversation();
+
         return ResponseEntity.ok(Map.of("token", jwt));
     }
     @PostMapping("/login")
