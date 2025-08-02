@@ -27,38 +27,7 @@ export default function Home() {
   }
 
 
-
-//   function handleSubmit(e: FormEvent<HTMLFormElement>) {
-//     const sendXPRequest = () => {
-//     if (typeof window !== 'undefined' && window.botpress) {
-//       console.log("trigger");
-//       window.botpress.sendEvent({
-//         type: 'trigger',
-//         channel: 'web',
-//         payload: {
-//           type: 'xp_request',
-//           tasks: [
-//             { name: 'DSA', description: 'arrays and sorting' },
-//             { name: 'UI Design', description: 'responsive layout' },
-//             { name: 'Website Development',description: 'responsive page and full workable'}
-//           ]
-//         }
-//       });
-//     } else {
-//       console.warn('Botpress not ready');
-//     }
-//   };
-//     sendXPRequest()
-//     e.preventDefault();
-//     if (!form.title.trim() || !form.description.trim()) return;
-
-//     setQueries([
-//       { ...form, id: Date.now() },
-//       ...queries,
-//     ]);
-
-//     setForm({ title: "", description: "", category: "General" });
-//   }
+  
   useEffect(()=>{
     const storedToken=localStorage.getItem("authToken")
     setToken(storedToken as string)

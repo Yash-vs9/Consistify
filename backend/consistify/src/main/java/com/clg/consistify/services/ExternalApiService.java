@@ -74,28 +74,36 @@ public class ExternalApiService {
         System.out.println("Generated JWT: " + xUserKey);
         return xUserKey;
     }
-    public void skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
-        String xUserKey=createUserKey();
+    public CompletableFuture<Void> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
+        String xUserKey = createUserKey();
+
         if (body.getPayload() == null) {
             body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
         }
-        body.getPayload().getTasks().add(new BotSkillBody("Lazy not working","React"));
+        // Optional: You might want to reconsider if this dummy task should be always added
+        body.getPayload().getTasks().add(new BotSkillBody("Lazy not working", "React"));
+
         ObjectMapper mapper = new ObjectMapper();
         System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
-        CompletableFuture<List<String>> response= webClient.post()
+
+        return webClient.post()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/events")
-                .header("x-user-key",xUserKey)
-                .contentType(MediaType.APPLICATION_JSON) // ✅ sets Content-Type: application/json
+                .header("x-user-key", xUserKey)
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
                 .bodyToFlux(String.class)
                 .collectList()
-                .toFuture();
-        if(response.isCancelled()){
-            throw new RuntimeException("Error while sending Query to Bot");
-        }
-
+                .toFuture()
+                .thenAccept(responseList -> {
+                    if (responseList == null || responseList.isEmpty()) {
+                        throw new RuntimeException("Empty response from Botpress API");
+                    }
+                    // Additional validation can be added here if needed
+                    System.out.println("Received response from skillsProcessing: " + responseList);
+                });
     }
+
     public CompletableFuture<List<String>> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
         String xUserKey=createUserKey();
         if (body.getPayload()==null){
@@ -145,28 +153,32 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<String> getMessage(String queryName) throws ExecutionException, InterruptedException, JsonProcessingException {
-        String username="12345";
-        String xUserKey=createUserKey();
-        CompletableFuture<List<String>> responseFuture= webClient.get()
-                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages",username)
-                .header("x-user-key",xUserKey)
+    public CompletableFuture<String> getMessage(String queryName) {
+        String username = "12345";
+        String xUserKey = createUserKey();
+
+        return webClient.get()
+                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", username)
+                .header("x-user-key", xUserKey)
                 .retrieve()
                 .bodyToFlux(String.class)
                 .collectList()
-                .toFuture();
-        List<String> response= responseFuture.get();
-        System.out.println(response);
-        if(response.isEmpty()){
-            throw new RuntimeException("Empty response from API");
-        }
-        String jsonResponse=response.get(0);
-        ObjectMapper mapper=new ObjectMapper();
-        JsonNode root=mapper.readTree(jsonResponse);
-        String  firstPayload=root.path("messages").get(0).path("payload").path("text").asText();
-        JsonNode extracted=mapper.readTree(firstPayload);
-        String dsaValue = extracted.get(queryName).asText();
-        System.out.println(dsaValue);
-        return CompletableFuture.completedFuture(dsaValue);
+                .toFuture()
+                .thenApply(response -> {
+                    if (response == null || response.isEmpty()) {
+                        throw new RuntimeException("Empty response from API");
+                    }
+                    try {
+                        ObjectMapper mapper = new ObjectMapper();
+                        String jsonResponse = response.get(0);
+                        JsonNode root = mapper.readTree(jsonResponse);
+                        String firstPayload = root.path("messages").get(0).path("payload").path("text").asText();
+                        JsonNode extracted = mapper.readTree(firstPayload);
+                        return extracted.get(queryName).asText();
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Error parsing JSON response", e);
+                    }
+                });
     }
+
 }
