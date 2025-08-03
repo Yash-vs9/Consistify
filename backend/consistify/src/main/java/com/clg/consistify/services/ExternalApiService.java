@@ -75,7 +75,7 @@ public class ExternalApiService {
         return xUserKey;
     }
     public CompletableFuture<Void> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
-        String xUserKey = SecurityContextHolder.getContext().getAuthentication().getName();
+        String xUserKey = createUserKey(SecurityContextHolder.getContext().getAuthentication().getName());
 
         if (body.getPayload() == null) {
             body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
@@ -153,8 +153,8 @@ public class ExternalApiService {
                 .toFuture();
     }
     public CompletableFuture<String> getMessage(String queryName) {
-        String username = "12345";
-        String xUserKey = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String xUserKey = createUserKey(username);
 
         return webClient.get()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", username)
