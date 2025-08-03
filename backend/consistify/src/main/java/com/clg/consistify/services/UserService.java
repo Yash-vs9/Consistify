@@ -73,13 +73,6 @@ public class UserService extends XpRankEvaluator {
         UserDetails userDetails = userDetailService.loadUserByUsername(savedUser.getUsername());
         String jwt = jwtUtil.generateToken(savedUser.getUsername());
 
-        CompletableFuture.runAsync(() -> {
-            try {
-                sendWelcomeEmail(savedUser.getEmail());
-            } catch (Exception e) {
-                System.err.println("Failed to send welcome email: " + e.getMessage());
-            }
-        });
         return jwt;
     }
 

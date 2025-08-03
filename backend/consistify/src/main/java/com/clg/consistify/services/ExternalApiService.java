@@ -57,8 +57,8 @@ public class ExternalApiService {
                 .map(list -> list.get(random.nextInt(list.size()))) // pick random from list
                 .toFuture();
     }
-    public String createUserKey() {
-        String username = getCurrentUsername();
+    public String createUserKey(String username) {
+
         String YOUR_USER_ID = username;
         String YOUR_ENCRYPTION_KEY = "yLmN89pVwXrTqLzKbNdGeSyFbQmTcHuY"; // secret key
 
@@ -75,7 +75,7 @@ public class ExternalApiService {
         return xUserKey;
     }
     public CompletableFuture<Void> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
-        String xUserKey = createUserKey();
+        String xUserKey = SecurityContextHolder.getContext().getAuthentication().getName();
 
         if (body.getPayload() == null) {
             body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
@@ -105,7 +105,7 @@ public class ExternalApiService {
     }
 
     public CompletableFuture<List<String>> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
-        String xUserKey=createUserKey();
+        String xUserKey=SecurityContextHolder.getContext().getAuthentication().getName();
         if (body.getPayload()==null){
             body.setPayload(new PayloadDifficultyDTO());
         }
@@ -122,10 +122,9 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<List<String>> createBotUser(){
-        String xUserKey=createUserKey();
+    public CompletableFuture<List<String>> createBotUser(String username){
+        String xUserKey=createUserKey(username);
 
-        String username=getCurrentUsername();
         HashMap<String, String > map=new HashMap<>();
         map.put("name",username);
         return webClient.post()
@@ -138,9 +137,9 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<List<String>> createConversation(){
-        String username=getCurrentUsername();
-        String xUserKey=createUserKey();
+    public CompletableFuture<List<String>> createConversation(String username){
+
+        String xUserKey=createUserKey(username);
         HashMap<String,String> map=new HashMap<>();
         map.put("id",username);
         return webClient.post()
@@ -155,7 +154,7 @@ public class ExternalApiService {
     }
     public CompletableFuture<String> getMessage(String queryName) {
         String username = "12345";
-        String xUserKey = createUserKey();
+        String xUserKey = SecurityContextHolder.getContext().getAuthentication().getName();
 
         return webClient.get()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", username)

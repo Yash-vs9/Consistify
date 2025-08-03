@@ -60,8 +60,8 @@ public class UserController {
     @CacheEvict(value = "users",allEntries = true)
     public ResponseEntity<Map<String, String>> register(@RequestBody RegisterBody body) {
         String jwt = userService.register(body);
-        externalApiService.createBotUser();
-        externalApiService.createConversation();
+        externalApiService.createBotUser(body.getUsername());
+        externalApiService.createConversation(body.getUsername());
 
         return ResponseEntity.ok(Map.of("token", jwt));
     }
