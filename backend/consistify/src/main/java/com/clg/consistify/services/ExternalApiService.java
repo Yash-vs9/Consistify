@@ -153,7 +153,7 @@ public class ExternalApiService {
                 .toFuture();
     }
     public CompletableFuture<String> getMessage(String queryName) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = "lakshya12";
         String xUserKey = createUserKey(username);
 
         return webClient.get()
@@ -173,6 +173,9 @@ public class ExternalApiService {
                         JsonNode root = mapper.readTree(jsonResponse);
                         String firstPayload = root.path("messages").get(0).path("payload").path("text").asText();
                         JsonNode extracted = mapper.readTree(firstPayload);
+                        System.out.println(firstPayload);
+                        System.out.println(extracted);
+
                         return extracted.get(queryName).asText();
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException("Error parsing JSON response", e);
