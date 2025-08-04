@@ -121,6 +121,18 @@ const TaskList: React.FC = () => {
   if(tasks==null){
     return <LoadingPage/>
   }
+  if (status === "succeeded" && tasks.length === 0)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#0d0f1a] via-[#0e111f] to-[#050610] text-white">
+        <div className="absolute left-0">
+          <Sidebar />
+        </div>
+
+        <h1 className="text-3xl font-bold mb-4">No Tasks Found</h1>
+        <p className="text-gray-400">Start by creating a new task!</p>
+      </div>
+    );
+
   return (
     <div className="flex min-h-screen bg-[#0d0f1a] text-white">
       <Sidebar />
