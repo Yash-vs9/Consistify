@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5173",allowCredentials = "true")
@@ -60,8 +61,19 @@ public class UserController {
     @CacheEvict(value = "users",allEntries = true)
     public ResponseEntity<Map<String, String>> register(@RequestBody RegisterBody body) {
         String jwt = userService.register(body);
-        externalApiService.createBotUser(body.getUsername());
-        externalApiService.createConversation(body.getUsername());
+
+        CompletableFuture
+                .runAsync(() -> {
+                    externalApiService.createBotUser(body.getUsername());
+                })
+                .thenRun(() -> {
+                    externalApiService.createConversation(body.getUsername());
+                })
+                .exceptionally(ex -> {
+                    // Log the error
+                    System.err.println("Async error: " + ex.getMessage());
+                    return null;
+                });
 
         return ResponseEntity.ok(Map.of("token", jwt));
     }

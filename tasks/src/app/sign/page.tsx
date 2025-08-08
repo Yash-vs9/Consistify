@@ -13,11 +13,14 @@ const Sign: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false); // <<<< ADDED
   const router = useRouter();
-
+  interface LoginBody{
+    email: string ,
+    password: string
+  }
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true); // <<<< ADDED
-    const loginData = {
+    setIsLoading(true); 
+    const loginData : LoginBody={
       email: loginEmail,
       password: loginPassword,
     };

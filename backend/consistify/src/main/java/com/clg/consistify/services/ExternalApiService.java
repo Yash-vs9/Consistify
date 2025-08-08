@@ -153,7 +153,7 @@ public class ExternalApiService {
                 .toFuture();
     }
     public CompletableFuture<String> getMessage(String queryName) {
-        String username = "lakshya12";
+        String username = "cr7";
         String xUserKey = createUserKey(username);
 
         return webClient.get()
