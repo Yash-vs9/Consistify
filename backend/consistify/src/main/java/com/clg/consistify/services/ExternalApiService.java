@@ -3,11 +3,13 @@ package com.clg.consistify.services;
 import com.clg.consistify.DTO.BotBody.*;
 import com.clg.consistify.DTO.QuoteDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -19,10 +21,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -137,50 +136,76 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<List<String>> createConversation(String username){
+    public CompletableFuture<Map> createConversation(String username) throws Exception {
+        // Create the x-user-key
+        String xUserKey = createUserKey(username);
 
-        String xUserKey=createUserKey(username);
-        HashMap<String,String> map=new HashMap<>();
-        map.put("id",username);
-        return webClient.post()
-                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/get-or-create")
-                .header("x-user-key",xUserKey)
-                .header("Content-Type","application/json")
+        // Request body
+        Map<String, String> map = new HashMap<>();
+        map.put("id", username);
+
+        // API call
+        CompletableFuture<Map> result = webClient.post()
+                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations")
+                .header("x-user-key", xUserKey)
+                .header("Content-Type", "application/json")
                 .bodyValue(map)
                 .retrieve()
-                .bodyToFlux(String.class)
-                .collectList()
+                .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse
+                        .bodyToMono(String.class)
+                        .map(body -> new RuntimeException("API Error: " + body)))
+                .bodyToMono(Map.class) // Parse JSON into Map
                 .toFuture();
+
+        // Print the actual response (blocking here just for demo)
+        System.out.println(result.get());
+
+        return result;
     }
     public CompletableFuture<String> getMessage(String queryName) {
-        String username = "cr7";
+        String username = "d";
         String xUserKey = createUserKey(username);
 
         return webClient.get()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", username)
                 .header("x-user-key", xUserKey)
                 .retrieve()
-                .bodyToFlux(String.class)
-                .collectList()
+                .bodyToMono(String.class) // Get the whole JSON as one string
                 .toFuture()
-                .thenApply(response -> {
-                    if (response == null || response.isEmpty()) {
+                .thenApply(jsonResponse -> {
+                    if (jsonResponse == null || jsonResponse.isEmpty()) {
                         throw new RuntimeException("Empty response from API");
                     }
                     try {
                         ObjectMapper mapper = new ObjectMapper();
-                        String jsonResponse = response.get(0);
-                        JsonNode root = mapper.readTree(jsonResponse);
-                        String firstPayload = root.path("messages").get(0).path("payload").path("text").asText();
-                        JsonNode extracted = mapper.readTree(firstPayload);
-                        System.out.println(firstPayload);
-                        System.out.println(extracted);
 
-                        return extracted.get(queryName).asText();
+                        // Parse the main JSON
+                        JsonNode root = mapper.readTree(jsonResponse);
+
+                        // Get the payload text from the first message
+                        String firstPayload = root.path("messages").get(0)
+                                .path("payload").path("text").asText();
+
+                        // Parse the payload text (which itself is JSON)
+                        JsonNode extracted = mapper.readTree(firstPayload);
+                        JsonNode targetNode = extracted.get(queryName);
+
+                        if (targetNode == null) {
+                            throw new RuntimeException("Key not found in payload: " + queryName);
+                        }
+
+                        // If it's an array, return it as comma-separated string
+                        if (targetNode.isArray()) {
+                            List<String> list = mapper.convertValue(targetNode, new TypeReference<List<String>>() {});
+                            return String.join(", ", list);
+                        }
+
+                        // Otherwise, return as plain text
+                        return targetNode.asText();
+
                     } catch (JsonProcessingException e) {
                         throw new RuntimeException("Error parsing JSON response", e);
                     }
                 });
     }
-
 }

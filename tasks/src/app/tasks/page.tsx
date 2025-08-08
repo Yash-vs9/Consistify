@@ -37,7 +37,6 @@ const TaskList: React.FC = () => {
 
   const usernameJWT = getUsernameFromToken(token);
 
-  // pages/api/ask.js
 
 
 
@@ -45,7 +44,8 @@ const TaskList: React.FC = () => {
 
 
 
-  // ✅ Read localStorage in `useEffect` safely
+
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedToken = localStorage.getItem("authToken");
@@ -57,7 +57,7 @@ const TaskList: React.FC = () => {
     }
   }, []);
 
-  // 🔁 Fetch tasks once token is available
+
   useEffect(() => {
     const fetchTasks = async () => {
       if (!token) return;
@@ -88,7 +88,7 @@ const TaskList: React.FC = () => {
     if (token) fetchTasks();
   }, [token]);
 
-  // 📣 Task refresh method to be passed to TaskCard
+
   const handleTaskChange = () => {
 
     if (token) {
