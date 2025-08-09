@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
 
 type Query = {
@@ -19,7 +20,7 @@ export default function Home() {
     description: "",
     category: "General",
   });
-
+  const router=useRouter()
   function handleChange(
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) {
@@ -67,7 +68,12 @@ export default function Home() {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 transition-all">
       {/* Glow effect */}
-      <div
+      <button
+      onClick={() => router.push("/queries")}
+      className="rounded bg-blue-500 p-2 absolute right-10 top-20 text-black hover:bg-cyan-300 transition-colors"
+    >
+      View All Queries
+    </button>      <div
         className="absolute -z-10"
         aria-hidden
       >

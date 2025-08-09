@@ -75,7 +75,7 @@ public class TaskServiceTest {
         UserModel user=new UserModel();
         user.getTasks().add(task);
         when(userRepository.findByUsername("yash")).thenReturn(Optional.of(user));
-        taskService.deleteByUserName(task.getTaskName());
+        taskService.deleteByUserName(task.getTaskName(),userName);
         verify(userRepository,times(1)).save(user);
         assertEquals(0, user.getTasks().size());
 

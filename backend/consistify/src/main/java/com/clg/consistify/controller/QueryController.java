@@ -1,6 +1,7 @@
 package com.clg.consistify.controller;
 
 import com.clg.consistify.DTO.QueryDTO;
+import com.clg.consistify.DTO.QueryGetDTO;
 import com.clg.consistify.services.ExternalApiService;
 import com.clg.consistify.services.QueryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -28,4 +30,8 @@ public class QueryController {
         queryService.createQuery(body);
         return ResponseEntity.ok("Query Submitted");
     }
+    public ResponseEntity<List<QueryGetDTO>> getAllQueries(){
+
+    }
+
 }

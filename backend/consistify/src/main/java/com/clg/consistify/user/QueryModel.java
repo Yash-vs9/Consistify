@@ -14,6 +14,8 @@ public class QueryModel {
     private String name;
     private String description;
     private String status;
+    private String likes;
+    private String comments;
     private List<String> skillsRequired=new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "user_id")

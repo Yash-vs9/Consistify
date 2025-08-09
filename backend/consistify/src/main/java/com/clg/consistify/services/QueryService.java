@@ -4,6 +4,7 @@ import com.clg.consistify.DTO.BotBody.BotSkillBody;
 import com.clg.consistify.DTO.BotBody.BotpressSkillBody;
 import com.clg.consistify.DTO.BotBody.PayloadSkillDTO;
 import com.clg.consistify.DTO.QueryDTO;
+import com.clg.consistify.DTO.QueryGetDTO;
 import com.clg.consistify.exception.FieldNullException;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.repository.QueryRepository;
@@ -107,5 +108,10 @@ public class QueryService {
             // Optionally wrap or handle exceptions here
         }
     }
+//    public List<QueryGetDTO> getQueries(){
+//        List<QueryGetDTO> queries= queryRepository.findAll()
+//                .stream()
+//                .map(QueryModel::);
+//    }
 
 }

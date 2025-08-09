@@ -131,9 +131,9 @@ public class TaskService {
                 .map(TaskModel::getTaskName)
                 .collect(Collectors.toList());
     }
+    @CacheEvict(value = "TaskModels",key = "#username")
+    public void deleteByUserName(String deletetaskname,String username) {
 
-    public void deleteByUserName(String deletetaskname) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserModel user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -164,7 +164,7 @@ public class TaskService {
                 .stream()
                 .filter(t -> t.getTaskName().equalsIgnoreCase(dto.getOldtaskName()))
                 .findFirst()
-                .orElseThrow(() -> new TaskAlreadyExistException("Task with the old name not found"));
+                .orElseThrow(() -> new TaskAlreadyExistException("Task Already exist"));
 
         // 2. Check if another task with the new name already exists (avoid duplicate names)
         if (dto.getNewtaskName() != null && !dto.getNewtaskName().equalsIgnoreCase(dto.getOldtaskName())) {

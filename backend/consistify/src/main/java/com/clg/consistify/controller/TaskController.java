@@ -41,8 +41,9 @@ public class TaskController {
     }
     @DeleteMapping("/delete/{taskName}")
     public ResponseEntity<String> deletebytaskid(@PathVariable String taskName){
+
         String userName= SecurityContextHolder.getContext().getAuthentication().getName();
-        taskService.deleteByUserName(taskName);
+        taskService.deleteByUserName(taskName,userName);
         return ResponseEntity.ok("Task deleted Successfully. ");
     }
     @PutMapping("/edit")
