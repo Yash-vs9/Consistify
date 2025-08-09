@@ -1,5 +1,6 @@
 package com.clg.consistify.DTO;
 
+import com.clg.consistify.user.Comment;
 import com.clg.consistify.user.QueryModel;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class QueryGetDTO {
     private String queryName;
     private String queryDescription;
     private int likes;
-    private List<String> comments;
+    private List<Comment> comments;
     private List<String> skillsRequired;
     private String username;
 
@@ -62,11 +63,11 @@ public class QueryGetDTO {
         this.likes = likes;
     }
 
-    public List<String> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<String> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
 

@@ -16,7 +16,8 @@ public class QueryModel {
     private String description;
     private String status;
     private int likes;
-    private List<String> comments;
+    @OneToMany(mappedBy = "query")
+    private List<Comment> comments;
     private List<String> skillsRequired=new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -39,11 +40,11 @@ public class QueryModel {
         this.likes = likes;
     }
 
-    public List<String> getComments() {
+    public List<Comment> getComments() {
         return comments;
     }
 
-    public void setComments(List<String> comments) {
+    public void setComments(List<Comment> comments) {
         this.comments = comments;
     }
 
