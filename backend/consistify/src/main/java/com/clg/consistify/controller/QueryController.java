@@ -7,10 +7,7 @@ import com.clg.consistify.services.QueryService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -30,8 +27,9 @@ public class QueryController {
         queryService.createQuery(body);
         return ResponseEntity.ok("Query Submitted");
     }
+    @GetMapping("/get")
     public ResponseEntity<List<QueryGetDTO>> getAllQueries(){
-
+        return ResponseEntity.ok(queryService.getQueries());
     }
 
 }

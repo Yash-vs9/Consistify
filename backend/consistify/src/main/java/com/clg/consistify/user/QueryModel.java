@@ -1,5 +1,6 @@
 package com.clg.consistify.user;
 
+import com.clg.consistify.DTO.QueryGetDTO;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -14,12 +15,37 @@ public class QueryModel {
     private String name;
     private String description;
     private String status;
-    private String likes;
-    private String comments;
+    private int likes;
+    private List<String> comments;
     private List<String> skillsRequired=new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
+    public QueryModel(){}
+    public QueryModel(QueryGetDTO body){
+        this.name=body.getQueryName();
+        this.description=body.getQueryDescription();
+        this.likes=body.getLikes();
+        this.comments=body.getComments();
+        this.skillsRequired=body.getSkillsRequired();
+
+    }
+
+    public int getLikes() {
+        return likes;
+    }
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
+
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<String> comments) {
+        this.comments = comments;
+    }
 
     public long getQueryId() {
         return queryId;

@@ -107,11 +107,13 @@ public class QueryService {
             e.printStackTrace();
             // Optionally wrap or handle exceptions here
         }
+
     }
-//    public List<QueryGetDTO> getQueries(){
-//        List<QueryGetDTO> queries= queryRepository.findAll()
-//                .stream()
-//                .map(QueryModel::);
-//    }
+    public List<QueryGetDTO> getQueries(){
+        return queryRepository.findAll()
+                .stream()
+                .map((QueryGetDTO::new))
+                .toList();
+    }
 
 }
