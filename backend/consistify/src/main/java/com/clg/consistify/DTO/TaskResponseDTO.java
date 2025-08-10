@@ -11,7 +11,17 @@ public class TaskResponseDTO {
     private String taskPriority;
     private Date startingDate;
     private Date lastDate;
+    private String description;
+
     private String userName;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public String getUserName() {
         return userName;
@@ -27,6 +37,7 @@ public class TaskResponseDTO {
         this.startingDate = task.getStartingDate();
         this.lastDate = task.getLastDate();
         this.userName=task.getUser().getUsername();
+        this.description=task.getDescription();
 
     }
     public TaskResponseDTO(){

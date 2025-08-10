@@ -14,7 +14,7 @@ interface Task {
   taskPriority: string;
   startingDate: string;
   lastDate: string;
-  collaborators: string[];
+  description: string;
 }
 
 const TaskList: React.FC = () => {
@@ -78,6 +78,7 @@ const TaskList: React.FC = () => {
 
         const data: Task[] = await response.json();
         setTasks(data);
+        console.log(data)
         setStatus("succeeded");
       } catch (err: any) {
         setError(err.message || "Something went wrong");
