@@ -11,7 +11,6 @@ public class TaskResponseDTO {
     private String taskPriority;
     private Date startingDate;
     private Date lastDate;
-    private List<String> collaborators;
     private String userName;
 
     public String getUserName() {
@@ -27,7 +26,6 @@ public class TaskResponseDTO {
         this.taskPriority = task.getTaskPriority();
         this.startingDate = task.getStartingDate();
         this.lastDate = task.getLastDate();
-        this.collaborators = task.getCollaborators();
         this.userName=task.getUser().getUsername();
 
     }
@@ -66,11 +64,4 @@ public class TaskResponseDTO {
         this.lastDate = lastDate;
     }
 
-    public List<String> getCollaborators() {
-        return collaborators;
-    }
-
-    public void setCollaborators(List<String> collaborators) {
-        this.collaborators = collaborators;
-    }
 }

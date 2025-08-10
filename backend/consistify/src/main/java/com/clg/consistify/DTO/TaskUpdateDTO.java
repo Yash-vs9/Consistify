@@ -1,7 +1,6 @@
 package com.clg.consistify.DTO;
 
 import java.util.Date;
-import java.util.List;
 
 public class TaskUpdateDTO {
     private String oldtaskName;
@@ -9,15 +8,16 @@ public class TaskUpdateDTO {
     private Date startingDate;
     private Date lastDate;
     private String taskPriority;
-    private List<String> collaborators;
+    private String description;
 
-    public TaskUpdateDTO(String oldtaskName, String newtaskName, Date startingDate, Date lastDate, String taskPriority, Long userId, List<String> collaborators) {
+
+    public TaskUpdateDTO(String oldtaskName, String newtaskName, Date startingDate, Date lastDate, String taskPriority, Long userId,String description) {
         this.newtaskName = newtaskName;
         this.startingDate = startingDate;
         this.lastDate = lastDate;
         this.taskPriority = taskPriority;
-        this.collaborators = collaborators;
         this.oldtaskName=oldtaskName;
+        this.description=description;
     }
 
     public TaskUpdateDTO() {
@@ -64,11 +64,11 @@ public class TaskUpdateDTO {
         this.taskPriority = taskPriority;
     }
 
-    public List<String> getCollaborators() {
-        return collaborators;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCollaborators(List<String> collaborators) {
-        this.collaborators = collaborators;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

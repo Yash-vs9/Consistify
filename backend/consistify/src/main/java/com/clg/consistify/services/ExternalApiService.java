@@ -80,8 +80,6 @@ public class ExternalApiService {
             body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
         }
         // Optional: You might want to reconsider if this dummy task should be always added
-        body.getPayload().getTasks().add(new BotSkillBody("Lazy not working", "React"));
-
         ObjectMapper mapper = new ObjectMapper();
         System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
 
@@ -102,13 +100,11 @@ public class ExternalApiService {
                     System.out.println("Received response from skillsProcessing: " + responseList);
                 });
     }
-
-    public CompletableFuture<List<String>> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
+    public CompletableFuture<Void> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
         String xUserKey=SecurityContextHolder.getContext().getAuthentication().getName();
         if (body.getPayload()==null){
             body.setPayload(new PayloadDifficultyDTO());
         }
-        body.getPayload().getTasks().add(new BotDifficultyBody("DSA",new Date(2025,8,1),new Date(2025,8,11)));
         ObjectMapper mapper=new ObjectMapper();
         System.out.println("Sending payload:\n"+mapper.writeValueAsString(body));
         return webClient.post()
@@ -119,7 +115,14 @@ public class ExternalApiService {
                 .retrieve()
                 .bodyToFlux(String.class)
                 .collectList()
-                .toFuture();
+                .toFuture()
+                .thenAccept(responseList -> {
+                    if (responseList == null || responseList.isEmpty()) {
+                        throw new RuntimeException("Empty response from Botpress API");
+                    }
+                    // Additional validation can be added here if needed
+                    System.out.println("Received response from skillsProcessing: " + responseList);
+                });
     }
     public CompletableFuture<List<String>> createBotUser(String username){
         String xUserKey=createUserKey(username);
@@ -162,12 +165,11 @@ public class ExternalApiService {
 
         return result;
     }
-    public CompletableFuture<String> getMessage(String queryName) {
-        String username = "d";
-        String xUserKey = createUserKey(username);
+    public CompletableFuture<List<String>> getMessageOfSkillMap(String queryName,String userName) {
+        String xUserKey = createUserKey(userName);
 
         return webClient.get()
-                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", username)
+                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", userName)
                 .header("x-user-key", xUserKey)
                 .retrieve()
                 .bodyToMono(String.class) // Get the whole JSON as one string
@@ -196,7 +198,52 @@ public class ExternalApiService {
 
                         // If it's an array, return it as comma-separated string
                         if (targetNode.isArray()) {
-                            List<String> list = mapper.convertValue(targetNode, new TypeReference<List<String>>() {});
+                            return mapper.convertValue(targetNode,new TypeReference<List<String>>() {});
+                        }
+
+                        // Otherwise, return as plain text
+                        return List.of(targetNode.asText());
+
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException("Error parsing JSON response", e);
+                    }
+                });
+    }
+    public CompletableFuture<String> getMessageOfTaskDifficulty(String taskName,String userName) {
+        String xUserKey = createUserKey(userName);
+
+        return webClient.get()
+                .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", userName)
+                .header("x-user-key", xUserKey)
+                .retrieve()
+                .bodyToMono(String.class) // Get the whole JSON as one string
+                .toFuture()
+                .thenApply(jsonResponse -> {
+                    if (jsonResponse == null || jsonResponse.isEmpty()) {
+                        throw new RuntimeException("Empty response from API");
+                    }
+                    try {
+                        ObjectMapper mapper = new ObjectMapper();
+
+                        // Parse the main JSON
+                        JsonNode root = mapper.readTree(jsonResponse);
+
+                        // Get the payload text from the first message
+                        String firstPayload = root.path("messages").get(0)
+                                .path("payload").path("text").asText();
+
+                        // Parse the payload text (which itself is JSON)
+                        JsonNode extracted = mapper.readTree(firstPayload);
+                        JsonNode targetNode = extracted.get(taskName);
+
+                        if (targetNode == null) {
+                            throw new RuntimeException("Key not found in payload: " + taskName);
+                        }
+
+                        // If it's an array, return it as comma-separated string
+                        if (targetNode.isArray()) {
+                            List<String> list = mapper.convertValue(targetNode, new TypeReference<List<String>>() {
+                            });
                             return String.join(", ", list);
                         }
 

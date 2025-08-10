@@ -5,7 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class BotpressDifficultyBody {
     String type="task_difficulty";
     PayloadDifficultyDTO payload;
-    String conversationId;
+    String conversationId=SecurityContextHolder.getContext().getAuthentication().getName();
 
     public PayloadDifficultyDTO getPayload() {
         return payload;

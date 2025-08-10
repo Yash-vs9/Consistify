@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @Table(name = "user_tasks")
@@ -20,21 +19,11 @@ public class TaskModel {
     private Date startingDate;
     @NotNull(message = "Last date is required")
     private Date lastDate;
-
-    public List<String> getCollaborators() {
-        return collaborators;
-    }
-
-    public void setCollaborators(List<String> collaborators) {
-        this.collaborators = collaborators;
-    }
+    private String difficulty;
+    private String description;
 
     private String taskPriority;
 
-    @ElementCollection
-    @CollectionTable(name = "task_collaborators", joinColumns = @JoinColumn(name = "task_id"))
-    @Column(name = "collaborator")
-    private List<String> collaborators;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
@@ -79,9 +68,23 @@ public class TaskModel {
         return user;
     }
 
+    public String getDifficulty() {
+        return difficulty;
+    }
+
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
+    }
+
     public void setUser(UserModel user) {
         this.user = user;
     }
 
+    public String getDescription() {
+        return description;
+    }
 
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }

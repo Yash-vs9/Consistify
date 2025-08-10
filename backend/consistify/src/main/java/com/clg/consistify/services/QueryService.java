@@ -12,6 +12,7 @@ import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.QueryModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.management.Query;
@@ -51,7 +52,7 @@ public class QueryService {
         query.setUser(userRepository.findByUsername(body.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User not found")));
 
-        queryRepository.save(query);
+//        queryRepository.save(query);
 
         // Prepare BotpressSkillBody payload
         BotpressSkillBody requestBody = new BotpressSkillBody();
@@ -63,10 +64,7 @@ public class QueryService {
         requestBody.setPayload(payload);
 
         // Guard clause to ensure payload is valid
-        if (requestBody != null &&
-                requestBody.getPayload() != null &&
-                requestBody.getPayload().getTasks() != null &&
-                !requestBody.getPayload().getTasks().isEmpty()) {
+        if (requestBody.getPayload() != null && requestBody.getPayload().getTasks() != null && !requestBody.getPayload().getTasks().isEmpty()) {
 
             // Update the first task with the query info (optional but you did it)
             requestBody.getPayload().getTasks().get(0).setDescription(body.getDescription());
@@ -90,21 +88,25 @@ public class QueryService {
             throw e;
         }
 
-        CompletableFuture<String> resultFuture = skillFuture.thenCompose(unused -> {
+        CompletableFuture<List<String>> resultFuture = skillFuture.thenCompose(unused -> {
             try {
-                return externalApiService.getMessage(body.getQueryName());
+                return externalApiService.getMessageOfSkillMap(body.getQueryName(), SecurityContextHolder.getContext().getAuthentication().getName());
             } catch (Exception e) {
-                CompletableFuture<String> failedFuture = new CompletableFuture<>();
+                CompletableFuture<List<String>> failedFuture = new CompletableFuture<>();
                 failedFuture.completeExceptionally(e);
                 return failedFuture;
             }
         });
 
         try {
-            String result = resultFuture.get(); // blocks until complete
-            System.out.println("Result from getMessage: " + result);
+            List<String> skillsList = resultFuture.get(); // blocks until complete
+            System.out.println("Skills from API: " + skillsList);
+
+            query.setSkillsRequired(skillsList);
+            queryRepository.save(query);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
+            throw e;
             // Optionally wrap or handle exceptions here
         }
 

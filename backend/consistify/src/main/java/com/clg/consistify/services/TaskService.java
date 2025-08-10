@@ -1,5 +1,8 @@
 package com.clg.consistify.services;
 
+import com.clg.consistify.DTO.BotBody.BotDifficultyBody;
+import com.clg.consistify.DTO.BotBody.BotpressDifficultyBody;
+import com.clg.consistify.DTO.BotBody.PayloadDifficultyDTO;
 import com.clg.consistify.DTO.TaskDTO;
 import com.clg.consistify.DTO.TaskResponseDTO;
 import com.clg.consistify.DTO.TaskUpdateDTO;
@@ -9,6 +12,7 @@ import com.clg.consistify.repository.TaskRepository;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.TaskModel;
 import com.clg.consistify.user.UserModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
@@ -28,6 +32,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,18 +40,20 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final ExternalApiService externalApiService;
     @Autowired
     private CacheManager cacheManager;
-    public TaskService(TaskRepository taskRepository, UserRepository userRepository, UserService userService) {
+    public TaskService(TaskRepository taskRepository, UserRepository userRepository, UserService userService, ExternalApiService externalApiService) {
         this.taskRepository = taskRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.externalApiService = externalApiService;
     }
     @Autowired
     @Lazy
     private TaskService self;
     @CacheEvict(value = "TaskModels", key = "#username")
-    public TaskResponseDTO createTask(TaskDTO body,String username) {
+    public TaskResponseDTO createTask(TaskDTO body,String username) throws ExecutionException, InterruptedException {
 
         UserModel user = getUserByUsername(username);
 
@@ -86,13 +93,50 @@ public class TaskService {
         task.setTaskPriority(body.getTaskPriority());
         task.setStartingDate(body.getStartingDate());
         task.setLastDate(body.getLastDate());
-        task.setCollaborators(body.getCollaborators());
+        task.setDescription(body.getDescription());
         task.setUser(user);
+        //creating  the payload
+        BotpressDifficultyBody requestBody=new BotpressDifficultyBody();
+        PayloadDifficultyDTO payload=new PayloadDifficultyDTO();
+        BotDifficultyBody tasks = new BotDifficultyBody(body.getTaskName(),body.getStartingDate(),body.getLastDate());
+        payload.getTasks().add(tasks);
+        requestBody.setPayload(payload);
+        if (requestBody.getPayload() != null && requestBody.getPayload().getTasks() != null && !requestBody.getPayload().getTasks().isEmpty()) {
 
-        user.getTasks().add(task);
+            // Update the first task with the query info (optional but you did it)
+            requestBody.getPayload().getTasks().get(0).setName(body.getTaskName());
+            requestBody.getPayload().getTasks().get(0).setStartingDate(body.getStartingDate());
+            requestBody.getPayload().getTasks().get(0).setLastDate(body.getLastDate());
 
+        }
+        CompletableFuture<Void> skillFuture;
+        try {
+            skillFuture=externalApiService.taskdifficulty(requestBody);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+        CompletableFuture<String> resultFuture = skillFuture.thenCompose(unused -> {
+            try {
+                return externalApiService.getMessageOfTaskDifficulty(body.getTaskName(), SecurityContextHolder.getContext().getAuthentication().getName());
+            } catch (Exception e) {
+                CompletableFuture<String > failedFuture = new CompletableFuture<>();
+                failedFuture.completeExceptionally(e);
+                return failedFuture;
+            }
+        });
 
-        userRepository.save(user);
+        try {
+            String taskdifficulty = resultFuture.get(); // blocks until complete
+            System.out.println("Skills from API: " + taskdifficulty);
+
+            task.setDifficulty(taskdifficulty);
+            user.getTasks().add(task);
+            userRepository.save(user);
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            throw e;
+            // Optionally wrap or handle exceptions here
+        }
         self.updateXpAndRank(user);
         return new TaskResponseDTO(task);
 
@@ -213,10 +257,15 @@ public class TaskService {
             }
             task.setLastDate(dto.getLastDate());
         }
-
-        if (dto.getCollaborators() != null) {
-            task.setCollaborators(dto.getCollaborators());
+        if(dto.getDescription() !=null){
+            if (!dto.getDescription().equals("")){
+                task.setDescription(dto.getDescription());
+            }
+            else {
+                task.setDescription("None");
+            }
         }
+        
 
         taskRepository.save(task);
         cacheManager.getCache("TaskModels").evict(username);
@@ -236,7 +285,6 @@ public class TaskService {
         getTask.setTaskPriority(task.getTaskPriority());
         getTask.setLastDate(task.getLastDate());
         getTask.setStartingDate(task.getStartingDate());
-        getTask.setCollaborators(task.getCollaborators());
         return getTask;
     }
 

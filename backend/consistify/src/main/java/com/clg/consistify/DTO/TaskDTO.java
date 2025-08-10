@@ -11,22 +11,19 @@ public class TaskDTO {
     private Date lastDate;
     private String taskPriority;
     private Long userId;
-    private List<String> collaborators;
+    private String description;
 
-    public TaskDTO(List<String> collaborators) {
-        this.collaborators = collaborators;
-    }
-    public TaskDTO() {
-    }
 
-    public TaskDTO(Long id, String taskName, Date startingDate, Date lastDate, String taskPriority, Long userId, List<String> collaborators) {
+
+    public TaskDTO(Long id, String taskName, Date startingDate, Date lastDate, String taskPriority, Long userId,String description) {
         this.task_id = id;
         this.taskName = taskName;
         this.startingDate = startingDate;
         this.lastDate = lastDate;
         this.taskPriority = taskPriority;
         this.userId = userId;
-        this.collaborators = collaborators;
+        this.description=description;
+
     }
 
 
@@ -78,11 +75,11 @@ public class TaskDTO {
         this.userId = userId;
     }
 
-    public List<String> getCollaborators() {
-        return collaborators;
+    public String getDescription() {
+        return description;
     }
 
-    public void setCollaborators(List<String> collaborators) {
-        this.collaborators = collaborators;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

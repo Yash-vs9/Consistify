@@ -18,6 +18,7 @@ public class QueryModel {
     private int likes;
     @OneToMany(mappedBy = "query")
     private List<Comment> comments;
+    @ElementCollection
     private List<String> skillsRequired=new ArrayList<>();
     @ManyToOne
     @JoinColumn(name = "user_id")
