@@ -1,128 +1,130 @@
-"use client"
-import { useEffect, useState } from 'react'
+"use client";
+import { useEffect, useState } from "react";
 
 export default function Profile() {
-  const [token,setToken]=useState<string>("")
-  const [name,setName]=useState<string>("")
-  const [xp,setXp]=useState<string>("")
-  const [countFriends,setCountFriends]=useState<number>(0)
-  const [countTasks,setCountTasks]=useState<number>(0)
-  useEffect(()=>{
+  const [token, setToken] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [xp, setXp] = useState<number>(0);
+  const [countFriends, setCountFriends] = useState<number>(0);
+  const [countTasks, setCountTasks] = useState<number>(0);
 
-    const storedToken=localStorage.getItem("authToken")
+  const rank = xp > 2000 ? "S" : xp > 1000 ? "A" : xp > 500 ? "B" : "C";
 
-    setToken(storedToken as string)
-  },[token])
-  useEffect(()=>{
-    if(!token) return
-    const fetchProfile=(async()=>{
-      try{
-        console.log("FDDS")
+  // Rank thresholds
+  const thresholds = { C: 0, B: 500, A: 1000, S: 2000 };
 
-        const response=await fetch("http://localhost:8080/profile",{
-          method:"GET",
-          headers:{
-            Authorization:`Bearer ${token}`,
-            "Content-Type":"application/json"
-          }
-        })
-        if(!response.ok){
-          const errData=await response.text()
-          throw new Error(errData)
-        }
-        const data=await response.json()
-        console.log(data)
-        setName(data[0][0])
-        setXp(data[0][1])
-        setCountFriends(data[0][2])
-        setCountTasks(data[0][3])
+  let currentRankXp = 0;
+  let nextRankXp = 0;
 
+  if (rank === "C") {
+    currentRankXp = thresholds.C;
+    nextRankXp = thresholds.B;
+  } else if (rank === "B") {
+    currentRankXp = thresholds.B;
+    nextRankXp = thresholds.A;
+  } else if (rank === "A") {
+    currentRankXp = thresholds.A;
+    nextRankXp = thresholds.S;
+  } else {
+    currentRankXp = thresholds.S;
+    nextRankXp = thresholds.S;
+  }
+
+  const progressPercent =
+    rank === "S"
+      ? 100
+      : Math.min(((xp - currentRankXp) / (nextRankXp - currentRankXp)) * 100, 100);
+
+  useEffect(() => {
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) {
+      setToken(storedToken);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    const fetchProfile = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/profile", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        if (!response.ok) throw new Error(await response.text());
+
+        const data = await response.json();
+        setName(data[0][0]);
+        setXp(data[0][1]);
+        setCountFriends(data[0][2]);
+        setCountTasks(data[0][3]);
+      } catch (e) {
+        console.error(e);
       }
-      catch(e){
-        console.log(e);
-      }
-     
-    })
-    fetchProfile()
+    };
+    fetchProfile();
+  }, [token]);
 
-  },[token])
   return (
-    
-    <div className="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen flex flex-col items-center">
-      <div className="w-full max-w-2xl mx-auto mt-12 rounded-xl shadow-lg bg-gray-900 p-8 text-white">
-        {/* Profile Header */}
-        <div className="flex items-center space-x-6 mb-8">
+    <div className="relative min-h-screen flex justify-center items-center overflow-hidden p-4 bg-gray-950">
+      {/* Animated Glowing Background */}
+      <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-700 opacity-30 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-[30rem] h-[30rem] bg-cyan-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
+
+      {/* Card */}
+      <div className="relative w-full max-w-md bg-gray-900 rounded-xl shadow-2xl border border-gray-700 p-8 backdrop-blur-lg bg-opacity-90 transition-transform hover:scale-[1.01] hover:shadow-cyan-500/30">
         
-          <div>
-            <h1 className="text-3xl font-bold mb-1">{name}</h1>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center">
+        {/* Profile Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-white drop-shadow-lg">{name || "User"}</h1>
+          <p className="text-sm text-gray-400">Professional Profile Overview</p>
+        </div>
 
-                <span className="ml-2 text-yellow-300 font-semibold text-lg">Diamond League</span>
-              </div>
-            </div>
-            <p className="text-gray-400 font-medium">FPS Specialist | #PC | #RPG | #Shooter</p>
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-4 text-center mb-6">
+          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-blue-400/50 transition">
+            <div className="text-2xl font-semibold text-blue-400">{countTasks}</div>
+            <div className="text-gray-400 text-sm">Tasks</div>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-pink-400/50 transition">
+            <div className="text-2xl font-semibold text-pink-400">{countFriends}</div>
+            <div className="text-gray-400 text-sm">Followers</div>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-green-400/50 transition">
+            <div className="text-2xl font-semibold text-green-400">{xp}</div>
+            <div className="text-gray-400 text-sm">XP</div>
+          </div>
+          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-yellow-400/50 transition">
+            <div className="text-2xl font-semibold text-yellow-400">{rank}</div>
+            <div className="text-gray-400 text-sm">Rank</div>
           </div>
         </div>
 
-        {/* Stat Overview */}
-        <div className="grid grid-cols-3 gap-4 mb-6 text-center">
-          <div>
-            <div className="text-2xl font-bold text-green-400">{countTasks}</div>
-            <div className="text-xs text-gray-300">Tasks</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-blue-400">{xp}</div>
-            <div className="text-xs text-gray-300">XP</div>
-          </div>
-          <div>
-            <div className="text-2xl font-bold text-purple-400">23</div>
-            <div className="text-xs text-gray-300">Level</div>
-          </div>
-        </div>
-
-        {/* Followers and Badges */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <span className="text-xl font-bold text-pink-400">{countFriends}</span>
-            <span className="ml-2 text-gray-300">Followers</span>
-          </div>
-          <div className="flex space-x-2">
-            {/* Example: League Badges */}
-
-          </div>
-        </div>
-
-        {/* League Progress */}
-        <div className="mb-8">
-          <h2 className="text-xl text-yellow-300 font-bold mb-1">League Progress</h2>
-          <div className="w-full bg-gray-700 rounded-full h-5">
-            <div className="bg-yellow-400 h-5 rounded-full" style={{ width: '65%' }}></div>
-          </div>
-          <div className="flex justify-between text-xs mt-1 text-gray-400">
-            <span>Gold</span>
-            <span>Platinum</span>
-            <span>Diamond</span>
-          </div>
-        </div>
-
-        {/* Recent Games */}
+        {/* Rank Progress */}
         <div>
-          <h2 className="text-xl font-semibold mb-3 text-purple-300">Recent Games</h2>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-center">
-
-              <div className="font-semibold mt-2">Apex Legends</div>
-              <span className="text-xs text-gray-400">Platinum III</span>
-            </div>
-            <div className="bg-gray-800 rounded-lg p-4 flex flex-col items-center">
-
-              <div className="font-semibold mt-2">The Witcher 3</div>
-              <span className="text-xs text-gray-400">100% Completed</span>
-            </div>
+          <h2 className="text-lg font-semibold text-gray-300 mb-2">Progress to Next Rank</h2>
+          <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+            <div
+              className="h-4 rounded-full shadow-lg"
+              style={{
+                width: `${progressPercent}%`,
+                background: "linear-gradient(90deg, #06b6d4, #0ea5e9, #3b82f6)",
+                boxShadow: "0 0 20px rgba(14,165,233,0.7)",
+              }}
+            ></div>
           </div>
+          {rank !== "S" ? (
+            <p className="text-xs text-gray-400 mt-1">
+              {xp - currentRankXp} / {nextRankXp - currentRankXp} XP to Rank{" "}
+              {rank === "C" ? "B" : rank === "B" ? "A" : "S"}
+            </p>
+          ) : (
+            <p className="text-xs text-gray-400 mt-1">Max Rank Achieved</p>
+          )}
         </div>
       </div>
     </div>
-  )
+  );
 }
