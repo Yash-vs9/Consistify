@@ -15,7 +15,7 @@ const ProjectHome: React.FC = () => {
   const [startingDate, setStartingDate] = useState<string>('');
   const [lastDate, setLastDate] = useState<string>('');
   const [taskPriority, setTaskPriority] = useState<string>('');
-  const [collaborators, setCollaborators] = useState<string[]>([]);
+  const [description, setDescription] = useState<string>("");
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filteredFriends, setFilteredFriends] = useState<string[]>([]);
   const [friends,setFriends]=useState<string[]>([])
@@ -59,7 +59,7 @@ const ProjectHome: React.FC = () => {
   const createTaskButton = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     SetIsDisabled(true)
-    const data = { taskName, startingDate, lastDate, taskPriority, collaborators };
+    const data = { taskName, startingDate, lastDate, taskPriority, description };
     try{
         const response=await fetch("http://localhost:8080/task/create",{
             method:"POST",
@@ -87,20 +87,11 @@ const ProjectHome: React.FC = () => {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchTerm(value);
-    const filtered = friends.filter((friend: string) =>
-      friend.toLowerCase().includes(value.toLowerCase())
-    );
-    setFilteredFriends(filtered);
   };
 
   const handleSelect = (friend: string) => {
     setSearchTerm('');
     setFilteredFriends([]);
-    if (!collaborators.includes(friend)) {
-      setCollaborators((prev) => [...prev, friend]);
-    }
   };
   if(!hasMounted){
     return null
@@ -171,12 +162,12 @@ const ProjectHome: React.FC = () => {
 
           {/* Right Section */}
           <div className="w-1/2 px-8 py-6 text-white space-y-4">
-            <h2 className="text-xl font-semibold">Add Collaborators</h2>
+            <h2 className="text-xl font-semibold">Description</h2>
 
             <input
               type="text"
-              value={searchTerm}
-              onChange={handleChange}
+              value={description}
+              onChange={(e)=>setDescription(e.target.value)}
               placeholder="Search from friend list"
               className="h-10 w-full bg-[#2b2d3a] text-white text-center font-mono border-2 border-white rounded outline-none"
             />
@@ -195,16 +186,7 @@ const ProjectHome: React.FC = () => {
               </ul>
             )}
 
-            {collaborators.length > 0 && (
-              <div className="text-sm mt-2 max-h-28 overflow-y-auto">
-                <p className="font-semibold">Selected Collaborators:</p>
-                <ul className="list-disc list-inside text-cyan-400">
-                  {collaborators.map((friend) => (
-                    <li key={friend}>{friend}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          
 
             <button
               disabled={isDisabled}

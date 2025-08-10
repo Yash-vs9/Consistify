@@ -7,7 +7,7 @@ interface Task {
   taskPriority: string;
   startingDate: string;
   lastDate: string;
-  collaborators: string[];
+  description: string;
 }
 
 interface TaskCardProps {
@@ -102,12 +102,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskUpdate }) => {
       </div>
 
       <div>
-        <span className="text-cyan-200 font-semibold opacity-90">Collaborators</span>
+        <span className="text-cyan-200 font-semibold opacity-90">Description</span>
         <ul className="mt-1 space-y-1 text-sm text-cyan-100 font-mono opacity-90">
-          {task.collaborators?.map((collab, idx) => (
-            <li key={idx}
-              className="pl-2 before:content-['→'] before:text-pink-400 before:mr-1 animate-fade-in">{collab}</li>
-          ))}
+          {task.description}
         </ul>
       </div>
 
