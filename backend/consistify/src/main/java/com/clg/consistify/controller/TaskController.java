@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/task")
@@ -24,7 +25,7 @@ public class TaskController {
         this.taskService = taskService;
     }
     @PostMapping("/create")
-    public ResponseEntity<TaskResponseDTO> createTask(@Valid @RequestBody TaskDTO body) {
+    public ResponseEntity<TaskResponseDTO> createTask(@Valid @RequestBody TaskDTO body) throws ExecutionException, InterruptedException {
         String username=SecurityContextHolder.getContext().getAuthentication().getName();
         TaskResponseDTO createdTask = taskService.createTask(body,username);
         System.out.println(body);

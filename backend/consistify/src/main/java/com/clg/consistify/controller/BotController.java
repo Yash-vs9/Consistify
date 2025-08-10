@@ -19,10 +19,6 @@ public class BotController {
     public BotController(ExternalApiService externalApiService) {
         this.externalApiService = externalApiService;
     }
-    @GetMapping("/getSkills")
-    public CompletableFuture<String> skillsNeeded(String name) throws ExecutionException, InterruptedException, JsonProcessingException {
-
-        return externalApiService.getMessage(name);
-    }
+    
 
 }
