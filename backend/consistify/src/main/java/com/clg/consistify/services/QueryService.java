@@ -34,6 +34,7 @@ public class QueryService {
 
     public void createQuery(QueryDTO body) throws ExecutionException, InterruptedException, JsonProcessingException {
         // Validate and prepare QueryModel
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
         QueryModel query = new QueryModel();
 
         if (body.getQueryName() != null && !body.getQueryName().trim().isEmpty()) {
@@ -90,7 +91,7 @@ public class QueryService {
 
         CompletableFuture<List<String>> resultFuture = skillFuture.thenCompose(unused -> {
             try {
-                return externalApiService.getMessageOfSkillMap(body.getQueryName(), SecurityContextHolder.getContext().getAuthentication().getName());
+                return externalApiService.getMessageOfSkillMap(body.getQueryName(),username);
             } catch (Exception e) {
                 CompletableFuture<List<String>> failedFuture = new CompletableFuture<>();
                 failedFuture.completeExceptionally(e);

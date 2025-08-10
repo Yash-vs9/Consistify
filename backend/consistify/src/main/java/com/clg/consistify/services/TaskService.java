@@ -117,7 +117,7 @@ public class TaskService {
         }
         CompletableFuture<String> resultFuture = skillFuture.thenCompose(unused -> {
             try {
-                return externalApiService.getMessageOfTaskDifficulty(body.getTaskName(), SecurityContextHolder.getContext().getAuthentication().getName());
+                return externalApiService.getMessageOfTaskDifficulty(body.getTaskName(),username);
             } catch (Exception e) {
                 CompletableFuture<String > failedFuture = new CompletableFuture<>();
                 failedFuture.completeExceptionally(e);

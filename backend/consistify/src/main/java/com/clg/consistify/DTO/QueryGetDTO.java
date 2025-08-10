@@ -2,6 +2,7 @@ package com.clg.consistify.DTO;
 
 import com.clg.consistify.user.Comment;
 import com.clg.consistify.user.QueryModel;
+import jakarta.persistence.ElementCollection;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class QueryGetDTO {
     private String queryDescription;
     private int likes;
     private List<Comment> comments;
+    @ElementCollection
     private List<String> skillsRequired;
     private String username;
 

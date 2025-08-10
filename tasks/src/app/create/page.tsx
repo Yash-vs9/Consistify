@@ -168,7 +168,7 @@ const ProjectHome: React.FC = () => {
               type="text"
               value={description}
               onChange={(e)=>setDescription(e.target.value)}
-              placeholder="Search from friend list"
+              placeholder="Enter the Description"
               className="h-10 w-full bg-[#2b2d3a] text-white text-center font-mono border-2 border-white rounded outline-none"
             />
 

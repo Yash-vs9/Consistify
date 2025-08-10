@@ -101,7 +101,8 @@ public class ExternalApiService {
                 });
     }
     public CompletableFuture<Void> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
-        String xUserKey=SecurityContextHolder.getContext().getAuthentication().getName();
+        String xUserKey=createUserKey(SecurityContextHolder.getContext().getAuthentication().getName());
+
         if (body.getPayload()==null){
             body.setPayload(new PayloadDifficultyDTO());
         }
