@@ -17,17 +17,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.Query;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class QueryService {
-    private UserRepository userRepository;
-    private QueryRepository queryRepository;
-    private ExternalApiService externalApiService;
+    private final UserRepository userRepository;
+    private final QueryRepository queryRepository;
+    private final ExternalApiService externalApiService;
 
     public QueryService(UserRepository userRepository, QueryRepository queryRepository, ExternalApiService externalApiService) {
         this.userRepository = userRepository;
@@ -53,9 +55,10 @@ public class QueryService {
         }
 
         query.setStatus("PENDING");
+        query.setSkillsRequired(new ArrayList<>());
         query.setUser(userRepository.findByUsername(body.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User not found")));
-
+        queryRepository.save(query);
 //        queryRepository.save(query);
 
         // Prepare BotpressSkillBody payload
@@ -74,48 +77,21 @@ public class QueryService {
             requestBody.getPayload().getTasks().get(0).setDescription(body.getDescription());
             requestBody.getPayload().getTasks().get(0).setName(body.getQueryName());
         }
-
-        // Now, call the externalApiService asynchronously and chain correctly
-
-        // IMPORTANT: To chain futures properly, skillsProcessing must return CompletableFuture<Void>
-        // Let's assume you've refactored it as below:
-        //
-        // public CompletableFuture<Void> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
-        //     // returns CompletableFuture<Void> that completes when http request finishes
-        // }
-
-        CompletableFuture<Void> skillFuture;
-        try {
-            skillFuture = externalApiService.skillsProcessing(requestBody);
-        } catch (JsonProcessingException e) {
-            // If creating the request or something synchronous throws, propagate
-            throw e;
-        }
-
-        CompletableFuture<List<String>> resultFuture = skillFuture.thenCompose(unused -> {
+        CompletableFuture.runAsync(() -> {
             try {
-                return externalApiService.getMessageOfSkillMap(body.getQueryName(),username);
+                List<String> difficulty = externalApiService
+                        .skillsProcessing(requestBody, body.getQueryName(), username)
+                        .get();
+                updateQuery(difficulty, query.getName(),username);
+                System.out.println("Updated difficulty: " + difficulty);
             } catch (Exception e) {
-                CompletableFuture<List<String>> failedFuture = new CompletableFuture<>();
-                failedFuture.completeExceptionally(e);
-                return failedFuture;
+                System.err.println("Error fetching difficulty: " + e.getMessage());
             }
         });
 
-        try {
-            List<String> skillsList = resultFuture.get(); // blocks until complete
-            System.out.println("Skills from API: " + skillsList);
 
-            query.setSkillsRequired(skillsList);
-            queryRepository.save(query);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            throw e;
-            // Optionally wrap or handle exceptions here
-        }
 
-    }
-    public List<QueryGetDTO> getQueries(){
+    }    public List<QueryGetDTO> getQueries(){
         return queryRepository.findAll()
                 .stream()
                 .map((QueryGetDTO::new))
@@ -131,6 +107,15 @@ public class QueryService {
 
         query.getComments().add(commentObj);
         queryRepository.save(query);
+    }
+    @Transactional
+    public void updateQuery(List<String> skillMap,String username,String queryName){
+        QueryModel query = queryRepository.findByNameAndUsername(queryName, username)
+                .orElseThrow(() -> new QueryNotFoundException("Query not found"));
+        System.out.println(query.getName());
+        query.setSkillsRequired(skillMap);
+        queryRepository.save(query);
+
     }
 
 }

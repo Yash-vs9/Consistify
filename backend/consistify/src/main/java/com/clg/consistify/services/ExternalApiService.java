@@ -57,9 +57,9 @@ public class ExternalApiService {
                 .map(list -> list.get(random.nextInt(list.size()))) // pick random from list
                 .toFuture();
     }
-    public String createUserKey(String username) {
+    public String createUserKey(String userName) {
 
-        String YOUR_USER_ID = username;
+        String YOUR_USER_ID = userName;
         String YOUR_ENCRYPTION_KEY = "yLmN89pVwXrTqLzKbNdGeSyFbQmTcHuY"; // secret key
 
         // Convert secret key to HMAC-SHA key
@@ -74,13 +74,18 @@ public class ExternalApiService {
         System.out.println("Generated JWT: " + xUserKey);
         return xUserKey;
     }
-    public CompletableFuture<Void> skillsProcessing(BotpressSkillBody body) throws JsonProcessingException {
-        String xUserKey = createUserKey(SecurityContextHolder.getContext().getAuthentication().getName());
+    public CompletableFuture<List<String>> skillsProcessing(
+            BotpressSkillBody body,
+            String queryName,
+            String userName
+    ) throws JsonProcessingException {
+
+        String xUserKey = createUserKey(userName);
 
         if (body.getPayload() == null) {
-            body.setPayload(new PayloadSkillDTO()); // or just new PayloadDTO()
+            body.setPayload(new PayloadSkillDTO());
         }
-        // Optional: You might want to reconsider if this dummy task should be always added
+
         ObjectMapper mapper = new ObjectMapper();
         System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
 
@@ -93,16 +98,29 @@ public class ExternalApiService {
                 .bodyToFlux(String.class)
                 .collectList()
                 .toFuture()
-                .thenAccept(responseList -> {
+                .thenCompose(responseList -> {
                     if (responseList == null || responseList.isEmpty()) {
                         throw new RuntimeException("Empty response from Botpress API");
                     }
-                    // Additional validation can be added here if needed
                     System.out.println("Received response from skillsProcessing: " + responseList);
+
+                    // Properly delay before fetching skill map
+                    return CompletableFuture.runAsync(() -> {
+                        try {
+                            Thread.sleep(15000); // wait 15 seconds
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt();
+                        }
+                    });
+                })
+                .thenCompose(v -> getMessageOfSkillMap(queryName, userName)) // only call once
+                .exceptionally(ex -> {
+                    System.err.println("Error fetching skill map: " + ex.getMessage());
+                    return null;
                 });
     }
-    public CompletableFuture<String> taskdifficulty(
-            BotpressDifficultyBody body, String taskName, String userName) throws JsonProcessingException {
+
+    public CompletableFuture<String> taskdifficulty(BotpressDifficultyBody body, String taskName, String userName) throws JsonProcessingException {
 
         String xUserKey = createUserKey(userName);
 
@@ -140,11 +158,11 @@ public class ExternalApiService {
                     return null;
                 });
     }
-    public CompletableFuture<List<String>> createBotUser(String username){
-        String xUserKey=createUserKey(username);
+    public CompletableFuture<List<String>> createBotUser(String userName){
+        String xUserKey=createUserKey(userName);
 
         HashMap<String, String > map=new HashMap<>();
-        map.put("name",username);
+        map.put("name",userName);
         return webClient.post()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/users/get-or-create")
                 .header("x-user-key", xUserKey)
@@ -155,13 +173,13 @@ public class ExternalApiService {
                 .collectList()
                 .toFuture();
     }
-    public CompletableFuture<Map> createConversation(String username) throws Exception {
+    public CompletableFuture<Map> createConversation(String userName) throws Exception {
         // Create the x-user-key
-        String xUserKey = createUserKey(username);
+        String xUserKey = createUserKey(userName);
 
         // Request body
         Map<String, String> map = new HashMap<>();
-        map.put("id", username);
+        map.put("id", userName);
 
         // API call
         CompletableFuture<Map> result = webClient.post()
@@ -183,7 +201,7 @@ public class ExternalApiService {
     }
     public CompletableFuture<List<String>> getMessageOfSkillMap(String queryName,String userName) {
         String xUserKey = createUserKey(userName);
-
+        System.out.println("in the getmessage");
         return webClient.get()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/conversations/{username}/messages", userName)
                 .header("x-user-key", xUserKey)
@@ -216,7 +234,7 @@ public class ExternalApiService {
                         if (targetNode.isArray()) {
                             return mapper.convertValue(targetNode,new TypeReference<List<String>>() {});
                         }
-
+                        System.out.println(targetNode);
                         // Otherwise, return as plain text
                         return List.of(targetNode.asText());
 
