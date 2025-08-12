@@ -53,7 +53,7 @@ public class TaskService {
     @Lazy
     private TaskService self;
     @CacheEvict(value = "TaskModels", key = "#username")
-    public TaskResponseDTO createTask(TaskDTO body,String username) throws ExecutionException, InterruptedException {
+    public TaskResponseDTO createTask(TaskDTO body,String username) throws ExecutionException, InterruptedException, JsonProcessingException {
 
         UserModel user = getUserByUsername(username);
 
@@ -109,37 +109,23 @@ public class TaskService {
             requestBody.getPayload().getTasks().get(0).setLastDate(body.getLastDate());
 
         }
-        CompletableFuture<Void> skillFuture;
-        try {
-            skillFuture=externalApiService.taskdifficulty(requestBody);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-        CompletableFuture<String> resultFuture = skillFuture.thenCompose(unused -> {
+        task.setDifficulty("Pending");
+        user.getTasks().add(task);
+        userRepository.save(user);
+        CompletableFuture.runAsync(() -> {
             try {
-                return externalApiService.getMessageOfTaskDifficulty(body.getTaskName(),username);
+                String difficulty = externalApiService
+                        .taskdifficulty(requestBody, task.getTaskName(), username)
+                        .get();
+                updateTaskForDifficulty(difficulty, body.getTaskName(),username);
+                System.out.println("Updated difficulty: " + difficulty);
             } catch (Exception e) {
-                CompletableFuture<String > failedFuture = new CompletableFuture<>();
-                failedFuture.completeExceptionally(e);
-                return failedFuture;
+                System.err.println("Error fetching difficulty: " + e.getMessage());
             }
         });
 
-        try {
-            String taskdifficulty = resultFuture.get(); // blocks until complete
-            System.out.println("Skills from API: " + taskdifficulty);
-
-            task.setDifficulty(taskdifficulty);
-            user.getTasks().add(task);
-            userRepository.save(user);
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-            throw e;
-            // Optionally wrap or handle exceptions here
-        }
         self.updateXpAndRank(user);
         return new TaskResponseDTO(task);
-
     }
     public void updateXpAndRank(UserModel user) {
         int updatedXp = user.getXp() + 50;
@@ -271,6 +257,15 @@ public class TaskService {
         cacheManager.getCache("TaskModels").evict(username);
 
     }
+    @Transactional
+    public void updateTaskForDifficulty(String taskDifficulty, String taskName,String username) {
+        TaskModel task=taskRepository.findByTaskNameAndUsername(taskName,username)
+                        .orElseThrow(()-> new TaskAlreadyExistException("Task not found"));
+        task.setDifficulty(taskDifficulty);
+        taskRepository.save(task);
+        cacheManager.getCache("TaskModels").evict(username);
+    }
+
     public TaskResponseDTO getTaskByName(String taskName){
         String userName=SecurityContextHolder.getContext().getAuthentication().getName();
         UserModel user=userRepository.findByUsername(userName)

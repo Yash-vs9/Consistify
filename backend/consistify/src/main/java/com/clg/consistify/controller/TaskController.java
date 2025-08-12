@@ -7,6 +7,7 @@ import com.clg.consistify.DTO.TaskResponseDTO;
 import com.clg.consistify.DTO.TaskUpdateDTO;
 import com.clg.consistify.services.TaskService;
 import com.clg.consistify.user.TaskModel;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class TaskController {
         this.taskService = taskService;
     }
     @PostMapping("/create")
-    public ResponseEntity<TaskResponseDTO> createTask(@Valid @RequestBody TaskDTO body) throws ExecutionException, InterruptedException {
+    public ResponseEntity<TaskResponseDTO> createTask(@Valid @RequestBody TaskDTO body) throws ExecutionException, InterruptedException, JsonProcessingException {
         String username=SecurityContextHolder.getContext().getAuthentication().getName();
         TaskResponseDTO createdTask = taskService.createTask(body,username);
         System.out.println(body);

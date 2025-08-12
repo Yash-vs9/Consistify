@@ -24,6 +24,7 @@ import java.security.Key;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class ExternalApiService {
@@ -100,29 +101,43 @@ public class ExternalApiService {
                     System.out.println("Received response from skillsProcessing: " + responseList);
                 });
     }
-    public CompletableFuture<Void> taskdifficulty(BotpressDifficultyBody body) throws JsonProcessingException {
-        String xUserKey=createUserKey(SecurityContextHolder.getContext().getAuthentication().getName());
+    public CompletableFuture<String> taskdifficulty(
+            BotpressDifficultyBody body, String taskName, String userName) throws JsonProcessingException {
 
-        if (body.getPayload()==null){
+        String xUserKey = createUserKey(userName);
+
+        if (body.getPayload() == null) {
             body.setPayload(new PayloadDifficultyDTO());
         }
-        ObjectMapper mapper=new ObjectMapper();
-        System.out.println("Sending payload:\n"+mapper.writeValueAsString(body));
+
+        ObjectMapper mapper = new ObjectMapper();
+        System.out.println("Sending payload:\n" + mapper.writeValueAsString(body));
+
         return webClient.post()
                 .uri("https://chat.botpress.cloud/a1bf9783-18da-4fa8-8473-37e44aa43859/events")
-                .header("x-user-key",xUserKey)
-                .contentType(MediaType.APPLICATION_JSON) // ✅ sets Content-Type: application/json
+                .header("x-user-key", xUserKey)
+                .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(body)
                 .retrieve()
                 .bodyToFlux(String.class)
                 .collectList()
                 .toFuture()
-                .thenAccept(responseList -> {
+                .thenCompose(responseList -> {
                     if (responseList == null || responseList.isEmpty()) {
                         throw new RuntimeException("Empty response from Botpress API");
                     }
-                    // Additional validation can be added here if needed
                     System.out.println("Received response from skillsProcessing: " + responseList);
+
+                    // Wait 5 seconds before calling getMessageOfTaskDifficulty
+                    return CompletableFuture.supplyAsync(
+                            () -> null,
+                            CompletableFuture.delayedExecutor(10, TimeUnit.SECONDS)
+                    );
+                })
+                .thenCompose(nil -> getMessageOfTaskDifficulty(taskName, userName)) // return this result
+                .exceptionally(ex -> {
+                    System.err.println("Error: " + ex.getMessage());
+                    return null;
                 });
     }
     public CompletableFuture<List<String>> createBotUser(String username){
