@@ -16,7 +16,7 @@ public class QueryModel {
     private String description;
     private String status;
     private int likes;
-    @OneToMany(mappedBy = "query")
+    @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
     @ElementCollection
     private List<String> skillsRequired=new ArrayList<>();

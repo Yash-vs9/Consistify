@@ -1,5 +1,6 @@
 package com.clg.consistify.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Table(name = "comments")
@@ -12,6 +13,7 @@ public class Comment {
     private String username;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "query_id")
+    @JsonIgnore
     private QueryModel query;
 
     public QueryModel getQuery() {

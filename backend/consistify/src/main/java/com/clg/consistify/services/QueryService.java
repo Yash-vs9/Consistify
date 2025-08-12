@@ -3,12 +3,15 @@ package com.clg.consistify.services;
 import com.clg.consistify.DTO.BotBody.BotSkillBody;
 import com.clg.consistify.DTO.BotBody.BotpressSkillBody;
 import com.clg.consistify.DTO.BotBody.PayloadSkillDTO;
+import com.clg.consistify.DTO.CommentDTO;
 import com.clg.consistify.DTO.QueryDTO;
 import com.clg.consistify.DTO.QueryGetDTO;
 import com.clg.consistify.exception.FieldNullException;
+import com.clg.consistify.exception.QueryNotFoundException;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.repository.QueryRepository;
 import com.clg.consistify.repository.UserRepository;
+import com.clg.consistify.user.Comment;
 import com.clg.consistify.user.QueryModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -117,6 +120,17 @@ public class QueryService {
                 .stream()
                 .map((QueryGetDTO::new))
                 .toList();
+    }
+    public void postComment(CommentDTO comment){
+        QueryModel query=queryRepository.findById(comment.getQueryId())
+                .orElseThrow(()->new QueryNotFoundException("Query Not found"));
+        Comment commentObj=new Comment();
+        commentObj.setQuery(query);
+        commentObj.setReply(comment.getReply());
+        commentObj.setUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        query.getComments().add(commentObj);
+        queryRepository.save(query);
     }
 
 }

@@ -110,8 +110,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskUpdate }) => {
 
       <div className="flex justify-between items-center gap-3 mt-auto">
         <button
-          onClick={() => router.push(`/tasks/edit/${encodeURIComponent(task.taskName)}`)}
-          className="flex-1 py-2 px-0 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-700 to-purple-700
+onClick={() => router.push(`/tasks/edit/${task.taskName.replace(/\s+/g, '-')}`)}          className="flex-1 py-2 px-0 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-700 to-purple-700
              text-white font-bold uppercase tracking-wider text-sm
             transition-all duration-150 hover:brightness-110 hover:scale-105 border-none animate-slide-up"
         >

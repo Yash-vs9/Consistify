@@ -1,55 +1,43 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-
-import { toast } from 'react-toastify';
-import Sidebar from '../../../../../components/Sidebar';
-import { useParams } from 'next/navigation';
-
-import LoadingPage from '../../../../../components/LoadingPage';
-import { useRouter } from 'next/navigation';
+"use client";
+import React, { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import Sidebar from "../../../../../components/Sidebar";
+import { useParams, useRouter } from "next/navigation";
+import LoadingPage from "../../../../../components/LoadingPage";
 
 interface Task {
   taskName: string;
   taskPriority: string;
   startingDate: string;
   lastDate: string;
-  collaborators: string[];
+  description: string;
 }
 
-const TaskEditPage: React.FC = () => { 
-  const router=useRouter()
-    const [name,setName]=useState<string>("")
-    const params=useParams()
-   const [token,setToken]=useState<string>("")
-    useEffect(()=>{
-      const name = params.taskName
-      setName(name as string)
-      const storedToken=localStorage.getItem("authToken")
-      setToken(storedToken as string)
-    },[])
+const TaskEditPage: React.FC = () => {
+  const router = useRouter();
+  const params = useParams();
 
+  const [name, setName] = useState<string>("");
+  const [token, setToken] = useState<string>("");
 
+  const [taskName, setTaskName] = useState<string>("");
+  const [startingDate, setStartingDate] = useState<string>("");
+  const [endingDate, setEndingDate] = useState<string>("");
+  const [priority, setPriority] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const [taskName, setTaskName] = useState<string>('');
-  const [startingDate, setStartingDate] = useState<string>('');
-  const [endingDate, setEndingDate] = useState<string>('');
-  const [priority, setPriority] = useState<string>('');
-  const [collaborators, setCollaborators] = useState<string[]>([]);
-    const[tasks,setTasks]=useState<Task[]>([])
-
-  // useEffect(() => {
-  //   if (tasks.length > 0) {
-  //     const task = tasks.find((task) => task.taskName === name);
-  //     if (task) {
-  //       setTaskName(task.taskName);
-  //       setPriority(task.taskPriority);
-  //       setStartingDate(task.startingDate);
-  //       setEndingDate(task.lastDate);
-  //       setCollaborators(task.collaborators || []);
-  //     }
-  //   }
-  // }, [tasks, name]);
+  useEffect(() => {
+    const rawName = params.taskName;
+    if (rawName) {
+      // Decode both %20 and -
+      const decoded = decodeURIComponent(rawName as string).replace(/-/g, " ");
+      setName(decoded);
+    }
+    const storedToken = localStorage.getItem("authToken");
+    if (storedToken) setToken(storedToken);
+  }, [params.taskName]);
 
   const handleClick = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,37 +45,36 @@ const TaskEditPage: React.FC = () => {
     const data = {
       oldtaskName: name,
       newtaskName: taskName,
-      startingDate:startingDate,
+      startingDate: startingDate,
       lastDate: endingDate,
       taskPriority: priority,
-      collaborators:collaborators,
+      description: description,
     };
-    console.log(data)
-    try{
-      const response=await fetch("http://localhost:8080/task/edit",{
-        method:"PUT",
-        headers:{
-          Authorization:`Bearer ${token}`,
-          "Content-Type":"application/json"
+
+    try {
+      const response = await fetch("http://localhost:8080/task/edit", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body:JSON.stringify(data)
-      })
-      if(!response.ok){
-        const errData=await response.text()
-        throw new Error(errData)
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errData = await response.text();
+        throw new Error(errData);
       }
-      toast.success("Task updated successfully")
 
-      router.push("/tasks")
-    }
-    catch(e){
-      toast.error("Error "+e)
-      console.log(e)
-    }
-    
-  }
+      toast.success("Task updated successfully");
 
- 
+      // Redirect back to /tasks after saving
+      router.push("/tasks");
+    } catch (err) {
+      toast.error("Error " + err);
+      console.error(err);
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-gradient-to-b from-[#0d0d1c] via-[#0f0f1c] to-[#050510] text-white font-[Poppins]">
@@ -97,7 +84,9 @@ const TaskEditPage: React.FC = () => {
 
       <div className="flex-1 flex items-center justify-center px-6 py-12 relative">
         <div className="w-full max-w-3xl bg-[#111222] rounded-2xl border border-cyan-700 shadow-[0_0_30px_#0ff3] p-10 relative z-10">
-          <h1 className="text-4xl font-extrabold text-center text-cyan-400 tracking-widest mb-10 neon-glow">Edit Task</h1>
+          <h1 className="text-4xl font-extrabold text-center text-cyan-400 tracking-widest mb-10 neon-glow">
+            Edit Task
+          </h1>
 
           <form className="space-y-8" onSubmit={handleClick}>
             <div>
@@ -136,8 +125,8 @@ const TaskEditPage: React.FC = () => {
               <label className="block text-sm text-gray-300 mb-2">Collaborators</label>
               <input
                 type="text"
-                value={collaborators.join(',')}
-                onChange={(e) => setCollaborators(e.target.value.split(','))}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
                 placeholder="Search or type usernames..."
                 className="w-full bg-[#1b1c2e] text-white p-3 rounded-md border border-cyan-700"
               />
@@ -146,7 +135,7 @@ const TaskEditPage: React.FC = () => {
             <div>
               <label className="block text-sm text-gray-300 mb-2">Priority</label>
               <div className="flex gap-6">
-                {['High', 'Medium', 'Low'].map((level) => (
+                {["High", "Medium", "Low"].map((level) => (
                   <label key={level} className="flex items-center gap-2 text-sm">
                     <input
                       type="radio"

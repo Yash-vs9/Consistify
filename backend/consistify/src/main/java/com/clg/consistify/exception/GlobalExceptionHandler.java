@@ -14,6 +14,10 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler(QueryNotFoundException.class)
+    public ResponseEntity<String> handleQueryNotFoundException(QueryNotFoundException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.NOT_FOUND);
+    }
     @ExceptionHandler(FieldNullException.class)
     public ResponseEntity<String> handleFieldNullException(FieldNullException ex){
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);

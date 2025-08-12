@@ -194,7 +194,7 @@ public class TaskService {
                 .stream()
                 .filter(t -> t.getTaskName().equalsIgnoreCase(dto.getOldtaskName()))
                 .findFirst()
-                .orElseThrow(() -> new TaskAlreadyExistException("Task Already exist"));
+                .orElseThrow(() -> new TaskNotFoundException("Task not found "));
 
         // 2. Check if another task with the new name already exists (avoid duplicate names)
         if (dto.getNewtaskName() != null && !dto.getNewtaskName().equalsIgnoreCase(dto.getOldtaskName())) {

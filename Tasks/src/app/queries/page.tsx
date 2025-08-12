@@ -4,7 +4,7 @@ import { Heart, MessageCircle } from "lucide-react";
 
 interface Comment {
   id: number;
-  text: string;
+  reply: string;
   queryId: number;
   username: string;
 }
@@ -78,43 +78,26 @@ export default function Home() {
   };
 
   const handleAddComment = async (id: number) => {
-    const text = commentText[id]?.trim();
-    if (!text) return;
-
-    const newComment: Comment = {
-      id: Date.now(),
-      text,
-      queryId: id,
-      username: "You", // optimistic username
-    };
-
-    setQueries((prev) =>
-      prev.map((q) =>
-        q.id === id ? { ...q, comments: [...q.comments, newComment] } : q
-      )
-    );
-    setCommentText((prev) => ({ ...prev, [id]: "" }));
-
-    try {
-      await fetch(`http://localhost:8080/query/${id}/comment`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text }),
-      });
-    } catch (err) {
-      console.error("Failed to save comment", err);
-      setQueries((prev) =>
-        prev.map((q) =>
-          q.id === id
-            ? { ...q, comments: q.comments.filter((c) => c.id !== newComment.id) }
-            : q
-        )
-      );
+    const body={
+      reply:commentText[id],
+      queryId:id
     }
-  };
+    console.log(body)
+   const response=await fetch("http://localhost:8080/query/postComment",{
+    method:"POST",
+    headers:{
+      Authorization:`Bearer ${token}`,
+      "Content-Type":"application/json"
+    },
+    body:JSON.stringify(body)
+   })
+   if(!response.ok){
+    const errData=await response.text();
+    console.log(errData)
+  }
+  const data=await response.json()
+  console.log(data)
+};
 
   const toggleComments = (id: number) => {
     setOpenComments((prev) => {
@@ -182,7 +165,7 @@ export default function Home() {
                     key={comment.id}
                     className="text-slate-300 text-sm mb-1"
                   >
-                    {comment.text}
+                    {comment.reply}
                   </p>
                 ))}
 

@@ -1,5 +1,6 @@
 package com.clg.consistify.controller;
 
+import com.clg.consistify.DTO.CommentDTO;
 import com.clg.consistify.DTO.QueryDTO;
 import com.clg.consistify.DTO.QueryGetDTO;
 import com.clg.consistify.services.ExternalApiService;
@@ -10,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -30,6 +32,11 @@ public class QueryController {
     @GetMapping("/get")
     public ResponseEntity<List<QueryGetDTO>> getAllQueries(){
         return ResponseEntity.ok(queryService.getQueries());
+    }
+    @PostMapping("/postComment")
+    public ResponseEntity<Map<String, String>> sendComments(@RequestBody CommentDTO body) {
+        queryService.postComment(body);
+        return ResponseEntity.ok(Map.of("message", "Comment saved"));
     }
 
 }
