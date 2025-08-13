@@ -8,14 +8,12 @@ export default function Profile() {
   const [countFriends, setCountFriends] = useState<number>(0);
   const [countTasks, setCountTasks] = useState<number>(0);
 
+  // Rank & thresholds
   const rank = xp > 2000 ? "S" : xp > 1000 ? "A" : xp > 500 ? "B" : "C";
-
-  // Rank thresholds
   const thresholds = { C: 0, B: 500, A: 1000, S: 2000 };
 
   let currentRankXp = 0;
   let nextRankXp = 0;
-
   if (rank === "C") {
     currentRankXp = thresholds.C;
     nextRankXp = thresholds.B;
@@ -33,18 +31,20 @@ export default function Profile() {
   const progressPercent =
     rank === "S"
       ? 100
-      : Math.min(((xp - currentRankXp) / (nextRankXp - currentRankXp)) * 100, 100);
+      : Math.min(
+          ((xp - currentRankXp) / (nextRankXp - currentRankXp)) * 100,
+          100
+        );
 
+  // Token & fetch
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    if (storedToken) setToken(storedToken);
   }, []);
 
   useEffect(() => {
     if (!token) return;
-    const fetchProfile = async () => {
+    (async () => {
       try {
         const response = await fetch("http://localhost:8080/profile", {
           method: "GET",
@@ -54,77 +54,119 @@ export default function Profile() {
           },
         });
         if (!response.ok) throw new Error(await response.text());
-
         const data = await response.json();
+        console.log(data);
         setName(data[0][0]);
         setXp(data[0][1]);
-        setCountFriends(data[0][2]);
-        setCountTasks(data[0][3]);
+        setCountFriends(data[0][3]);
+        setCountTasks(data[0][2]);
       } catch (e) {
         console.error(e);
       }
-    };
-    fetchProfile();
+    })();
   }, [token]);
 
   return (
-    <div className="relative min-h-screen flex justify-center items-center overflow-hidden p-4 bg-gray-950">
-      {/* Animated Glowing Background */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-700 opacity-30 rounded-full blur-3xl animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-[30rem] h-[30rem] bg-cyan-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
+    <div className="relative min-h-screen bg-gray-950 text-white overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute inset-0">
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-purple-700 opacity-30 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-0 right-0 w-[30rem] h-[30rem] bg-cyan-500 opacity-20 rounded-full blur-3xl animate-pulse" />
+      </div>
 
-      {/* Card */}
-      <div className="relative w-full max-w-md bg-gray-900 rounded-xl shadow-2xl border border-gray-700 p-8 backdrop-blur-lg bg-opacity-90 transition-transform hover:scale-[1.01] hover:shadow-cyan-500/30">
-        
-        {/* Profile Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white drop-shadow-lg">{name || "User"}</h1>
-          <p className="text-sm text-gray-400">Professional Profile Overview</p>
+      <div className="relative max-w-5xl mx-auto px-6 py-12 space-y-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row items-center gap-6 bg-gray-900/80 rounded-2xl border border-gray-700 p-8 shadow-xl backdrop-blur-lg">
+          <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-cyan-400 to-blue-500 flex items-center justify-center text-4xl font-bold shadow-lg">
+            {name ? name.charAt(0) : "U"}
+          </div>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-cyan-300 to-blue-400 bg-clip-text text-transparent">
+              {name || "User"}
+            </h1>
+            <p className="text-gray-400 text-sm tracking-wide">
+              Dedicated to productivity & growth — track your tasks, connect
+              with peers, and climb the ranks.
+            </p>
+          </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 gap-4 text-center mb-6">
-          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-blue-400/50 transition">
-            <div className="text-2xl font-semibold text-blue-400">{countTasks}</div>
-            <div className="text-gray-400 text-sm">Tasks</div>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-pink-400/50 transition">
-            <div className="text-2xl font-semibold text-pink-400">{countFriends}</div>
-            <div className="text-gray-400 text-sm">Followers</div>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-green-400/50 transition">
-            <div className="text-2xl font-semibold text-green-400">{xp}</div>
-            <div className="text-gray-400 text-sm">XP</div>
-          </div>
-          <div className="bg-gray-800 rounded-lg p-4 shadow-lg hover:shadow-yellow-400/50 transition">
-            <div className="text-2xl font-semibold text-yellow-400">{rank}</div>
-            <div className="text-gray-400 text-sm">Rank</div>
-          </div>
-        </div>
+        {/* Stats Section */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <StatCard value={countTasks} label="Completed Tasks" color="blue" />
+          <StatCard value={countFriends} label="Followers" color="pink" />
+          <StatCard value={xp} label="XP Earned" color="green" />
+          <StatCard value={rank} label="Current Rank" color="yellow" />
+        </section>
 
         {/* Rank Progress */}
-        <div>
-          <h2 className="text-lg font-semibold text-gray-300 mb-2">Progress to Next Rank</h2>
-          <div className="w-full bg-gray-700 rounded-full h-4 overflow-hidden">
+        <section className="bg-gray-900/80 rounded-2xl border border-gray-700 p-8 shadow-xl backdrop-blur-lg">
+          <h2 className="text-xl font-semibold mb-3">Progress to Next Rank</h2>
+          <div className="w-full bg-gray-800 rounded-full h-4 overflow-hidden mb-2">
             <div
-              className="h-4 rounded-full shadow-lg"
               style={{
                 width: `${progressPercent}%`,
-                background: "linear-gradient(90deg, #06b6d4, #0ea5e9, #3b82f6)",
-                boxShadow: "0 0 20px rgba(14,165,233,0.7)",
+                background:
+                  "linear-gradient(90deg, #06b6d4, #0ea5e9, #3b82f6)",
+                boxShadow: "0 0 15px rgba(14,165,233,0.6)",
               }}
-            ></div>
+              className="h-4 rounded-full transition-all duration-500"
+            />
           </div>
           {rank !== "S" ? (
-            <p className="text-xs text-gray-400 mt-1">
-              {xp - currentRankXp} / {nextRankXp - currentRankXp} XP to Rank{" "}
+            <p className="text-xs text-gray-400">
+              {xp - currentRankXp} / {nextRankXp - currentRankXp} XP until Rank{" "}
               {rank === "C" ? "B" : rank === "B" ? "A" : "S"}
             </p>
           ) : (
-            <p className="text-xs text-gray-400 mt-1">Max Rank Achieved</p>
+            <p className="text-xs text-gray-400">Max Rank Achieved</p>
           )}
-        </div>
+        </section>
+
+        {/* About Text */}
+        <section className="bg-gray-900/80 rounded-2xl border border-gray-700 p-8 shadow-xl backdrop-blur-lg">
+          <h2 className="text-xl font-semibold mb-3">About</h2>
+          <p className="text-gray-300 text-sm leading-relaxed">
+            This is your personal performance hub. Here you can monitor your
+            growth, achievements, and social reach. Your XP reflects dedication,
+            while your Rank showcases your consistency. Keep engaging, complete
+            more tasks, and connect with peers to level up and unlock new
+            opportunities.
+          </p>
+        </section>
       </div>
     </div>
   );
 }
+
+
+const colorClasses: Record<
+  string,
+  { text: string; hover: string }
+> = {
+  blue: { text: "text-blue-400", hover: "hover:border-blue-400" },
+  pink: { text: "text-pink-400", hover: "hover:border-pink-400" },
+  green: { text: "text-green-400", hover: "hover:border-green-400" },
+  yellow: { text: "text-yellow-400", hover: "hover:border-yellow-400" },
+};
+
+const StatCard = ({
+  value,
+  label,
+  color,
+}: {
+  value: number | string;
+  label: string;
+  color: string;
+}) => (
+  <div
+    className={`rounded-xl p-6 bg-gray-800 border border-transparent transition-all shadow-lg flex flex-col items-center justify-center ${
+      colorClasses[color]?.hover || ""
+    }`}
+  >
+    <span className={`text-3xl font-bold ${colorClasses[color]?.text || ""}`}>
+      {value}
+    </span>
+    <span className="text-gray-400 text-sm mt-1">{label}</span>
+  </div>
+);

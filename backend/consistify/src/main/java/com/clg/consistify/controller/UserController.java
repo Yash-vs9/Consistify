@@ -177,4 +177,8 @@ public class UserController {
     public Object[] findProfile(){
         return userService.gettingProfile();
     }
+    @GetMapping("/getNumber")
+    public ResponseEntity<GetTaskAndQueryNoDTO> getCountOfTaskAndQuery(){
+        return ResponseEntity.ok().body(userService.NumberOfTasksAndQuery());
+    }
 }

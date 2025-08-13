@@ -1,5 +1,6 @@
 package com.clg.consistify.services;
 
+import com.clg.consistify.DTO.GetTaskAndQueryNoDTO;
 import com.clg.consistify.DTO.LoginBody;
 import com.clg.consistify.DTO.RegisterBody;
 import com.clg.consistify.DTO.UserDTO;
@@ -196,5 +197,8 @@ public class UserService extends XpRankEvaluator {
     public void evaluateRank(UserModel user) {
         user.setRank(calculateRank(user.getXp()));
 
+    }
+    public GetTaskAndQueryNoDTO NumberOfTasksAndQuery(){
+        return userRepository.getNumberOfTasksAndQueriesAndUsers();
     }
 }

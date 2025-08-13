@@ -47,6 +47,8 @@ export default function Home() {
         if (!response.ok) throw await response.json();
         const data = await response.json();
         setQueries(data);
+        console.log(data)
+
       } catch (e) {
         console.error(e);
       }
@@ -78,6 +80,20 @@ export default function Home() {
   };
 
   const handleAddComment = async (id: number) => {
+    const newComment: Comment = {
+      id: Date.now(), // temporary ID for UI
+      reply: commentText[id],
+      queryId: id,
+      username: "You" // or fetch actual logged-in user's name
+    };
+    setCommentText("")
+  
+    // Optimistic UI update
+    setQueries((prev) =>
+      prev.map((q) =>
+        q.id === id ? { ...q, comments: [...q.comments, newComment] } : q
+      )
+    );
     const body={
       reply:commentText[id],
       queryId:id
@@ -165,7 +181,7 @@ export default function Home() {
                     key={comment.id}
                     className="text-slate-300 text-sm mb-1"
                   >
-                    {comment.reply}
+                     <span className="font-bold">{comment.username}</span> {comment.reply} 
                   </p>
                 ))}
 

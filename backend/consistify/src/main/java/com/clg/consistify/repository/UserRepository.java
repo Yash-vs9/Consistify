@@ -1,6 +1,7 @@
 package com.clg.consistify.repository;
 
 
+import com.clg.consistify.DTO.GetTaskAndQueryNoDTO;
 import com.clg.consistify.DTO.ProfileDTO;
 import com.clg.consistify.user.UserModel;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,4 +30,14 @@ public interface UserRepository extends JpaRepository<UserModel,Long> {
     WHERE u.id = :id
 """, nativeQuery = true)
     Object[] getProfile(@Param("id") Long id);
+
+    @Query(
+            value = "SELECT " +
+                    "(SELECT COUNT(task_name) FROM user_tasks) AS task_count, " +
+                    "(SELECT COUNT(name) FROM query) AS query_count," +
+                    "(SELECT COUNT(username) FROM users) AS user_count",
+            nativeQuery = true
+    )
+    GetTaskAndQueryNoDTO getNumberOfTasksAndQueriesAndUsers();
+
 }
