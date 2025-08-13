@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.Query;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -39,7 +40,7 @@ public class QueryService {
 
     public void createQuery(QueryDTO body) throws ExecutionException, InterruptedException, JsonProcessingException {
         // Validate and prepare QueryModel
-        String username=SecurityContextHolder.getContext().getAuthentication().getName();
+        String userName=SecurityContextHolder.getContext().getAuthentication().getName();
         QueryModel query = new QueryModel();
 
         if (body.getQueryName() != null && !body.getQueryName().trim().isEmpty()) {
@@ -80,9 +81,10 @@ public class QueryService {
         CompletableFuture.runAsync(() -> {
             try {
                 List<String> difficulty = externalApiService
-                        .skillsProcessing(requestBody, body.getQueryName(), username)
+                        .skillsProcessing(requestBody, body.getQueryName(), userName)
                         .get();
-                updateQuery(difficulty, query.getName(),username);
+                System.out.println(difficulty);
+                updateQuery(query.getName(),userName,difficulty);
                 System.out.println("Updated difficulty: " + difficulty);
             } catch (Exception e) {
                 System.err.println("Error fetching difficulty: " + e.getMessage());
@@ -109,13 +111,34 @@ public class QueryService {
         queryRepository.save(query);
     }
     @Transactional
-    public void updateQuery(List<String> skillMap,String username,String queryName){
-        QueryModel query = queryRepository.findByNameAndUsername(queryName, username)
-                .orElseThrow(() -> new QueryNotFoundException("Query not found"));
-        System.out.println(query.getName());
-        query.setSkillsRequired(skillMap);
+    public void updateQuery(String queryName, String userName, List<String> skillmap) {
+        if (queryName == null || userName == null) {
+            throw new IllegalArgumentException("Query name and user name cannot be null");
+        }
+
+        // Trim spaces
+        String searchQueryName = queryName.trim();
+        String searchUserName = userName.trim();
+
+        System.out.println("🔍 Searching for query: '" + searchQueryName + "' for user: '" + searchUserName + "'");
+
+        // Search ignoring case
+        Optional<QueryModel> existingQuery = queryRepository.findByNameIgnoreCaseAndUsernameIgnoreCase(
+                searchQueryName, searchUserName
+        );
+
+        if (existingQuery.isEmpty()) {
+            throw new QueryNotFoundException(
+                    "No query found with name '" + searchQueryName + "' for user '" + searchUserName + "'."
+            );
+        }
+
+        QueryModel query = existingQuery.get();
+        query.setSkillsRequired(skillmap);
         queryRepository.save(query);
 
+        System.out.println("✅ Query updated successfully for " + searchUserName);
     }
+
 
 }

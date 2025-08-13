@@ -26,8 +26,8 @@ const BotpressWidget = ({ username }: BotpressWidgetProps) => {
       console.log('✅ Botpress script loaded ');
 
       window.botpress.init({
-        botId: '0b639e72-ebb2-471f-9430-18aa97f879b4',
-        clientId: '23256eb0-67de-406d-9967-3f5ccb897ca2',
+        botId: 'ad6b440f-8717-43ee-a53a-1b5fbfa844b6',
+        clientId: '009e5f72-bcf6-43ac-beb5-b5c47c0d238e',
         messagingUrl: 'https://messaging.botpress.cloud',
         hostUrl: 'https://cdn.botpress.cloud/webchat/v3.2',
         user: {
