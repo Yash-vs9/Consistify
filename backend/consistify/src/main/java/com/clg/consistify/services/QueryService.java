@@ -59,7 +59,9 @@ public class QueryService {
         query.setSkillsRequired(new ArrayList<>());
         query.setUser(userRepository.findByUsername(body.getUsername())
                 .orElseThrow(() -> new UserNotFoundException("User not found")));
-        queryRepository.save(query);
+       QueryModel savedQuery= queryRepository.save(query);
+       Long queryId= savedQuery.getQueryId();
+
 //        queryRepository.save(query);
 
         // Prepare BotpressSkillBody payload
@@ -84,7 +86,7 @@ public class QueryService {
                         .skillsProcessing(requestBody, body.getQueryName(), userName)
                         .get();
                 System.out.println(difficulty);
-                updateQuery(query.getName(),userName,difficulty);
+                updateQuery(queryId,userName,difficulty);
                 System.out.println("Updated difficulty: " + difficulty);
             } catch (Exception e) {
                 System.err.println("Error fetching difficulty: " + e.getMessage());
@@ -111,25 +113,20 @@ public class QueryService {
         queryRepository.save(query);
     }
     @Transactional
-    public void updateQuery(String queryName, String userName, List<String> skillmap) {
-        if (queryName == null || userName == null) {
-            throw new IllegalArgumentException("Query name and user name cannot be null");
-        }
+    public void updateQuery(Long id, String userName, List<String> skillmap) {
 
         // Trim spaces
-        String searchQueryName = queryName.trim();
+
         String searchUserName = userName.trim();
 
-        System.out.println("🔍 Searching for query: '" + searchQueryName + "' for user: '" + searchUserName + "'");
+        System.out.println("🔍 Searching for query: '" + id+ "' for user: '" + searchUserName + "'");
 
         // Search ignoring case
-        Optional<QueryModel> existingQuery = queryRepository.findByNameIgnoreCaseAndUsernameIgnoreCase(
-                searchQueryName, searchUserName
-        );
+        Optional<QueryModel> existingQuery = queryRepository.findById(id);
 
         if (existingQuery.isEmpty()) {
             throw new QueryNotFoundException(
-                    "No query found with name '" + searchQueryName + "' for user '" + searchUserName + "'."
+                    "No query found with id '" + id+ "' for user '" + searchUserName + "'."
             );
         }
 

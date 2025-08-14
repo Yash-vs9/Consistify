@@ -54,7 +54,7 @@ const Sidebar = () => {
     { label: 'Tasks', icon: <ListChecks className="w-5 h-5" />, href: '/tasks' },
     { label: 'Schedule', icon: <CalendarDays className="w-5 h-5" />, href: '/calendar' },
     { label: 'Profile', icon: <User className="w-5 h-5" />, href: '/profile' },
-    { label: 'Query', icon: <MessageCircleQuestion className="w-5 h-5" />, href: '/query' },
+    { label: 'Query', icon: <MessageCircleQuestion className="w-5 h-5" />, href: '/queries' },
 
   ];
 

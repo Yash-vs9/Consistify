@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, ChangeEvent, FormEvent, useEffect } from "react";
-
+import Sidebar from "components/Sidebar";
 type Query = {
   id: number;
   title: string;
@@ -68,18 +68,14 @@ export default function Home() {
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-950 transition-all">
       {/* Glow effect */}
-      <button
-      onClick={() => router.push("/queries")}
-      className="rounded bg-blue-500 p-2 absolute right-10 top-20 text-black hover:bg-cyan-300 transition-colors"
-    >
-      View All Queries
-    </button>      <div
+          <div
         className="absolute -z-10"
         aria-hidden
       >
         <div className="w-[600px] h-[400px] bg-blue-400 blur-3xl opacity-30 rounded-full absolute -top-24 left-1/2 -translate-x-1/2" />
         <div className="w-[400px] h-[200px] bg-indigo-400 blur-2xl opacity-25 rounded-full absolute -bottom-10 left-1/3" />
       </div>
+      <Sidebar></Sidebar>
       <main className="relative max-w-xl w-full mx-auto bg-white/90 dark:bg-gray-900/80 mt-20 p-8 rounded-2xl shadow-2xl border border-blue-100 dark:border-gray-800 backdrop-blur-md">
         <header className="text-center mb-8">
           <h1 className="text-3xl font-bold text-blue-700 dark:text-blue-400 drop-shadow-sm">

@@ -1,6 +1,8 @@
 'use client';
 import { useEffect, useState } from "react";
-import { Heart, MessageCircle } from "lucide-react";
+import { Heart, MessageCircle, X } from "lucide-react";
+import Sidebar from "components/Sidebar";
+import { useRouter } from "next/navigation";
 
 interface Comment {
   id: number;
@@ -20,21 +22,19 @@ interface Query {
 }
 
 export default function Home() {
+  const router=useRouter()
   const [token, setToken] = useState<string>("");
   const [queries, setQueries] = useState<Query[]>([]);
   const [commentText, setCommentText] = useState<Record<number, string>>({});
-  const [openComments, setOpenComments] = useState<Set<number>>(new Set());
+  const [selectedQuery, setSelectedQuery] = useState<Query | null>(null);
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    if (storedToken) setToken(storedToken);
   }, []);
 
   useEffect(() => {
     if (!token) return;
-
     const fetchQueries = async () => {
       try {
         const response = await fetch("http://localhost:8080/query/get", {
@@ -47,22 +47,17 @@ export default function Home() {
         if (!response.ok) throw await response.json();
         const data = await response.json();
         setQueries(data);
-        console.log(data)
-
       } catch (e) {
         console.error(e);
       }
     };
-
     fetchQueries();
   }, [token]);
 
   const handleLikeQuery = async (id: number) => {
-    // Optimistic update
     setQueries((prev) =>
       prev.map((q) => (q.id === id ? { ...q, likes: q.likes + 1 } : q))
     );
-
     try {
       await fetch(`http://localhost:8080/query/${id}/like`, {
         method: "POST",
@@ -71,8 +66,7 @@ export default function Home() {
           "Content-Type": "application/json",
         },
       });
-    } catch (err) {
-      console.error("Failed to save like", err);
+    } catch {
       setQueries((prev) =>
         prev.map((q) => (q.id === id ? { ...q, likes: q.likes - 1 } : q))
       );
@@ -81,135 +75,160 @@ export default function Home() {
 
   const handleAddComment = async (id: number) => {
     const newComment: Comment = {
-      id: Date.now(), // temporary ID for UI
+      id: Date.now(),
       reply: commentText[id],
       queryId: id,
-      username: "You" // or fetch actual logged-in user's name
+      username: "You"
     };
-    setCommentText("")
-  
-    // Optimistic UI update
+    setCommentText((prev) => ({ ...prev, [id]: "" }));
     setQueries((prev) =>
       prev.map((q) =>
         q.id === id ? { ...q, comments: [...q.comments, newComment] } : q
       )
     );
-    const body={
-      reply:commentText[id],
-      queryId:id
+    try {
+      await fetch("http://localhost:8080/query/postComment", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reply: commentText[id], queryId: id })
+      });
+    } catch (error) {
+      console.error("Error adding comment:", error);
     }
-    console.log(body)
-   const response=await fetch("http://localhost:8080/query/postComment",{
-    method:"POST",
-    headers:{
-      Authorization:`Bearer ${token}`,
-      "Content-Type":"application/json"
-    },
-    body:JSON.stringify(body)
-   })
-   if(!response.ok){
-    const errData=await response.text();
-    console.log(errData)
-  }
-  const data=await response.json()
-  console.log(data)
-};
-
-  const toggleComments = (id: number) => {
-    setOpenComments((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) newSet.delete(id);
-      else newSet.add(id);
-      return newSet;
-    });
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center px-4 py-8 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        <div className="absolute inset-0 animate-pulse opacity-25 bg-[radial-gradient(circle_at_center,rgba(96,165,250,0.4),transparent_70%)]"></div>
-      </div>
+    <div className="min-h-screen flex">
+      {/* Sidebar */}
+      <div className="z-20">
+        <Sidebar />
+        <button onClick={()=>router.push("/query")} className="absolute top-20 right-20 bg-gray-900 text-white px-5 py-2 rounded-xl shadow-md hover:bg-slate-600 transition-colors duration-200">
+  Create
+</button>      </div>
 
-      <div className="relative z-10 w-full max-w-2xl bg-white/5 backdrop-blur-lg rounded-xl shadow-2xl p-6 border border-white/10">
-        <h1 className="text-3xl font-bold mb-6 text-center text-white/90 tracking-tight">
-          💬 Community Queries
-        </h1>
+      {/* Main Content with background */}
+      <div className="relative flex-1 px-4 py-8 overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
+          <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.25),transparent_70%)]"></div>
+        </div>
 
-        {queries.map((query) => (
-          <div
-            key={query.id}
-            className="bg-slate-800/60 border border-slate-700 rounded-lg p-4 mb-4 shadow-md hover:shadow-lg hover:border-blue-400 transition-all duration-200"
-          >
-            <p className="text-white text-lg font-medium mb-1">
-              {query.queryName}
-            </p>
-            <p className="text-slate-400 text-xs mb-3">— by {query.username}</p>
+        {/* Foreground Content */}
+        <div className="relative z-10 w-full max-w-3xl mx-auto bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-white/10">
+          <h1 className="text-4xl font-bold mb-8 text-center text-white tracking-tight">
+            💬 Community Queries
+          </h1>
 
-            <div className="flex items-center gap-6 text-sm mb-2">
-              <button
-                onClick={() => handleLikeQuery(query.id)}
-                className="flex items-center gap-1 text-red-400 hover:text-red-500 transition"
-              >
-                <Heart size={18} />
-                <span>{query.likes}</span>
-              </button>
+          {queries.map((query) => (
+            <div
+              key={query.id}
+              onClick={() => setSelectedQuery(query)}
+              className="cursor-pointer bg-slate-900/60 border border-slate-800 rounded-lg p-5 mb-5 shadow-md hover:shadow-lg hover:border-cyan-400 transition-all duration-300"
+            >
+              <p className="text-white text-lg font-semibold mb-1">{query.queryName}</p>
+              <p className="text-slate-400 text-xs mb-4">— by {query.username}</p>
 
-              <button
-                onClick={() => toggleComments(query.id)}
-                className="flex items-center gap-1 text-blue-300 hover:text-blue-200 transition"
-              >
-                <MessageCircle size={18} />
-                <span>
-                  {openComments.has(query.id) ? "Hide" : "Comments"}
-                </span>
-              </button>
-            </div>
-
-            {openComments.has(query.id) && (
-              <div className="mt-3 pt-3 border-t border-slate-700">
-                <h4 className="text-xs uppercase text-slate-400 mb-2">
-                  Comments
-                </h4>
-                {query.comments.length === 0 && (
-                  <p className="text-slate-500 text-xs mb-2">
-                    No comments yet
-                  </p>
-                )}
-
-                {query.comments.map((comment) => (
-                  <p
-                    key={comment.id}
-                    className="text-slate-300 text-sm mb-1"
-                  >
-                     <span className="font-bold">{comment.username}</span> {comment.reply} 
-                  </p>
-                ))}
-
-                <div className="flex gap-2 mt-2">
-                  <input
-                    type="text"
-                    className="flex-1 bg-slate-900 border border-slate-600 text-white placeholder-slate-400 rounded-lg px-3 py-1 text-sm outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400 transition"
-                    placeholder="Write a comment..."
-                    value={commentText[query.id] || ""}
-                    onChange={(e) =>
-                      setCommentText((prev) => ({
-                        ...prev,
-                        [query.id]: e.target.value,
-                      }))
-                    }
-                  />
-                  <button
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded-lg text-sm font-medium transition"
-                    onClick={() => handleAddComment(query.id)}
-                  >
-                    Comment
-                  </button>
+              <div className="flex items-center gap-6 text-sm">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleLikeQuery(query.id);
+                  }}
+                  className="flex items-center gap-1 text-red-400 hover:text-red-500 transition"
+                >
+                  <Heart size={18} />
+                  <span>{query.likes}</span>
+                </button>
+                <div className="flex items-center gap-1 text-cyan-300">
+                  <MessageCircle size={18} />
+                  <span>{query.comments.length} Comments</span>
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            </div>
+          ))}
+        </div>
       </div>
+
+      {/* Modal */}
+      {selectedQuery && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center animate-fadeIn">
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm animate-fadeIn"
+            onClick={() => setSelectedQuery(null)}
+          ></div>
+          <div className="relative z-10 w-full max-w-xl bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-lg rounded-2xl shadow-2xl border border-slate-700 p-6 animate-scaleIn">
+            <button
+              onClick={() => setSelectedQuery(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition"
+            >
+              <X size={22} />
+            </button>
+            <h2 className="text-2xl font-bold text-white mb-1">{selectedQuery.queryName}</h2>
+            <p className="text-slate-400 text-sm mb-4">— by {selectedQuery.username}</p>
+            <p className="text-slate-300 mb-6">{selectedQuery.queryDescription}</p>
+            <h4 className="text-sm font-semibold text-slate-400 mb-3">Comments</h4>
+            <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+              {selectedQuery.comments.length === 0 ? (
+                <p className="text-slate-500 text-xs mb-2">No comments yet</p>
+              ) : (
+                selectedQuery.comments.map((comment) => (
+                  <p key={comment.id} className="text-slate-300 text-sm mb-2">
+                    <span className="font-bold text-cyan-400">{comment.username}:</span> {comment.reply}
+                  </p>
+                ))
+              )}
+            </div>
+            <div className="flex gap-2 mt-4">
+              <input
+                type="text"
+                className="flex-1 bg-slate-800 border border-slate-600 text-white placeholder-slate-400 rounded-lg px-3 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400 transition"
+                placeholder="Write a comment..."
+                value={commentText[selectedQuery.id] || ""}
+                onChange={(e) =>
+                  setCommentText((prev) => ({
+                    ...prev,
+                    [selectedQuery.id]: e.target.value,
+                  }))
+                }
+              />
+              <button
+                className="bg-cyan-500 hover:bg-cyan-600 text-white px-5 py-2 rounded-lg text-sm font-medium transition"
+                onClick={() => handleAddComment(selectedQuery.id)}
+              >
+                Comment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Animations */}
+      <style jsx>{`
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out forwards;
+        }
+        .animate-scaleIn {
+          animation: scaleIn 0.25s ease-out forwards;
+        }
+        @keyframes fadeIn {
+          from { opacity: 0 }
+          to { opacity: 1 }
+        }
+        @keyframes scaleIn {
+          from { transform: scale(0.95); opacity: 0 }
+          to { transform: scale(1); opacity: 1 }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: rgba(100, 116, 139, 0.5);
+          border-radius: 3px;
+        }
+      `}</style>
     </div>
   );
 }
