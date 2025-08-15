@@ -114,19 +114,11 @@ public class QueryService {
     }
     @Transactional
     public void updateQuery(Long id, String userName, List<String> skillmap) {
-
-        // Trim spaces
-
-        String searchUserName = userName.trim();
-
-        System.out.println("🔍 Searching for query: '" + id+ "' for user: '" + searchUserName + "'");
-
-        // Search ignoring case
         Optional<QueryModel> existingQuery = queryRepository.findById(id);
 
         if (existingQuery.isEmpty()) {
             throw new QueryNotFoundException(
-                    "No query found with id '" + id+ "' for user '" + searchUserName + "'."
+                    "No query found with id '" + id+ "' for user '" + userName + "'."
             );
         }
 
@@ -134,8 +126,29 @@ public class QueryService {
         query.setSkillsRequired(skillmap);
         queryRepository.save(query);
 
-        System.out.println("✅ Query updated successfully for " + searchUserName);
+        System.out.println("✅ Query updated successfully for " + userName);
+    }
+    @Transactional
+    public void updateLikePlus(Long id) {
+        QueryModel query = queryRepository.findById(id)
+                .orElseThrow(() -> new QueryNotFoundException(
+                        "No query found with id '" + id + "'."
+                ));
+
+        query.setLikes(query.getLikes() + 1);
     }
 
+    @Transactional
+    public void updateLikeMinus(Long id) {
+        QueryModel query = queryRepository.findById(id)
+                .orElseThrow(() -> new QueryNotFoundException(
+                        "No query found with id '" + id + "'."
+                ));
+
+        int likes = query.getLikes();
+        if (likes > 0) {
+            query.setLikes(likes - 1);
+        }
+    }
 
 }
