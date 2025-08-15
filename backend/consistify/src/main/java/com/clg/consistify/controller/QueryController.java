@@ -30,8 +30,9 @@ public class QueryController {
         return ResponseEntity.ok("Query Submitted");
     }
     @GetMapping("/get")
-    public ResponseEntity<List<QueryGetDTO>> getAllQueries(){
-        return ResponseEntity.ok(queryService.getQueries());
+    public ResponseEntity<List<QueryGetDTO>> getAllQueries(@RequestParam int pageNo){
+
+        return ResponseEntity.ok(queryService.getQueries(pageNo));
     }
     @PostMapping("/postComment")
     public ResponseEntity<Map<String, String>> sendComments(@RequestBody CommentDTO body) {

@@ -90,7 +90,7 @@ public class UserController {
     @GetMapping("/users")
     public List<String> getAllUsers(@RequestParam int pageNo) {
         System.out.println("💡 Getting data from DB... (Not cache)");
-        return userRepository.findAll(PageRequest.of(pageNo,5,Sort.by("id")))
+        return userRepository.findAll(PageRequest.of(pageNo,10,Sort.by("id")))
                 .stream()
                 .map(UserModel::getUsername)
                 .toList();

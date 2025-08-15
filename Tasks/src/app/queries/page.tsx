@@ -22,11 +22,13 @@ interface Query {
 }
 
 export default function Home() {
-  const router=useRouter()
+  const router = useRouter();
   const [token, setToken] = useState<string>("");
   const [queries, setQueries] = useState<Query[]>([]);
   const [commentText, setCommentText] = useState<Record<number, string>>({});
   const [selectedQuery, setSelectedQuery] = useState<Query | null>(null);
+  const [pageNo, setPageNo] = useState<number>(0); // new
+  const [isLastPage, setIsLastPage] = useState<boolean>(false); // to disable Next button
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
@@ -37,7 +39,7 @@ export default function Home() {
     if (!token) return;
     const fetchQueries = async () => {
       try {
-        const response = await fetch("http://localhost:8080/query/get", {
+        const response = await fetch(`http://localhost:8080/query/get?pageNo=${pageNo}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -46,13 +48,22 @@ export default function Home() {
         });
         if (!response.ok) throw await response.json();
         const data = await response.json();
-        setQueries(data);
+        
+        // If your backend returns a Page object
+        if (data.content && Array.isArray(data.content)) {
+          setQueries(data.content);
+          setIsLastPage(data.last);
+        } else {
+          // If your backend returns just a list
+          setQueries(data);
+          setIsLastPage(data.length < 10); // assume last page if less than page size
+        }
       } catch (e) {
         console.error(e);
       }
     };
     fetchQueries();
-  }, [token]);
+  }, [token, pageNo]);
 
   const handleLikeQuery = async (id: number) => {
     setQueries((prev) =>
@@ -105,18 +116,22 @@ export default function Home() {
       {/* Sidebar */}
       <div className="z-20">
         <Sidebar />
-        <button onClick={()=>router.push("/query")} className="absolute top-20 right-20 bg-gray-900 text-white px-5 py-2 rounded-xl shadow-md hover:bg-slate-600 transition-colors duration-200">
-  Create
-</button>      </div>
+        <button
+          onClick={() => router.push("/query")}
+          className="absolute top-20 right-20 bg-gray-900 text-white px-5 py-2 rounded-xl shadow-md hover:bg-slate-600 transition-colors duration-200"
+        >
+          Create
+        </button>
+      </div>
 
-      {/* Main Content with background */}
+      {/* Main Content */}
       <div className="relative flex-1 px-4 py-8 overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950 to-slate-950">
           <div className="absolute inset-0 opacity-30 bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.25),transparent_70%)]"></div>
         </div>
 
-        {/* Foreground Content */}
+        {/* Foreground */}
         <div className="relative z-10 w-full max-w-3xl mx-auto bg-white/5 backdrop-blur-md rounded-2xl shadow-2xl p-6 border border-white/10">
           <h1 className="text-4xl font-bold mb-8 text-center text-white tracking-tight">
             💬 Community Queries
@@ -149,10 +164,32 @@ export default function Home() {
               </div>
             </div>
           ))}
+
+          {/* Pagination Controls */}
+          <div className="flex justify-between mt-6">
+            <button
+              disabled={pageNo === 0}
+              onClick={() => setPageNo((prev) => Math.max(0, prev - 1))}
+              className={`px-4 py-2 rounded-lg text-white ${
+                pageNo === 0 ? "bg-gray-600 cursor-not-allowed" : "bg-cyan-500 hover:bg-cyan-600"
+              }`}
+            >
+              Previous
+            </button>
+            <button
+              disabled={isLastPage}
+              onClick={() => setPageNo((prev) => prev + 1)}
+              className={`px-4 py-2 rounded-lg text-white ${
+                isLastPage ? "bg-gray-600 cursor-not-allowed" : "bg-cyan-500 hover:bg-cyan-600"
+              }`}
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Modal (unchanged) */}
       {selectedQuery && (
         <div className="fixed inset-0 z-50 flex items-center justify-center animate-fadeIn">
           <div

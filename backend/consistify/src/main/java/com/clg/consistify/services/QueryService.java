@@ -15,6 +15,8 @@ import com.clg.consistify.user.Comment;
 import com.clg.consistify.user.QueryModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,8 +97,8 @@ public class QueryService {
 
 
 
-    }    public List<QueryGetDTO> getQueries(){
-        return queryRepository.findAll()
+    }    public List<QueryGetDTO> getQueries(int pageNo){
+        return queryRepository.findAll(PageRequest.of(pageNo,10, Sort.by("queryId")))
                 .stream()
                 .map((QueryGetDTO::new))
                 .toList();
