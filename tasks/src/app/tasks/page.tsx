@@ -6,6 +6,7 @@ import LoadingPage from "../../../components/LoadingPage";
 import Sidebar from "../../../components/Sidebar";
 import ErrorPage from "../../../components/ErrorPage";
 import BotpressWidget from "components/BotpressWidget";
+import { div } from "framer-motion/client";
 
 
 

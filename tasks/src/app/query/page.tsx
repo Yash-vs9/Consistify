@@ -59,6 +59,7 @@ export default function Home() {
       }
       const data=response.text()
       console.log(data)
+      router.push("/queries")
     }
     catch(e){
       console.log(e)

@@ -117,28 +117,7 @@ const MainDashboard: React.FC = () => {
           />
         </div>
 
-        {/* Recent Activity Feed */}
-        <section className="bg-slate-800/50 rounded-xl p-6 border border-slate-700 backdrop-blur-lg">
-          <h2 className="text-xl font-semibold mb-4 text-cyan-300">
-            Recent Activity
-          </h2>
-          <div className="space-y-4">
-            {activities.map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between bg-slate-900/40 p-4 rounded-lg border border-slate-700 hover:border-cyan-400 transition"
-              >
-                <div>
-                  <p className="font-medium">{item.title}</p>
-                  <p className="text-slate-400 text-sm">{item.description}</p>
-                </div>
-                <span className="text-xs text-slate-500 mt-2 sm:mt-0">
-                  {item.time}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
+        
       </main>
     </div>
   );

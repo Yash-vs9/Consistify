@@ -122,7 +122,7 @@ const TaskEditPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm text-gray-300 mb-2">Collaborators</label>
+              <label className="block text-sm text-gray-300 mb-2">Description</label>
               <input
                 type="text"
                 value={description}
