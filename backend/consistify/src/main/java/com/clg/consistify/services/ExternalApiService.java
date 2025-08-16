@@ -22,6 +22,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -149,46 +151,77 @@ public class ExternalApiService {
                     return null;
                 });
     }
-    public CompletableFuture<List<String>> createBotUser(String userName){
-        String xUserKey=createUserKey(userName);
+    public CompletableFuture<List<String>> createBotUser(String userName) {
+        String xUserKey = createUserKey(userName);
 
-        HashMap<String, String > map=new HashMap<>();
-        map.put("name",userName);
+        HashMap<String, String> map = new HashMap<>();
+        map.put("name", userName);
+
         return webClient.post()
-                .uri("https://chat.botpress.cloud/"+webhookurl+"/users/get-or-create")
+                .uri("https://chat.botpress.cloud/" + webhookurl + "/users/get-or-create")
                 .header("x-user-key", xUserKey)
                 .header("Content-Type", "application/json")
                 .bodyValue(map)
                 .retrieve()
-                .bodyToFlux(String.class)
-                .collectList()
-                .toFuture();
+                .bodyToMono(String.class)
+                .doOnNext(userResponse -> {
+                    // 🔹 Log Bot User creation response
+                    System.out.println("Bot User created: " + userResponse);
+                })
+                .toFuture()
+                .thenCompose(userResponse -> {
+                    // Delay 10 seconds
+                    CompletableFuture<Void> delay = new CompletableFuture<>();
+                    ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+                    scheduler.schedule(() -> {
+                        delay.complete(null);
+                        scheduler.shutdown();
+                    }, 10, TimeUnit.SECONDS);
+
+                    // After delay, create conversation
+                    return delay.thenCompose(v -> {
+                        try {
+                            return createConversation(userName)
+                                    .thenApply(conversationResponse -> {
+                                        // 🔹 Log Conversation creation response
+                                        System.out.println("Conversation created: " + conversationResponse);
+                                        return conversationResponse;
+                                    });
+                        } catch (Exception e) {
+                            CompletableFuture<List<String>> failed = new CompletableFuture<>();
+                            failed.completeExceptionally(e);
+                            return failed;
+                        }
+                    });
+                });
     }
-    public CompletableFuture<Map> createConversation(String userName) throws Exception {
-        // Create the x-user-key
+    public CompletableFuture<List<String>> createConversation(String userName) throws Exception {
         String xUserKey = createUserKey(userName);
 
-        // Request body
         Map<String, String> map = new HashMap<>();
         map.put("id", userName);
 
-        // API call
-        CompletableFuture<Map> result = webClient.post()
-                .uri("https://chat.botpress.cloud/"+webhookurl+"/conversations")
+        return webClient.post()
+                .uri("https://chat.botpress.cloud/" + webhookurl + "/conversations")
                 .header("x-user-key", xUserKey)
                 .header("Content-Type", "application/json")
                 .bodyValue(map)
                 .retrieve()
-                .onStatus(HttpStatusCode::isError, clientResponse -> clientResponse
-                        .bodyToMono(String.class)
-                        .map(body -> new RuntimeException("API Error: " + body)))
-                .bodyToMono(Map.class) // Parse JSON into Map
+                .bodyToMono(Map.class) // response as Map
+                .map(responseMap -> {
+                    List<String> result = new ArrayList<>();
+                    Map conversation = (Map) responseMap.get("conversation");
+                    if (conversation != null) {
+                        String convId = (String) conversation.get("id");
+                        if (convId != null) {
+                            result.add(convId);
+                        }
+                    } else {
+                        System.err.println("Unexpected response: " + responseMap);
+                    }
+                    return result;
+                })
                 .toFuture();
-
-        // Print the actual response (blocking here just for demo)
-        System.out.println(result.get());
-
-        return result;
     }
     public CompletableFuture<List<String>> getMessageOfSkillMap(String queryName,String userName) {
         String xUserKey = createUserKey(userName);

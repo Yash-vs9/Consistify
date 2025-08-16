@@ -117,7 +117,11 @@ public class TaskService {
                 String difficulty = externalApiService
                         .taskdifficulty(requestBody, task.getTaskName(), username)
                         .get();
-                updateTaskForDifficulty(difficulty, body.getTaskName(),username);
+                if (difficulty!=null){
+                updateTaskForDifficulty(difficulty, body.getTaskName(),username);}
+                else {
+                    updateTaskForDifficulty("Easy",task.getTaskName(),username);
+                }
                 System.out.println("Updated difficulty: " + difficulty);
             } catch (Exception e) {
                 System.err.println("Error fetching difficulty: " + e.getMessage());

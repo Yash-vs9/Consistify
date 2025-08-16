@@ -66,15 +66,7 @@ public class UserController {
                 .runAsync(() -> {
                     externalApiService.createBotUser(body.getUsername());
                 })
-                .thenRun(() -> {
-                    try {
-                        externalApiService.createConversation(body.getUsername());
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                })
                 .exceptionally(ex -> {
-                    // Log the error
                     System.err.println("Async error: " + ex.getMessage());
                     return null;
                 });
