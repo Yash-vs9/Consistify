@@ -125,7 +125,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskUpdate }) => {
 
   return (
 <div
-  className={`relative w-[22vw] min-w-[360px] max-w-[420px] p-16 rounded-3xl
+  className={`relative w-[22vw] min-w-[360px] max-w-[420px] p-5 rounded-3xl
     shadow-xl bg-gradient-to-br from-[#141F2B]/90 via-[#192B43]/70 to-[#142634]/90
     border border-cyan-600/40 transition-all duration-500 ease-in-out shadow-cyan-500/20
     flex flex-col gap-4 select-none backdrop-blur-xl overflow-hidden cursor-pointer

@@ -48,14 +48,16 @@ export default function Home() {
         });
         if (!response.ok) throw await response.json();
         const data = await response.json();
-        
+        console.log(data.content)
         // If your backend returns a Page object
         if (data.content && Array.isArray(data.content)) {
+          console.log(data)
           setQueries(data.content);
           setIsLastPage(data.last);
         } else {
           // If your backend returns just a list
           setQueries(data);
+          console.log(queries)
           setIsLastPage(data.length < 10); // assume last page if less than page size
         }
       } catch (e) {
@@ -205,7 +207,8 @@ export default function Home() {
             </button>
             <h2 className="text-2xl font-bold text-white mb-1">{selectedQuery.queryName}</h2>
             <p className="text-slate-400 text-sm mb-4">— by {selectedQuery.username}</p>
-            <p className="text-slate-300 mb-6">{selectedQuery.queryDescription}</p>
+            <p className="text-slate-400 text-sm mb-4">{selectedQuery.skillsRequired.join(' , ')}  <span className="font-bold"> -Fetched by AI</span></p>
+            <p className="text-slate-300 mb-6"> <span className="font-bold">Description: </span>{selectedQuery.queryDescription}</p>
             <h4 className="text-sm font-semibold text-slate-400 mb-3">Comments</h4>
             <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
               {selectedQuery.comments.length === 0 ? (

@@ -205,7 +205,7 @@ const Friends: React.FC = () => {
         {/* Container */}
         <div className="relative z-10 space-y-10">
           <h1 className="text-4xl font-bold text-white border-b border-cyan-500 pb-2">
-            Friends
+
           </h1>
 
           {/* Friend Requests */}
@@ -248,7 +248,7 @@ const Friends: React.FC = () => {
                 ))
               ) : (
                 <p className="text-sm text-gray-400">
-                  You haven’t added anyone yet 😢
+                  You haven’t added anyone yet 
                 </p>
               )}
             </div>
