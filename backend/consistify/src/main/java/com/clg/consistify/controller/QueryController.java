@@ -1,6 +1,7 @@
 package com.clg.consistify.controller;
 
 import com.clg.consistify.DTO.CommentDTO;
+import com.clg.consistify.DTO.LikeDTO;
 import com.clg.consistify.DTO.QueryDTO;
 import com.clg.consistify.DTO.QueryGetDTO;
 import com.clg.consistify.services.ExternalApiService;
@@ -38,6 +39,17 @@ public class QueryController {
     public ResponseEntity<Map<String, String>> sendComments(@RequestBody CommentDTO body) {
         queryService.postComment(body);
         return ResponseEntity.ok(Map.of("message", "Comment saved"));
+    }
+    @PostMapping("/like")
+    public ResponseEntity<?> likePost(@RequestBody LikeDTO body){
+        queryService.updateLikePlus(body.getId());
+        return ResponseEntity.ok("Liked success");
+    }
+    @PostMapping("/dislike")
+    public ResponseEntity<?> dislikePost(@RequestBody LikeDTO body){
+        queryService.updateLikeMinus(body.getId());
+        return ResponseEntity.ok("Dislike success");
+
     }
 
 }

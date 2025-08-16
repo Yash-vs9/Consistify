@@ -27,8 +27,9 @@ export default function Home() {
   const [queries, setQueries] = useState<Query[]>([]);
   const [commentText, setCommentText] = useState<Record<number, string>>({});
   const [selectedQuery, setSelectedQuery] = useState<Query | null>(null);
-  const [pageNo, setPageNo] = useState<number>(0); // new
-  const [isLastPage, setIsLastPage] = useState<boolean>(false); // to disable Next button
+  const [pageNo, setPageNo] = useState<number>(0);
+  const [isLastPage, setIsLastPage] = useState<boolean>(false);
+  const [likedQueries, setLikedQueries] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
@@ -48,17 +49,12 @@ export default function Home() {
         });
         if (!response.ok) throw await response.json();
         const data = await response.json();
-        console.log(data.content)
-        // If your backend returns a Page object
         if (data.content && Array.isArray(data.content)) {
-          console.log(data)
           setQueries(data.content);
           setIsLastPage(data.last);
         } else {
-          // If your backend returns just a list
           setQueries(data);
-          console.log(queries)
-          setIsLastPage(data.length < 10); // assume last page if less than page size
+          setIsLastPage(data.length < 10);
         }
       } catch (e) {
         console.error(e);
@@ -67,22 +63,47 @@ export default function Home() {
     fetchQueries();
   }, [token, pageNo]);
 
-  const handleLikeQuery = async (id: number) => {
+  const handleToggleLike = async (id: number) => {
+    const alreadyLiked = likedQueries.has(id);
+
+    // Optimistic UI update
     setQueries((prev) =>
-      prev.map((q) => (q.id === id ? { ...q, likes: q.likes + 1 } : q))
+      prev.map((q) =>
+        q.id === id ? { ...q, likes: q.likes + (alreadyLiked ? -1 : 1) } : q
+      )
     );
+
+    setLikedQueries((prev) => {
+      const newSet = new Set(prev);
+      if (alreadyLiked) newSet.delete(id);
+      else newSet.add(id);
+      return newSet;
+    });
+
     try {
-      await fetch(`http://localhost:8080/query/${id}/like`, {
+      const endpoint = alreadyLiked ? "dislike" : "like";
+      await fetch(`http://localhost:8080/query/${endpoint}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
+        body: JSON.stringify({ id: id }),
       });
-    } catch {
+    } catch (error) {
+      console.error("Like/Dislike failed:", error);
+      // rollback on failure
       setQueries((prev) =>
-        prev.map((q) => (q.id === id ? { ...q, likes: q.likes - 1 } : q))
+        prev.map((q) =>
+          q.id === id ? { ...q, likes: q.likes + (alreadyLiked ? 1 : -1) } : q
+        )
       );
+      setLikedQueries((prev) => {
+        const newSet = new Set(prev);
+        if (alreadyLiked) newSet.add(id);
+        else newSet.delete(id);
+        return newSet;
+      });
     }
   };
 
@@ -91,7 +112,7 @@ export default function Home() {
       id: Date.now(),
       reply: commentText[id],
       queryId: id,
-      username: "You"
+      username: "You",
     };
     setCommentText((prev) => ({ ...prev, [id]: "" }));
     setQueries((prev) =>
@@ -104,9 +125,9 @@ export default function Home() {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ reply: commentText[id], queryId: id })
+        body: JSON.stringify({ reply: commentText[id], queryId: id }),
       });
     } catch (error) {
       console.error("Error adding comment:", error);
@@ -152,11 +173,18 @@ export default function Home() {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleLikeQuery(query.id);
+                    handleToggleLike(query.id);
                   }}
-                  className="flex items-center gap-1 text-red-400 hover:text-red-500 transition"
+                  className={`flex items-center gap-1 transition ${
+                    likedQueries.has(query.id)
+                      ? "text-red-500"
+                      : "text-red-400 hover:text-red-500"
+                  }`}
                 >
-                  <Heart size={18} />
+                  <Heart
+                    size={18}
+                    fill={likedQueries.has(query.id) ? "currentColor" : "none"}
+                  />
                   <span>{query.likes}</span>
                 </button>
                 <div className="flex items-center gap-1 text-cyan-300">
@@ -173,7 +201,9 @@ export default function Home() {
               disabled={pageNo === 0}
               onClick={() => setPageNo((prev) => Math.max(0, prev - 1))}
               className={`px-4 py-2 rounded-lg text-white ${
-                pageNo === 0 ? "bg-gray-600 cursor-not-allowed" : "bg-cyan-500 hover:bg-cyan-600"
+                pageNo === 0
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-cyan-500 hover:bg-cyan-600"
               }`}
             >
               Previous
@@ -182,7 +212,9 @@ export default function Home() {
               disabled={isLastPage}
               onClick={() => setPageNo((prev) => prev + 1)}
               className={`px-4 py-2 rounded-lg text-white ${
-                isLastPage ? "bg-gray-600 cursor-not-allowed" : "bg-cyan-500 hover:bg-cyan-600"
+                isLastPage
+                  ? "bg-gray-600 cursor-not-allowed"
+                  : "bg-cyan-500 hover:bg-cyan-600"
               }`}
             >
               Next
@@ -191,7 +223,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Modal (unchanged) */}
+      {/* Modal */}
       {selectedQuery && (
         <div className="fixed inset-0 z-50 flex items-center justify-center animate-fadeIn">
           <div
@@ -207,8 +239,15 @@ export default function Home() {
             </button>
             <h2 className="text-2xl font-bold text-white mb-1">{selectedQuery.queryName}</h2>
             <p className="text-slate-400 text-sm mb-4">— by {selectedQuery.username}</p>
-            <p className="text-slate-400 text-sm mb-4">{selectedQuery.skillsRequired.join(' , ')}  <span className="font-bold"> -Fetched by AI</span></p>
-            <p className="text-slate-300 mb-6"> <span className="font-bold">Description: </span>{selectedQuery.queryDescription}</p>
+            <p className="text-slate-400 text-sm mb-4">
+              {selectedQuery.skillsRequired.join(" , ")}{" "}
+              <span className="font-bold"> -Fetched by AI</span>
+            </p>
+            <p className="text-slate-300 mb-6">
+              {" "}
+              <span className="font-bold">Description: </span>
+              {selectedQuery.queryDescription}
+            </p>
             <h4 className="text-sm font-semibold text-slate-400 mb-3">Comments</h4>
             <div className="max-h-64 overflow-y-auto pr-2 custom-scrollbar">
               {selectedQuery.comments.length === 0 ? (
@@ -216,7 +255,8 @@ export default function Home() {
               ) : (
                 selectedQuery.comments.map((comment) => (
                   <p key={comment.id} className="text-slate-300 text-sm mb-2">
-                    <span className="font-bold text-cyan-400">{comment.username}:</span> {comment.reply}
+                    <span className="font-bold text-cyan-400">{comment.username}:</span>{" "}
+                    {comment.reply}
                   </p>
                 ))
               )}
@@ -254,12 +294,22 @@ export default function Home() {
           animation: scaleIn 0.25s ease-out forwards;
         }
         @keyframes fadeIn {
-          from { opacity: 0 }
-          to { opacity: 1 }
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
         }
         @keyframes scaleIn {
-          from { transform: scale(0.95); opacity: 0 }
-          to { transform: scale(1); opacity: 1 }
+          from {
+            transform: scale(0.95);
+            opacity: 0;
+          }
+          to {
+            transform: scale(1);
+            opacity: 1;
+          }
         }
         .custom-scrollbar::-webkit-scrollbar {
           width: 6px;
