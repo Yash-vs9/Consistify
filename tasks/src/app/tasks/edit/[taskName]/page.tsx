@@ -127,7 +127,7 @@ const TaskEditPage: React.FC = () => {
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Search or type usernames..."
+                placeholder="Enter Desciption..."
                 className="w-full bg-[#1b1c2e] text-white p-3 rounded-md border border-cyan-700"
               />
             </div>
