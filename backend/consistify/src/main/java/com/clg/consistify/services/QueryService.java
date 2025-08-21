@@ -131,6 +131,7 @@ public class QueryService {
         System.out.println("✅ Query updated successfully for " + userName);
     }
     @Transactional
+    //wrong
     public void updateLikePlus(Long id) {
         QueryModel query = queryRepository.findById(id)
                 .orElseThrow(() -> new QueryNotFoundException(
@@ -141,6 +142,7 @@ public class QueryService {
     }
 
     @Transactional
+    //wrong
     public void updateLikeMinus(Long id) {
         QueryModel query = queryRepository.findById(id)
                 .orElseThrow(() -> new QueryNotFoundException(

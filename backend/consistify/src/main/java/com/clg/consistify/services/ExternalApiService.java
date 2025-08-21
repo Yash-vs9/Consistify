@@ -139,7 +139,7 @@ public class ExternalApiService {
                     }
                     System.out.println("Received response from skillsProcessing: " + responseList);
 
-                    // Wait 5 seconds before calling getMessageOfTaskDifficulty
+
                     return CompletableFuture.supplyAsync(
                             () -> null,
                             CompletableFuture.delayedExecutor(10, TimeUnit.SECONDS)
@@ -183,7 +183,6 @@ public class ExternalApiService {
                         try {
                             return createConversation(userName)
                                     .thenApply(conversationResponse -> {
-                                        // 🔹 Log Conversation creation response
                                         System.out.println("Conversation created: " + conversationResponse);
                                         return conversationResponse;
                                     });
