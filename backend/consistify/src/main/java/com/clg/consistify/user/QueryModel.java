@@ -16,6 +16,16 @@ public class QueryModel {
     private String description;
     private String status;
     private int likes;
+    private boolean isLiked;
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
     @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
     @ElementCollection

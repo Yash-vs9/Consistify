@@ -1,5 +1,4 @@
 package com.clg.consistify.services;
-
 import com.clg.consistify.DTO.BotBody.BotSkillBody;
 import com.clg.consistify.DTO.BotBody.BotpressSkillBody;
 import com.clg.consistify.DTO.BotBody.PayloadSkillDTO;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-
 @Service
 public class QueryService {
     private final UserRepository userRepository;
@@ -131,27 +129,43 @@ public class QueryService {
         System.out.println("✅ Query updated successfully for " + userName);
     }
     @Transactional
-    //wrong
     public void updateLikePlus(Long id) {
         QueryModel query = queryRepository.findById(id)
                 .orElseThrow(() -> new QueryNotFoundException(
                         "No query found with id '" + id + "'."
                 ));
 
-        query.setLikes(query.getLikes() + 1);
-    }
 
+        if(query.isLiked()==true){
+            int likes = query.getLikes();
+            if (likes > 0) {
+                query.setLikes(likes - 1);
+                query.setLiked(false);
+            }
+        }
+        else{
+            query.setLikes(query.getLikes() + 1);
+            query.setLiked(true);
+        }
+    }
     @Transactional
-    //wrong
     public void updateLikeMinus(Long id) {
+
         QueryModel query = queryRepository.findById(id)
                 .orElseThrow(() -> new QueryNotFoundException(
                         "No query found with id '" + id + "'."
                 ));
+        if(query.isLiked()==true){
+            int likes = query.getLikes();
+            if (likes > 0) {
+                query.setLikes(likes - 1);
+            }
+            query.setLiked(false);
+        }
+        else{
+            query.setLikes(query.getLikes() + 1);
+            query.setLiked(true);
 
-        int likes = query.getLikes();
-        if (likes > 0) {
-            query.setLikes(likes - 1);
         }
     }
 
