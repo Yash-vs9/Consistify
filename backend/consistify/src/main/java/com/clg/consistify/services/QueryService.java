@@ -12,6 +12,7 @@ import com.clg.consistify.repository.QueryRepository;
 import com.clg.consistify.repository.UserRepository;
 import com.clg.consistify.user.Comment;
 import com.clg.consistify.user.QueryModel;
+import com.clg.consistify.user.UserModel;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.data.domain.PageRequest;
@@ -21,9 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.management.Query;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 @Service
@@ -39,7 +38,7 @@ public class QueryService {
     }
 
     public void createQuery(QueryDTO body) throws ExecutionException, InterruptedException, JsonProcessingException {
-        // Validate and prepare QueryModel
+
         String userName=SecurityContextHolder.getContext().getAuthentication().getName();
         QueryModel query = new QueryModel();
 
@@ -130,43 +129,32 @@ public class QueryService {
     }
     @Transactional
     public void updateLikePlus(Long id) {
+        String username=SecurityContextHolder.getContext().getAuthentication().getName();
         QueryModel query = queryRepository.findById(id)
                 .orElseThrow(() -> new QueryNotFoundException(
                         "No query found with id '" + id + "'."
                 ));
-
-
-        if(query.isLiked()==true){
-            int likes = query.getLikes();
-            if (likes > 0) {
-                query.setLikes(likes - 1);
-                query.setLiked(false);
-            }
+        Optional<UserModel> user= query.getLikedByUsers()
+                .stream()
+                .filter((u)->u.getUsername().equals(username))
+                .findFirst();
+        if(user.isEmpty()){
+            UserModel rUser=userRepository.findByUsername(username)
+                            .orElseThrow(()-> new UserNotFoundException("User not found"));
+            query.setLikes(query.getLikes()+1);
+            Set<UserModel> likedByUsers=query.getLikedByUsers();
+            likedByUsers.add(rUser);
+            query.setLikedByUsers(likedByUsers);
         }
         else{
-            query.setLikes(query.getLikes() + 1);
-            query.setLiked(true);
+            UserModel rUser=userRepository.findByUsername(username)
+                    .orElseThrow(()-> new UserNotFoundException("User not found"));
+            query.setLikes(query.getLikes()-1);
+            Set<UserModel> likedByUsers=query.getLikedByUsers();
+            likedByUsers.remove(rUser);
+            query.setLikedByUsers(likedByUsers);
         }
-    }
-    @Transactional
-    public void updateLikeMinus(Long id) {
-
-        QueryModel query = queryRepository.findById(id)
-                .orElseThrow(() -> new QueryNotFoundException(
-                        "No query found with id '" + id + "'."
-                ));
-        if(query.isLiked()==true){
-            int likes = query.getLikes();
-            if (likes > 0) {
-                query.setLikes(likes - 1);
-            }
-            query.setLiked(false);
-        }
-        else{
-            query.setLikes(query.getLikes() + 1);
-            query.setLiked(true);
-
-        }
+        queryRepository.save(query);
     }
 
 }

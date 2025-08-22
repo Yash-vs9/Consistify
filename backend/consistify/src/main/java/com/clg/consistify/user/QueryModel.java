@@ -4,7 +4,9 @@ import com.clg.consistify.DTO.QueryGetDTO;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="query")
@@ -16,16 +18,9 @@ public class QueryModel {
     private String description;
     private String status;
     private int likes;
-    private boolean isLiked;
 
-    public boolean isLiked() {
-        return isLiked;
-    }
-
-    public void setLiked(boolean liked) {
-        isLiked = liked;
-    }
-
+    @ManyToMany(mappedBy = "likedQueries")
+    private Set<UserModel> likedByUsers=new HashSet<>();
     @OneToMany(mappedBy = "query", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> comments;
     @ElementCollection
@@ -41,6 +36,14 @@ public class QueryModel {
         this.comments=body.getComments();
         this.skillsRequired=body.getSkillsRequired();
 
+    }
+
+    public Set<UserModel> getLikedByUsers() {
+        return likedByUsers;
+    }
+
+    public void setLikedByUsers(Set<UserModel> likedByUsers) {
+        this.likedByUsers = likedByUsers;
     }
 
     public int getLikes() {

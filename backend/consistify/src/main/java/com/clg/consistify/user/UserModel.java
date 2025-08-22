@@ -3,10 +3,7 @@ package com.clg.consistify.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -55,6 +52,21 @@ public class UserModel {
     public void addProject(ProjectModel project) {
         projects.add(project);
         project.setUser(this);
+    }
+    @ManyToMany
+    @JoinTable(
+            name="query_liked",
+            joinColumns = @JoinColumn(name="user_id"),
+            inverseJoinColumns = @JoinColumn(name="query_id")
+    )
+    private Set<QueryModel> likedQueries=new HashSet<>();
+
+    public Set<QueryModel> getLikedQueries() {
+        return likedQueries;
+    }
+
+    public void setLikedQueries(Set<QueryModel> likedQueries) {
+        this.likedQueries = likedQueries;
     }
 
     public void removeProject(ProjectModel project) {
