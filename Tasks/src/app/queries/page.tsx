@@ -81,7 +81,7 @@ export default function Home() {
     });
 
     try {
-      const endpoint = alreadyLiked ? "dislike" : "like";
+      const endpoint = alreadyLiked ? "like" : "like";
       await fetch(`http://localhost:8080/query/${endpoint}`, {
         method: "POST",
         headers: {

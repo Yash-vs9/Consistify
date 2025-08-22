@@ -45,11 +45,6 @@ public class QueryController {
         queryService.updateLikePlus(body.getId());
         return ResponseEntity.ok("Liked success");
     }
-    @PostMapping("/dislike")
-    public ResponseEntity<?> dislikePost(@RequestBody LikeDTO body){
-        queryService.updateLikeMinus(body.getId());
-        return ResponseEntity.ok("Dislike success");
 
-    }
 
 }

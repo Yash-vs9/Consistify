@@ -145,6 +145,8 @@ public class QueryService {
             Set<UserModel> likedByUsers=query.getLikedByUsers();
             likedByUsers.add(rUser);
             query.setLikedByUsers(likedByUsers);
+            rUser.getLikedQueries().add(query);
+            userRepository.save(rUser);
         }
         else{
             UserModel rUser=userRepository.findByUsername(username)
@@ -153,8 +155,11 @@ public class QueryService {
             Set<UserModel> likedByUsers=query.getLikedByUsers();
             likedByUsers.remove(rUser);
             query.setLikedByUsers(likedByUsers);
+            rUser.getLikedQueries().remove(query);
+            userRepository.save(rUser);
+
         }
-        queryRepository.save(query);
+
     }
 
 }
