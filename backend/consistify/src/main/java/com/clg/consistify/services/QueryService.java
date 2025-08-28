@@ -93,7 +93,6 @@ public class QueryService {
         });
 
 
-
     }    public List<QueryGetDTO> getQueries(int pageNo){
         return queryRepository.findAll(PageRequest.of(pageNo,10, Sort.by("queryId")))
                 .stream()
@@ -125,7 +124,7 @@ public class QueryService {
         query.setSkillsRequired(skillmap);
         queryRepository.save(query);
 
-        System.out.println("✅ Query updated successfully for " + userName);
+        System.out.println(" Query updated successfully for " + userName);
     }
     @Transactional
     public void updateLikePlus(Long id) {
