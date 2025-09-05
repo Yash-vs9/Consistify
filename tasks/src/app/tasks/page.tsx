@@ -35,6 +35,7 @@ const TaskList: React.FC = () => {
       return null;
     }
   };
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const usernameJWT = getUsernameFromToken(token);
 
@@ -65,7 +66,7 @@ const TaskList: React.FC = () => {
       setStatus("loading");
 
       try {
-        const response = await fetch("http://localhost:8080/task/getModel", {
+        const response = await fetch(`${API_BASE_URL}/task/getModel`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -94,7 +95,7 @@ const TaskList: React.FC = () => {
   const handleTaskChange = () => {
 
     if (token) {
-      fetch("http://localhost:8080/task/getModel", {
+      fetch(`${API_BASE_URL}/task/getModel`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

@@ -30,6 +30,7 @@ export default function Home() {
   const [pageNo, setPageNo] = useState<number>(0);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
   const [likedQueries, setLikedQueries] = useState<Set<number>>(new Set());
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
@@ -82,7 +83,7 @@ export default function Home() {
 
     try {
       const endpoint = alreadyLiked ? "like" : "like";
-      await fetch(`http://localhost:8080/query/${endpoint}`, {
+      await fetch(`${API_BASE_URL}/query/${endpoint}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -121,7 +122,7 @@ export default function Home() {
       )
     );
     try {
-      await fetch("http://localhost:8080/query/postComment", {
+      await fetch(`${API_BASE_URL}/query/postComment`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

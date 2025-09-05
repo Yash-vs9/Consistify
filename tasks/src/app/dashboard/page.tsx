@@ -17,6 +17,7 @@ const MainDashboard: React.FC = () => {
   const [queryCount,setQueryCount]=useState<number>(0)
   const [taskCount,setTaskCount]=useState<number>(0)
   const [userCount,setUserCount]=useState<number>(0)
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 
   useEffect(() => {
@@ -50,7 +51,7 @@ const MainDashboard: React.FC = () => {
     if (!token) return;
     const fetchNumberOfTasksAndQueries = async () => {
       try {
-        const response = await fetch("http://localhost:8080/getNumber", {
+        const response = await fetch(`${API_BASE_URL}/getNumber`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",

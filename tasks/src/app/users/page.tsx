@@ -13,6 +13,8 @@ const Friends: React.FC = () => {
   const [requests, setRequests] = useState<string[]>([]);
   const [friends, setFriends] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   const [loading,setLoading]=useState<boolean>(true)
 
   // Safely access localStorage (only on client side)
@@ -58,7 +60,7 @@ const Friends: React.FC = () => {
     const newPage = pageNo - 1;
     if (newPage < 0) return; // Optional: Prevent going below page 0
     try {
-      const response = await fetch(`http://localhost:8080/users?pageNo=${newPage}`, {
+      const response = await fetch(`${API_BASE_URL}/users?pageNo=${newPage}`, {
         method:"GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -79,7 +81,7 @@ const Friends: React.FC = () => {
   const fetchRightPage = async () => {
     const newPage = pageNo + 1;
     try {
-      const response = await fetch(`http://localhost:8080/users?pageNo=${newPage}`, {
+      const response = await fetch(`${API_BASE_URL}/users?pageNo=${newPage}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -113,7 +115,7 @@ const Friends: React.FC = () => {
   const fetchFriends = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:8080/users/friends", {
+      const res = await fetch(`${API_BASE_URL}/users/friends`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch friends");
@@ -129,7 +131,7 @@ const Friends: React.FC = () => {
     if (!token) return;
     try {
       const res = await fetch(
-        `http://localhost:8080/users/requests`,
+        `${API_BASE_URL}/users/requests`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -156,7 +158,7 @@ const Friends: React.FC = () => {
     if (!token) return;
     try {
       const res = await fetch(
-        `http://localhost:8080/users/send-request/${toUsername}`,
+        `${API_BASE_URL}/users/send-request/${toUsername}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
@@ -173,7 +175,7 @@ const Friends: React.FC = () => {
     if (!token) return;
     try {
       const res = await fetch(
-        `http://localhost:8080/users/${fromUsername}/accept-request`,
+        `${API_BASE_URL}/users/${fromUsername}/accept-request`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },

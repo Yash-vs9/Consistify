@@ -33,6 +33,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskUpdate }) => {
     }
   };
   const usernameJWT = getUsernameFromToken(token);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   // Generate array of dates between start and end date
   const generateDateRange = () => {
@@ -87,7 +88,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onTaskUpdate }) => {
     e.stopPropagation();
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:8080/task/delete/${task.taskName}`, {
+      const response = await fetch(`${API_BASE_URL}/task/delete/${task.taskName}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });

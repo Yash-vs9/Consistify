@@ -19,6 +19,7 @@ interface FriendsClientProps {
 const FriendsClient: React.FC<FriendsClientProps> = ({ usernames, requests, friends, token }) => {
   const [localRequests, setLocalRequests] = useState(requests);
   const [localFriends, setLocalFriends] = useState(friends);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const params = useParams();
   const router = useRouter();
@@ -58,7 +59,7 @@ const FriendsClient: React.FC<FriendsClientProps> = ({ usernames, requests, frie
   const handleAddFriend = async (toUsername: string) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/users/send-request/${toUsername}`,
+        `${process.env.API_BASE_URL}/users/send-request/${toUsername}`,
         {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },

@@ -13,6 +13,7 @@ interface Message {
 
 function getUsernameFromToken(token: string | null): string | null {
   if (!token) return null;
+
   try {
     const payloadBase64Url = token.split('.')[1];
     const payloadBase64 = payloadBase64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -26,6 +27,8 @@ function getUsernameFromToken(token: string | null): string | null {
 }
 
 const Chat: React.FC = () => {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   // Get username from route params (Next.js app router)
   const { username: chatPartner } = useParams<{ username: string }>();
   const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
@@ -52,7 +55,7 @@ const Chat: React.FC = () => {
 
     const fetchMessages = async () => {
       try {
-        const response = await fetch("http://localhost:8080/chat/receive", {
+        const response = await fetch(`${API_BASE_URL}/chat/receive`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -108,7 +111,7 @@ const Chat: React.FC = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/chat/send", {
+      const response = await fetch(`${API_BASE_URL}/chat/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -27,6 +27,7 @@ export default function Profile() {
     currentRankXp = thresholds.S;
     nextRankXp = thresholds.S;
   }
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const progressPercent =
     rank === "S"
@@ -46,7 +47,7 @@ export default function Profile() {
     if (!token) return;
     (async () => {
       try {
-        const response = await fetch("http://localhost:8080/profile", {
+        const response = await fetch(`${API_BASE_URL}/profile`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,

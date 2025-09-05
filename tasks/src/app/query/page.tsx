@@ -20,6 +20,8 @@ export default function Home() {
     description: "",
     category: "General",
   });
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   const router=useRouter()
   function handleChange(
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -43,7 +45,7 @@ export default function Home() {
     if(!token) return
     
     try{
-      const response=await fetch("http://localhost:8080/query/create",
+      const response=await fetch(`${API_BASE_URL}/query/create`,
         {
           method:"POST",
           headers:{
