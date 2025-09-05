@@ -3,6 +3,7 @@ package com.clg.consistify.utils;
 import com.clg.consistify.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,10 @@ public class JwtUtils {
     private SecretKey getSigningKey() {
 
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
+    @PostConstruct
+    public void init() {
+        System.out.println("JWT secret: " + this.SECRET_KEY);
     }
 
     public String extractUsername(String token) {
