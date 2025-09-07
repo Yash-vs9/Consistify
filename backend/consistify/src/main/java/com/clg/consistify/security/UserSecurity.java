@@ -72,7 +72,8 @@ public class UserSecurity {
         config.setAllowedOrigins(List.of(
                 "http://localhost:5173",
                 "http://localhost:3000",
-                "http://localhost:4200"
+                "http://localhost:4200",
+                "https://consistify-iota.vercel.app"
         )); // React dev server
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
