@@ -3,6 +3,7 @@ import React, {JSX, useEffect, useState } from 'react'
 
 const Page = (): JSX.Element => {
     const [quote,setQuote]=useState("")
+    
     useEffect( ()=>{
         fetch('https://api.api-ninjas.com/v1/advice', {
             headers: {

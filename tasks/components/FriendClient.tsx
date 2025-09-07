@@ -59,7 +59,7 @@ const FriendsClient: React.FC<FriendsClientProps> = ({ usernames, requests, frie
   const handleAddFriend = async (toUsername: string) => {
     try {
       const res = await fetch(
-        `${process.env.API_BASE_URL}/users/send-request/${toUsername}`,
+        `${API_BASE_URL}/users/send-request/${toUsername}`,
         {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },
@@ -75,7 +75,7 @@ const FriendsClient: React.FC<FriendsClientProps> = ({ usernames, requests, frie
   const handleAcceptRequest = async (fromUsername: string) => {
     try {
       const res = await fetch(
-        `http://localhost:8080/users/${fromUsername}/accept-request`,
+        `${API_BASE_URL}/${fromUsername}/accept-request`,
         {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}` },

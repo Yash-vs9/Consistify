@@ -13,6 +13,8 @@ const Sign: React.FC = () => {
   const [username, setUsername] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false); // <<<< ADDED
   const router = useRouter();
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   interface LoginBody{
     email: string ,
     password: string
@@ -25,7 +27,7 @@ const Sign: React.FC = () => {
       password: loginPassword,
     };
     try {
-      const response = await fetch("http://localhost:8080/login", {
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(loginData),
@@ -53,7 +55,7 @@ const Sign: React.FC = () => {
       password: registerPassword,
     };
     try {
-      const response = await fetch("http://localhost:8080/register", {
+      const response = await fetch(`${API_BASE_URL}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(registerData),

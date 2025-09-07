@@ -27,13 +27,15 @@ const ProjectHome: React.FC = () => {
     const storedToken = localStorage.getItem("authToken");
     setToken(storedToken);
   }, []);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
   useEffect(()=>{
     if(token==null){
         return
     }
     try{
         const fetchFriend=(async()=>{
-            const respone=await fetch("http://localhost:8080/users/friends",{
+            const respone=await fetch(`${API_BASE_URL}/users/friends`,{
                 method:"GET",
                 headers:{
                     Authorization:`Bearer ${token}`
@@ -61,7 +63,7 @@ const ProjectHome: React.FC = () => {
     SetIsDisabled(true)
     const data = { taskName, startingDate, lastDate, taskPriority, description };
     try{
-        const response=await fetch("http://localhost:8080/task/create",{
+        const response=await fetch(`${API_BASE_URL}/task/create`,{
             method:"POST",
             headers:{
                 Authorization:`Bearer ${token}`,

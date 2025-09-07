@@ -16,6 +16,7 @@ interface Task {
 const TaskEditPage: React.FC = () => {
   const router = useRouter();
   const params = useParams();
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const [name, setName] = useState<string>("");
   const [token, setToken] = useState<string>("");
@@ -52,7 +53,7 @@ const TaskEditPage: React.FC = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/task/edit", {
+      const response = await fetch(`${API_BASE_URL}/task/edit`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
