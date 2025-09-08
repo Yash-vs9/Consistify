@@ -41,7 +41,7 @@ export default function Home() {
     if (!token) return;
     const fetchQueries = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/query/get?pageNo=${pageNo}`, {
+        const response = await fetch(`${API_BASE_URL}/query/get?pageNo=${pageNo}`, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
