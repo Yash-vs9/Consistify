@@ -3,7 +3,7 @@ import React, { use, useEffect, useState } from "react";
 import SplashCursor from "../../../SplashCursor/SplashCursor";
 import Sidebar from "../../../components/Sidebar";
 import { Activity, Users, Folder, TrendingUp } from "lucide-react"; // Icons
-
+import LoadingPage from "components/LoadingPage";
 interface ActivityItem {
   id: number;
   title: string;
@@ -17,6 +17,7 @@ const MainDashboard: React.FC = () => {
   const [queryCount,setQueryCount]=useState<number>(0)
   const [taskCount,setTaskCount]=useState<number>(0)
   const [userCount,setUserCount]=useState<number>(0)
+  const [isLoading,setIsLoading]=useState<boolean>(true)
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 
@@ -49,6 +50,7 @@ const MainDashboard: React.FC = () => {
   }, []);
   useEffect(() => {
     if (!token) return;
+    setIsLoading(true)
     const fetchNumberOfTasksAndQueries = async () => {
       try {
         const response = await fetch(`${API_BASE_URL}/getNumber`, {
@@ -69,10 +71,13 @@ const MainDashboard: React.FC = () => {
       } catch (e) {
         console.log(e);
       }
+      finally{
+        setIsLoading(false)
+      }
     };
     fetchNumberOfTasksAndQueries()
   },[token]);
-
+  if (isLoading) return <LoadingPage />;
   return (
     <div className="relative min-h-screen flex bg-[#0f1117] overflow-hidden text-white font-sans">
       {/* Animated Gradient Background */}

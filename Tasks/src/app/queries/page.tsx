@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Heart, MessageCircle, X } from "lucide-react";
 import Sidebar from "components/Sidebar";
 import { useRouter } from "next/navigation";
+import LoadingPage from "components/LoadingPage";
 
 interface Comment {
   id: number;
@@ -30,6 +31,7 @@ export default function Home() {
   const [pageNo, setPageNo] = useState<number>(0);
   const [isLastPage, setIsLastPage] = useState<boolean>(false);
   const [likedQueries, setLikedQueries] = useState<Set<number>>(new Set());
+  const [isLoading,setIsLoading]=useState<boolean>(true)
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
@@ -38,6 +40,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    setIsLoading(true)
     if (!token) return;
     const fetchQueries = async () => {
       try {
@@ -59,6 +62,9 @@ export default function Home() {
         }
       } catch (e) {
         console.error(e);
+      }
+      finally{
+        setIsLoading(false)
       }
     };
     fetchQueries();
@@ -134,7 +140,7 @@ export default function Home() {
       console.error("Error adding comment:", error);
     }
   };
-
+  if (isLoading) return <LoadingPage />;
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}

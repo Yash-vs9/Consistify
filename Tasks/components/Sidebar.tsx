@@ -52,7 +52,6 @@ const Sidebar = () => {
     { label: 'Friends', icon: <Users className="w-5 h-5" />, href: username ? `/users` : '#' },
     { label: 'Create', icon: <PlusCircle className="w-5 h-5" />, href: '/create' },
     { label: 'Tasks', icon: <ListChecks className="w-5 h-5" />, href: '/tasks' },
-    { label: 'Schedule', icon: <CalendarDays className="w-5 h-5" />, href: '/calendar' },
     { label: 'Profile', icon: <User className="w-5 h-5" />, href: '/profile' },
     { label: 'Query', icon: <MessageCircleQuestion className="w-5 h-5" />, href: '/queries' },
 
