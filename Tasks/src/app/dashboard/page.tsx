@@ -4,6 +4,8 @@ import SplashCursor from "../../../SplashCursor/SplashCursor";
 import Sidebar from "../../../components/Sidebar";
 import { Activity, Users, Folder, TrendingUp } from "lucide-react"; // Icons
 import LoadingPage from "components/LoadingPage";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
 interface ActivityItem {
   id: number;
   title: string;
@@ -19,35 +21,19 @@ const MainDashboard: React.FC = () => {
   const [userCount,setUserCount]=useState<number>(0)
   const [isLoading,setIsLoading]=useState<boolean>(true)
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+  const router=useRouter()
 
   useEffect(() => {
     const storedToken = localStorage.getItem("authToken");
+    if(storedToken==null){
+      toast.error("Login First!")
+      router.push("/sign")
+      return
+    }
     setToken(storedToken as string);
+    
   }, [token]);
-  useEffect(() => {
-    // Example: Fetch or set dummy data
-    setActivities([
-      {
-        id: 1,
-        title: "New Query Posted",
-        description: "User JohnDoe added a new project idea",
-        time: "2 mins ago",
-      },
-      {
-        id: 2,
-        title: "Comment Added",
-        description: "You replied on 'React Optimization Tips'",
-        time: "15 mins ago",
-      },
-      {
-        id: 3,
-        title: "Query Liked",
-        description: "User JaneSmith liked your post",
-        time: "1 hour ago",
-      },
-    ]);
-  }, []);
+  
   useEffect(() => {
     if (!token) return;
     setIsLoading(true)

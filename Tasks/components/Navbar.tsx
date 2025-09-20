@@ -9,6 +9,7 @@ const Navbar = () => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   const links = [
+    { href: '/' , label : 'Home'},
     { href: '/about', label: 'About' },
     { href: '/dashboard', label: 'Dashboard' },
     { href: '/sign', label: 'Sign up' }

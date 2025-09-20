@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+
 import {
   Home,
   LayoutDashboard,
@@ -11,17 +12,21 @@ import {
   MessageCircleQuestion
 } from 'lucide-react';
 import Link from 'next/link';
+import { toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const Sidebar = () => {
   const [openMenu, setOpenMenu] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
   const [username, setUsername] = useState(null); // ✅ New state
+  const router=useRouter()
 
   // ✅ Decode token safely
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      alert('Login');
+      toast.error("Login First")
+      router.push("/")
       return;
     }
 
