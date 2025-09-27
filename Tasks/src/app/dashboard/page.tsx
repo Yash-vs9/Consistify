@@ -63,7 +63,6 @@ const MainDashboard: React.FC = () => {
     };
     fetchNumberOfTasksAndQueries()
   },[token]);
-  if (isLoading) return <LoadingPage />;
   return (
     <div className="relative min-h-screen flex bg-[#0f1117] overflow-hidden text-white font-sans">
       {/* Animated Gradient Background */}
