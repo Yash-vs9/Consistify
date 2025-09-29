@@ -91,10 +91,7 @@ const ProjectHome: React.FC = () => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
   };
 
-  const handleSelect = (friend: string) => {
-    setSearchTerm('');
-    setFilteredFriends([]);
-  };
+
   if(!hasMounted){
     return null
   }
