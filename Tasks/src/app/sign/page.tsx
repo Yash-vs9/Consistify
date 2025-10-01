@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
+import { supabase } from "../../../supabaseClient";
 import { useRouter } from "next/navigation";
+import { Session } from '@supabase/supabase-js';
+
 
 const Sign: React.FC = () => {
   const [active, setActive] = useState<boolean>(false);
@@ -19,6 +22,19 @@ const Sign: React.FC = () => {
     email: string ,
     password: string
   }
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        // optional: redirectTo: `${window.location.origin}/dashboard`
+      });
+      if (error) throw error;
+      // Supabase will redirect the user automatically after login
+    } catch (error: any) {
+      console.error(error.message);
+      alert(error.message);
+    }
+  };
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true); 
@@ -190,6 +206,39 @@ const Sign: React.FC = () => {
             </>
           )}
         </div>
+        <div className="relative left-44 top-1">or</div>
+        <div className="flex justify-center mt-4">
+  <button
+    onClick={handleGoogleLogin}
+    className="flex items-center justify-center w-full max-w-sm px-4 py-3 bg-white text-gray-700 rounded-lg shadow-md hover:shadow-lg transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+  >
+    {/* Google Icon */}
+    <svg
+      className="w-5 h-5 mr-3"
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 48 48"
+    >
+      <path
+        fill="#FFC107"
+        d="M43.6 20.5H42V20H24v8h11.3C33.7 32.3 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11.6 0 19.7-8.1 19.7-19.5 0-1.3-.1-2.3-.3-3.3z"
+      />
+      <path
+        fill="#FF3D00"
+        d="M6.3 14.7l6.6 4.8C14.4 16.1 18.9 14 24 14c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.6 4 24 4c-7.9 0-14.7 4.6-17.7 11.3z"
+      />
+      <path
+        fill="#4CAF50"
+        d="M24 44c5.3 0 10.2-1.8 14-5l-6.4-5.2C29.4 36 27 37 24 37c-5.3 0-9.7-3.6-11.3-8.5l-6.6 5.1C9.3 39.4 16 44 24 44z"
+      />
+      <path
+        fill="#1976D2"
+        d="M43.6 20.5H42V20H24v8h11.3c-1.3 3.9-5.2 7-9.3 7-2.9 0-5.5-1.1-7.4-2.9l-6.6 5.1C14.3 39.4 19.7 44 24 44c11.6 0 19.7-8.1 19.7-19.5 0-1.3-.1-2.3-.3-3.3z"
+      />
+    </svg>
+
+    <span className="font-medium">Sign in with Google</span>
+  </button>
+</div>
       </div>
     </div>
   );

@@ -22,7 +22,12 @@ const ProjectHome: React.FC = () => {
   const [token, setToken] = useState<string | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
   const router=useRouter()
-  
+  useEffect(() => {
+    setHasMounted(true);
+    const storedToken = localStorage.getItem("authToken");
+    setToken(storedToken);
+  }, []);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(()=>{
     if(token==null){
