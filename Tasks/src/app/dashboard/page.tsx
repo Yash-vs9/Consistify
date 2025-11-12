@@ -20,7 +20,7 @@ const MainDashboard: React.FC = () => {
   const [taskCount,setTaskCount]=useState<number>(0)
   const [userCount,setUserCount]=useState<number>(0)
   const [isLoading,setIsLoading]=useState<boolean>(true)
-  const API_BASE_URL =  "http://localhost:8080";
+  const API_BASE_URL =  process.env.NEXT_PUBLIC_API_BASE_URL;
   const router=useRouter()
 
   useEffect(() => {
