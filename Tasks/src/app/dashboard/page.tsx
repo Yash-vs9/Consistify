@@ -69,8 +69,8 @@ const MainDashboard: React.FC = () => {
     };
     fetchNumberOfTasksAndQueries()
   },[token]);
-  if(userCount===0){
-    return <LoadingPage/>
+  if (isLoading) {
+    return <LoadingPage />;
   }
   return (
     <div className="relative min-h-screen flex bg-[#0f1117] overflow-hidden text-white font-sans">
