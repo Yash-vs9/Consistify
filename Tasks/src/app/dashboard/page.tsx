@@ -20,7 +20,7 @@ const MainDashboard: React.FC = () => {
   const [taskCount,setTaskCount]=useState<number>(0)
   const [userCount,setUserCount]=useState<number>(0)
   const [isLoading,setIsLoading]=useState<boolean>(true)
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const API_BASE_URL =  "http://localhost:8080";
   const router=useRouter()
 
   useEffect(() => {
@@ -47,15 +47,21 @@ const MainDashboard: React.FC = () => {
         });
         if (!response.ok) {
           const errData = await response.json();
+          toast.error(errData.message)
+          if(errData.message=="Invalid token. Please log in."){
+            router.push("/sign")
+          }
           throw errData;
         }
         const data = await response.json();
         console.log(data);
+
         setQueryCount(data.query_count)
         setTaskCount(data.task_count)
         setUserCount(data.user_count)
       } catch (e) {
         console.log(e);
+
       }
       finally{
         setIsLoading(false)
@@ -63,6 +69,9 @@ const MainDashboard: React.FC = () => {
     };
     fetchNumberOfTasksAndQueries()
   },[token]);
+  if(userCount===0){
+    return <LoadingPage/>
+  }
   return (
     <div className="relative min-h-screen flex bg-[#0f1117] overflow-hidden text-white font-sans">
       {/* Animated Gradient Background */}

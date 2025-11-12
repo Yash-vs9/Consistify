@@ -1,13 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "../../../supabaseClient";
 import { useRouter } from "next/navigation";
 import { Session } from '@supabase/supabase-js';
+import { sup } from "framer-motion/client";
+import { toast } from "react-toastify";
 
 
 const Sign: React.FC = () => {
   const [active, setActive] = useState<boolean>(false);
+  const [session, setSession] = useState<Session | null>(null);
   const [name, setName] = useState<string>("");
   const [loginEmail, setLoginEmail] = useState<string>("");
   const [loginPassword, setLoginPassword] = useState<string>("");
@@ -15,6 +18,7 @@ const Sign: React.FC = () => {
   const [registerPassword, setRegisterPassword] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false); // <<<< ADDED
+  const [logging,setLogging]=useState<boolean>(false)
   const router = useRouter();
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -22,19 +26,99 @@ const Sign: React.FC = () => {
     email: string ,
     password: string
   }
-  const handleGoogleLogin = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        // optional: redirectTo: `${window.location.origin}/dashboard`
-      });
-      if (error) throw error;
-      // Supabase will redirect the user automatically after login
-    } catch (error: any) {
-      console.error(error.message);
-      alert(error.message);
-    }
-  };
+  const [user, setUser] = useState<any>(null);
+
+// useEffect(() => {
+//   const getUser = async () => {
+//     const { data, error } = await supabase.auth.getSession();
+//     if (error) {
+//       console.error(error);
+//       return;
+//     }
+//     if (data.session) {
+//       setUser(data.session.user); // <-- This is the logged-in user
+//     }
+//   };
+
+//   getUser();
+// }, []);
+const backendGoogleLogin=(async()=>{
+  try{
+    const response=await fetch("http//:localhost:8080/googleLogin",{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+            },
+      body:JSON.stringify({
+        email:session?.user.email,
+        access_token:session?.access_token
+
+      })})
+
+      if(!response.ok){
+        const errData=await response.json();
+        throw new Error(errData)
+      }
+      const data=await response.json();
+      console.log(data)
+
+      }
+      catch(e){
+        console.log(e)
+      }
+
+    })
+  
+
+
+// useEffect(() => {
+//   const {
+//     data: { subscription },
+//   } = supabase.auth.onAuthStateChange((event, session) => {
+//     setSession(session);   // keeps session always in sync
+//     setUser(session?.user ?? null);
+//   });
+
+//   return () => subscription.unsubscribe();
+// }, []);
+// useEffect(()=>{
+
+//   console.log(user)
+//   console.log(session)
+// },[session])
+const handleGoogleLogin = async () => {
+  try {
+    // Get the OAuth URL first (instead of redirecting)
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth`      },
+    });
+
+    if (error) throw error;
+
+
+
+
+  } catch (err) {
+    console.error("Google login failed:", err);
+  }
+};
+// useEffect(() => {
+//   const { data: authListener } = supabase.auth.onAuthStateChange(
+//     async (event, session) => {
+//       if (event === "SIGNED_IN" && session) {
+
+//         setLogging(true); // open modal for username input
+//       }
+//     }
+//   );
+
+//   return () => {
+//     authListener.subscription.unsubscribe();
+//   };
+// }, []);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true); 
@@ -50,6 +134,8 @@ const Sign: React.FC = () => {
       });
       if (!response.ok) {
         const errorData = await response.text();
+        toast.error(errorData )
+
         throw new Error(errorData);
       }
       const data = await response.json();
@@ -78,6 +164,7 @@ const Sign: React.FC = () => {
       });
       if (!response.ok) {
         const errorData = await response.text();
+        toast.error(errorData)
         throw new Error(errorData);
       }
       const data = await response.json();
@@ -205,40 +292,29 @@ const Sign: React.FC = () => {
               </button>
             </>
           )}
+          {logging && (
+  <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-xl shadow-lg w-96">
+      <h2 className="text-xl font-bold mb-4">Choose a Username</h2>
+      <input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Enter username"
+        className="border rounded p-2 w-full"
+      />
+      <button
+        onClick={backendGoogleLogin}
+        className="mt-4 w-full bg-cyan-500 text-white rounded p-2"
+      >
+        Submit
+      </button>
+    </div>
+  </div>
+)}
         </div>
-        <div className="relative left-44 top-1">or</div>
-        <div className="flex justify-center mt-4">
-  <button
-    onClick={handleGoogleLogin}
-    className="flex items-center justify-center w-full max-w-sm px-4 py-3 bg-white text-gray-700 rounded-lg shadow-md hover:shadow-lg transition hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-500"
-  >
-    {/* Google Icon */}
-    <svg
-      className="w-5 h-5 mr-3"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 48"
-    >
-      <path
-        fill="#FFC107"
-        d="M43.6 20.5H42V20H24v8h11.3C33.7 32.3 29.4 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20c11.6 0 19.7-8.1 19.7-19.5 0-1.3-.1-2.3-.3-3.3z"
-      />
-      <path
-        fill="#FF3D00"
-        d="M6.3 14.7l6.6 4.8C14.4 16.1 18.9 14 24 14c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.5 6.5 29.6 4 24 4c-7.9 0-14.7 4.6-17.7 11.3z"
-      />
-      <path
-        fill="#4CAF50"
-        d="M24 44c5.3 0 10.2-1.8 14-5l-6.4-5.2C29.4 36 27 37 24 37c-5.3 0-9.7-3.6-11.3-8.5l-6.6 5.1C9.3 39.4 16 44 24 44z"
-      />
-      <path
-        fill="#1976D2"
-        d="M43.6 20.5H42V20H24v8h11.3c-1.3 3.9-5.2 7-9.3 7-2.9 0-5.5-1.1-7.4-2.9l-6.6 5.1C14.3 39.4 19.7 44 24 44c11.6 0 19.7-8.1 19.7-19.5 0-1.3-.1-2.3-.3-3.3z"
-      />
-    </svg>
+        {/* <div className="relative left-44 top-1">or</div> */}
 
-    <span className="font-medium">Sign in with Google</span>
-  </button>
-</div>
       </div>
     </div>
   );

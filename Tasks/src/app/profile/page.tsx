@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import LoadingPage from "components/LoadingPage";
+import { toast } from "react-toastify";
 
 export default function Profile() {
   const [token, setToken] = useState<string>("");
@@ -54,9 +56,14 @@ export default function Profile() {
             "Content-Type": "application/json",
           },
         });
-        if (!response.ok) throw new Error(await response.text());
+        if (!response.ok){
+          const errData=await response.text()
+          toast.error(errData)
+          throw  Error(errData)
+        }
         const data = await response.json();
         console.log(data);
+
         setName(data[0][0]);
         setXp(data[0][1]);
         setCountFriends(data[0][3]);
@@ -66,6 +73,9 @@ export default function Profile() {
       }
     })();
   }, [token]);
+  if(name===""){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="relative min-h-screen bg-gray-950 text-white overflow-hidden">
