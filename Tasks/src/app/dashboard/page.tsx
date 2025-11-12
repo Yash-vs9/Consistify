@@ -51,6 +51,9 @@ const MainDashboard: React.FC = () => {
           if(errData.message=="Invalid token. Please log in."){
             router.push("/sign")
           }
+          if(errData.message=="Your Session has Expired, Login again"){
+            router.push("/sign")
+          }
           throw errData;
         }
         const data = await response.json();
@@ -85,7 +88,7 @@ const MainDashboard: React.FC = () => {
       {/* Main Dashboard Content */}
       <main className="relative z-10 flex-1 p-8 space-y-10 overflow-y-auto">
         {/* Splash Cursor Animation */}
-        <SplashCursor />
+
 
         {/* Top Greeting Section */}
         <div className="text-center space-y-2">
