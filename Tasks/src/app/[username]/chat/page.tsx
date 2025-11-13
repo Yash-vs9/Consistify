@@ -5,18 +5,17 @@ import { useParams } from "next/navigation";
 import SockJS from "sockjs-client";
 import { Client, IMessage } from "@stomp/stompjs";
 
-
 // ===============================
 // 💬 Message Interface
 // ===============================
 interface Message {
+  id: number;
   sender: string;
   text: string;
-  time: string;
-  date: string;
   timestamp: Date;
+  date: string;
+  time: string;
 }
-
 
 // ===============================
 // 🔑 Decode JWT to get username
@@ -35,35 +34,25 @@ function getUsernameFromToken(token: string | null): string | null {
   }
 }
 
-
 // ===============================
-// 🕐 Parse Timestamp - Handle Java LocalDateTime + UTC
+// 🕐 Parse Timestamp - Handle LocalDateTime / ISO
 // ===============================
 function parseTimestamp(timestamp: any): Date {
   if (!timestamp) return new Date();
 
-  // Handle Java LocalDateTime array format: [year, month, day, hour, minute, second, nano]
   if (Array.isArray(timestamp)) {
     const [year, month, day, hour, minute, second] = timestamp;
-    // ✅ Create as UTC to avoid browser timezone differences
     return new Date(Date.UTC(year, month - 1, day, hour, minute, second));
   }
 
-  // Handle ISO string format (already UTC)
   if (typeof timestamp === "string") {
-    // ✅ Always parse as UTC by ensuring 'Z' suffix
     const isoString = timestamp.includes("Z") ? timestamp : timestamp + "Z";
     return new Date(isoString);
   }
 
-  // Handle already parsed Date
-  if (timestamp instanceof Date) {
-    return timestamp;
-  }
-
+  if (timestamp instanceof Date) return timestamp;
   return new Date();
 }
-
 
 // ===============================
 // 💬 Chat Component
@@ -73,90 +62,81 @@ const ChatPage: React.FC = () => {
     process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8080";
   const { username: chatPartner } = useParams<{ username: string }>();
 
-
-  // JWT setup
   const token =
     typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
   const currentUser = getUsernameFromToken(token);
 
-
-  // React States
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [connected, setConnected] = useState(false);
 
-
-  // Refs
   const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const stompClientRef = useRef<Client | null>(null);
-
 
   // ===============================
   // 📜 Scroll to latest message
   // ===============================
   useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: "smooth",
+    const container = chatContainerRef.current;
+    if (container) {
+      requestAnimationFrame(() => {
+        container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
       });
     }
   }, [messages]);
+
   // ===============================
-// 🕓 Fetch previous chat messages
-// ===============================
-useEffect(() => {
-  if (!currentUser || !chatPartner) return;
+  // 🕓 Fetch previous chat messages
+  // ===============================
+  useEffect(() => {
+    if (!currentUser || !chatPartner) return;
 
-  const fetchChatHistory = async () => {
-    try {
-      const res = await fetch(`${API_BASE_URL}/chat/receive`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          senderName: currentUser,
-          receiverName: chatPartner,
-          message:"1"
-        }),
-      });
-
-      if (!res.ok) throw new Error("Failed to fetch chat history");
-
-      const data = await res.json();
-      console.log(data)
-      // Convert to your Message format
-      const formatted = data.map((msg: any) => {
-        const ts = new Date(msg.timestamp);
-        return {
-          sender: msg.sender,
-          text: msg.message,
-          date: ts.toLocaleDateString([], {
-            year: "numeric",
-            month: "short",
-            day: "2-digit",
+    const fetchChatHistory = async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/chat/receive`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            senderName: currentUser,
+            receiverName: chatPartner,
           }),
-          time: ts.toLocaleTimeString([], {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          timestamp: ts,
-        };
-      });
+        });
 
-      // Sort messages by timestamp
-      formatted.sort((a: { timestamp: { getTime: () => number; }; }, b: { timestamp: { getTime: () => number; }; }) => a.timestamp.getTime() - b.timestamp.getTime());
-      setMessages(formatted);
-    } catch (error) {
-      console.error("Error loading chat history:", error);
-    }
-  };
+        if (!res.ok) throw new Error("Failed to fetch chat history");
+        const data = await res.json();
 
-  fetchChatHistory();
-}, [currentUser, chatPartner, API_BASE_URL]);
+        const formatted: Message[] = data.map((msg: any) => {
+          const ts = parseTimestamp(msg.timestamp);
+          return {
+            id: msg.id,
+            sender: msg.sender,
+            text: msg.message,
+            timestamp: ts,
+            date: ts.toLocaleDateString([], {
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            }),
+            time: ts.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          };
+        });
+
+        formatted.sort((a, b) => a.id - b.id);
+        setMessages(formatted);
+      } catch (error) {
+        console.error("Error loading chat history:", error);
+      }
+    };
+
+    fetchChatHistory();
+  }, [currentUser, chatPartner, API_BASE_URL, token]);
 
   // ===============================
   // 🔌 WebSocket + STOMP Setup
@@ -164,32 +144,27 @@ useEffect(() => {
   useEffect(() => {
     if (!currentUser) return;
 
-
     const socket = new SockJS(`${API_BASE_URL}/ws?token=${token}`);
     const stompClient = new Client({
       webSocketFactory: () => socket,
       reconnectDelay: 5000,
       debug: (msg) => console.log("[STOMP]", msg),
 
-
-      // ✅ Connected
       onConnect: () => {
         console.log("✅ Connected to WebSocket");
         setConnected(true);
 
-
-        // Subscribe to private queue
         stompClient.subscribe("/user/queue/messages", (msg: IMessage) => {
           const payload = JSON.parse(msg.body);
-
           console.log("📨 Received message:", payload);
 
-          // ✅ Parse timestamp with UTC handling
           const ts = parseTimestamp(payload.timestamp);
 
           const newMsg: Message = {
+            id: payload.id || Date.now(), // fallback if backend didn't send id
             sender: payload.sender,
-            text: payload.content,
+            text: payload.content || payload.message,
+            timestamp: ts,
             date: ts.toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
@@ -201,60 +176,38 @@ useEffect(() => {
               minute: "2-digit",
               timeZone: "UTC",
             }),
-            timestamp: ts,
           };
 
-          console.log("📅 Formatted message time:", newMsg.time, newMsg.date);
-
-          // ✅ Keep message order always sorted
           setMessages((prev) => {
-            // ✅ Check if message already exists (prevent duplicates)
-            const exists = prev.some(
-              (m) =>
-                m.sender === newMsg.sender &&
-                m.text === newMsg.text &&
-                Math.abs(m.timestamp.getTime() - newMsg.timestamp.getTime()) < 1000
-            );
-
-            if (exists) {
-              console.log("⚠️ Duplicate message ignored");
-              return prev;
-            }
+            // ✅ Avoid duplicates using message id
+            const exists = prev.some((m) => m.id === newMsg.id);
+            if (exists) return prev;
 
             const updated = [...prev, newMsg];
-            return updated.sort(
-              (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
-            );
+            updated.sort((a, b) => a.id - b.id);
+            return updated;
           });
         });
       },
 
-
-      // ❌ Error handling
       onStompError: (frame) => {
         console.error("STOMP error:", frame.headers["message"], frame.body);
       },
 
-
-      // 🔌 Disconnected
       onDisconnect: () => {
         console.warn("Disconnected from WebSocket");
         setConnected(false);
       },
     });
 
-
     stompClient.activate();
     stompClientRef.current = stompClient;
 
-
-    // Cleanup
     return () => {
       stompClient.deactivate();
       setConnected(false);
     };
   }, [currentUser, API_BASE_URL, token]);
-
 
   // ===============================
   // ✉️ Send Message
@@ -266,39 +219,26 @@ useEffect(() => {
       return;
     }
 
-
     setSending(true);
 
-    // ✅ Send backend-calculated timestamp (don't send from frontend)
     const msgPayload = {
       sender: currentUser,
       receiver: chatPartner,
       content: newMessage,
-      // Backend will set timestamp from LocalDateTime.now()
     };
 
-    console.log("📤 Sending:", msgPayload);
-
-    // Send via WebSocket
     stompClientRef.current.publish({
       destination: "/app/chat.privateMessage",
       body: JSON.stringify(msgPayload),
     });
 
-    // ✅ REMOVED optimistic UI - let backend echo the message
-    // This ensures consistent timestamp across all browsers
-
     setNewMessage("");
     setSending(false);
   };
 
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !sending) {
-      handleSend();
-    }
+    if (e.key === "Enter" && !sending) handleSend();
   };
-
 
   // ===============================
   // 🎨 UI Rendering
@@ -307,12 +247,10 @@ useEffect(() => {
     <div className="min-h-screen flex bg-gray-950 text-white">
       <Sidebar />
 
-
       <div className="flex-1 flex flex-col items-center py-6 px-4">
         <h1 className="text-4xl font-bold mb-6 bg-gradient-to-r from-cyan-400 via-indigo-500 to-blue-600 bg-clip-text text-transparent">
           Chat with {chatPartner}
         </h1>
-
 
         {/* Chat Box */}
         <div
@@ -324,20 +262,19 @@ useEffect(() => {
               {connected ? "No messages yet." : "Connecting..."}
             </div>
           ) : (
-            messages.map((msg, idx) => (
+            messages.map((msg) => (
               <div
-                key={idx}
+                key={msg.id}
                 className={`flex ${
                   msg.sender === currentUser ? "justify-end" : "justify-start"
                 }`}
               >
                 <div
-                  className={`max-w-[75%] px-4 py-2 rounded-2xl shadow transition
-                      ${
-                        msg.sender === currentUser
-                          ? "bg-gradient-to-r from-cyan-600 to-blue-700 border border-cyan-400 text-right"
-                          : "bg-gray-800 border border-indigo-600 text-left"
-                      }`}
+                  className={`max-w-[75%] px-4 py-2 rounded-2xl shadow transition ${
+                    msg.sender === currentUser
+                      ? "bg-gradient-to-r from-cyan-600 to-blue-700 border border-cyan-400 text-right"
+                      : "bg-gray-800 border border-indigo-600 text-left"
+                  }`}
                 >
                   <div className="whitespace-pre-wrap break-words">
                     {msg.text}
@@ -351,7 +288,6 @@ useEffect(() => {
             ))
           )}
         </div>
-
 
         {/* Input Area */}
         <div className="w-full max-w-3xl mt-6 flex items-center gap-3">
@@ -379,6 +315,5 @@ useEffect(() => {
     </div>
   );
 };
-
 
 export default ChatPage;
