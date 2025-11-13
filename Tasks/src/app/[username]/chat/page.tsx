@@ -103,7 +103,60 @@ const ChatPage: React.FC = () => {
       });
     }
   }, [messages]);
+  // ===============================
+// 🕓 Fetch previous chat messages
+// ===============================
+useEffect(() => {
+  if (!currentUser || !chatPartner) return;
 
+  const fetchChatHistory = async () => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/chat/receive`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          senderName: currentUser,
+          receiverName: chatPartner,
+          message:"1"
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to fetch chat history");
+
+      const data = await res.json();
+      console.log(data)
+      // Convert to your Message format
+      const formatted = data.map((msg: any) => {
+        const ts = new Date(msg.timestamp);
+        return {
+          sender: msg.sender,
+          text: msg.message,
+          date: ts.toLocaleDateString([], {
+            year: "numeric",
+            month: "short",
+            day: "2-digit",
+          }),
+          time: ts.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          timestamp: ts,
+        };
+      });
+
+      // Sort messages by timestamp
+      formatted.sort((a: { timestamp: { getTime: () => number; }; }, b: { timestamp: { getTime: () => number; }; }) => a.timestamp.getTime() - b.timestamp.getTime());
+      setMessages(formatted);
+    } catch (error) {
+      console.error("Error loading chat history:", error);
+    }
+  };
+
+  fetchChatHistory();
+}, [currentUser, chatPartner, API_BASE_URL]);
 
   // ===============================
   // 🔌 WebSocket + STOMP Setup
