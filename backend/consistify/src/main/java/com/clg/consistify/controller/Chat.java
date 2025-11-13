@@ -42,8 +42,8 @@ public class Chat {
         );
 
         // save message in DB
-        String username= SecurityContextHolder.getContext().getAuthentication().getName();
-        UserModel sender = userRepository.findByUsername(username)
+
+        UserModel sender = userRepository.findByUsername(message.getSender())
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
         UserModel receiver = userRepository.findByUsername(message.getReceiver())
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
