@@ -1,4 +1,5 @@
 "use client";
+import LoadingPage from "components/LoadingPage";
 import { useEffect, useState } from "react";
 
 export default function Profile() {
@@ -66,7 +67,9 @@ export default function Profile() {
       }
     })();
   }, [token]);
-
+  if(name===""){
+    return <LoadingPage/>
+  }
   return (
     <div className="relative min-h-screen bg-gray-950 text-white overflow-hidden">
       {/* Background Glow */}

@@ -3,6 +3,7 @@ import React, { use, useEffect, useState } from "react";
 import SplashCursor from "../../../SplashCursor/SplashCursor";
 import Sidebar from "../../../components/Sidebar";
 import { Activity, Users, Folder, TrendingUp } from "lucide-react"; // Icons
+import LoadingPage from "components/LoadingPage";
 
 interface ActivityItem {
   id: number;
@@ -72,7 +73,9 @@ const MainDashboard: React.FC = () => {
     };
     fetchNumberOfTasksAndQueries()
   },[token]);
-
+  if (userCount === 0) {
+    return <LoadingPage />;
+  }
   return (
     <div className="relative min-h-screen flex bg-[#0f1117] overflow-hidden text-white font-sans">
       {/* Animated Gradient Background */}
