@@ -27,6 +27,7 @@ public class Chat {
 
     @MessageMapping("/chat.privateMessage")
     public void sendPrivateMessage(ChatMessage message) {
+        String currentUsername =message.getSender();
 
         // send to recipient via WebSocket
         message.setTimestamp(LocalDateTime.now());
@@ -36,14 +37,13 @@ public class Chat {
                 message
         );
         messagingTemplate.convertAndSendToUser(
-                message.getSender(),
+                currentUsername,
                 "/queue/messages",
                 message
         );
 
-        // save message in DB
 
-        UserModel sender = userRepository.findByUsername(message.getSender())
+        UserModel sender = userRepository.findByUsername(currentUsername)
                 .orElseThrow(() -> new RuntimeException("Sender not found"));
         UserModel receiver = userRepository.findByUsername(message.getReceiver())
                 .orElseThrow(() -> new RuntimeException("Receiver not found"));
