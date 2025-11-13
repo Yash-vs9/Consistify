@@ -12,6 +12,10 @@ public class ChatModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     @ManyToOne
     @JoinColumn(name = "sender_id")
     @JsonBackReference

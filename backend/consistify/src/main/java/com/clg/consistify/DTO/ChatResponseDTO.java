@@ -3,13 +3,23 @@ package com.clg.consistify.DTO;
 import java.time.LocalDateTime;
 
 public class ChatResponseDTO {
+    private Long id;
     private String sender;
     private String receiver;
     private String message;
     private LocalDateTime timestamp;
     private boolean read;
 
-    public ChatResponseDTO(String sender, String receiver, String message, LocalDateTime timestamp, boolean read) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public ChatResponseDTO(Long id,String sender, String receiver, String message, LocalDateTime timestamp, boolean read) {
+        this.id=id;
         this.sender = sender;
         this.receiver = receiver;
         this.message = message;

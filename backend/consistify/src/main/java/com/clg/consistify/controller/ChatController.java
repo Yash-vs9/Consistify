@@ -68,6 +68,7 @@ public class ChatController {
         // Map to DTO
         List<ChatResponseDTO> response = msgs.stream()
                 .map(msg -> new ChatResponseDTO(
+                        msg.getId(),
                         msg.getSender().getUsername(),
                         msg.getReceiver().getUsername(),
                         msg.getMessage(),
