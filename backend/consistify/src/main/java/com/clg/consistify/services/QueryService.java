@@ -94,7 +94,7 @@ public class QueryService {
 
 
     }    public List<QueryGetDTO> getQueries(int pageNo){
-        return queryRepository.findAll(PageRequest.of(pageNo,10, Sort.by("queryId")))
+        return queryRepository.findAll(PageRequest.of(pageNo,10, Sort.by("queryId").descending()))
                 .stream()
                 .map((QueryGetDTO::new))
                 .toList();

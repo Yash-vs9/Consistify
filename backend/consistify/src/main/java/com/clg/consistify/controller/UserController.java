@@ -78,6 +78,11 @@ public class UserController {
         String jwt = userService.login(user);
         return ResponseEntity.ok(Map.of("token", jwt));
     }
+    @PostMapping("/auth")
+    public ResponseEntity<?> googleAuth(@RequestBody GoogleLoginDTO body){
+        String jwt= userService.signByGoogle(body);
+        return ResponseEntity.ok(Map.of("token", jwt));
+    }
     @Cacheable("users")
     @GetMapping("/users")
     public List<String> getAllUsers(@RequestParam int pageNo) {

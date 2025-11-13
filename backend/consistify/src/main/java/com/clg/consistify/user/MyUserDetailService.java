@@ -19,10 +19,13 @@ public class MyUserDetailService implements UserDetailsService {
         Optional<UserModel> user= userRepository.findByUsername(username);
         if(user.isPresent()){
             UserModel userObj=user.get();
-
+            String password = userObj.getPassword();
+            if(password == null) {
+                password = "{noop}dummy"; // {noop} tells Spring Security this is plaintext
+            }
             return User.builder()
                     .username(userObj.getUsername())
-                    .password(userObj.getPassword())
+                    .password(password)
                     .roles(userObj.getRole())
                     .build();
 

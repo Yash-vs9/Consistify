@@ -1,9 +1,6 @@
 package com.clg.consistify.services;
 
-import com.clg.consistify.DTO.GetTaskAndQueryNoDTO;
-import com.clg.consistify.DTO.LoginBody;
-import com.clg.consistify.DTO.RegisterBody;
-import com.clg.consistify.DTO.UserDTO;
+import com.clg.consistify.DTO.*;
 import com.clg.consistify.exception.UserAlreadyExistException;
 import com.clg.consistify.exception.UserNotFoundException;
 import com.clg.consistify.repository.UserRepository;
@@ -28,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -74,6 +72,23 @@ public class UserService extends XpRankEvaluator {
         UserDetails userDetails = userDetailService.loadUserByUsername(savedUser.getUsername());
         String jwt = jwtUtil.generateToken(savedUser.getUsername());
 
+        return jwt;
+    }
+    @Transactional
+    public String signByGoogle(GoogleLoginDTO body){
+        UserModel user = userRepository.findByUsername(body.getUsername())
+                .orElseGet(() -> {
+                    UserModel newUser = new UserModel();
+                    newUser.setEmail(body.getEmail());
+                    newUser.setAccess_token(body.getAccess_token());
+                    newUser.setUsername(body.getUsername());
+                    newUser.setRank("E");
+                    newUser.setRole("USER");
+                    return userRepository.save(newUser);
+                });
+
+        UserDetails userDetails = userDetailService.loadUserByUsername(body.getUsername());
+        String jwt = jwtUtil.generateToken(userDetails.getUsername()); // <-- returns String
         return jwt;
     }
 

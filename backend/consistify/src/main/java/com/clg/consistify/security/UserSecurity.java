@@ -41,7 +41,9 @@ public class UserSecurity {
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register","/getNumber").permitAll()
+                        .requestMatchers("/login", "/register","/getNumber","/auth/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll() // allow all websocket requests
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

@@ -15,10 +15,22 @@ public class UserModel {
     private String username;
     @Column(unique = true, nullable = false)
     private String email;
+    @Column(nullable = true)
     private String password;
     private String rank;
     @Column(nullable = false)
     private int xp = 0;
+
+
+    @Column(name = "access_token")
+    private String access_token;
+    public String getAccess_token() {
+        return access_token;
+    }
+
+    public void setAccess_token(String access_token) {
+        this.access_token = access_token;
+    }
 
     public int getXp() {
         return xp;
