@@ -42,32 +42,32 @@ const Sign: React.FC = () => {
 
 //   getUser();
 // }, []);
-const backendGoogleLogin=(async()=>{
-  try{
-    const response=await fetch("http//:localhost:8080/googleLogin",{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json"
-            },
-      body:JSON.stringify({
-        email:session?.user.email,
-        access_token:session?.access_token
+// const backendGoogleLogin=(async()=>{
+//   try{
+//     const response=await fetch("http//:localhost:8080/googleLogin",{
+//       method:"POST",
+//       headers:{
+//         "Content-Type":"application/json"
+//             },
+//       body:JSON.stringify({
+//         email:session?.user.email,
+//         access_token:session?.access_token
 
-      })})
+//       })})
 
-      if(!response.ok){
-        const errData=await response.json();
-        throw new Error(errData)
-      }
-      const data=await response.json();
-      console.log(data)
+//       if(!response.ok){
+//         const errData=await response.json();
+//         throw new Error(errData)
+//       }
+//       const data=await response.json();
+//       console.log(data)
 
-      }
-      catch(e){
-        console.log(e)
-      }
+//       }
+//       catch(e){
+//         console.log(e)
+//       }
 
-    })
+//     })
   
 
 
@@ -86,24 +86,24 @@ const backendGoogleLogin=(async()=>{
 //   console.log(user)
 //   console.log(session)
 // },[session])
-const handleGoogleLogin = async () => {
-  try {
-    // Get the OAuth URL first (instead of redirecting)
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth`      },
-    });
+// const handleGoogleLogin = async () => {
+//   try {
+//     // Get the OAuth URL first (instead of redirecting)
+//     const { data, error } = await supabase.auth.signInWithOAuth({
+//       provider: "google",
+//       options: {
+//         redirectTo: `${window.location.origin}/auth`      },
+//     });
 
-    if (error) throw error;
-
-
+//     if (error) throw error;
 
 
-  } catch (err) {
-    console.error("Google login failed:", err);
-  }
-};
+
+
+//   } catch (err) {
+//     console.error("Google login failed:", err);
+//   }
+// };
 // useEffect(() => {
 //   const { data: authListener } = supabase.auth.onAuthStateChange(
 //     async (event, session) => {
@@ -304,7 +304,7 @@ const handleGoogleLogin = async () => {
         className="border rounded p-2 w-full"
       />
       <button
-        onClick={backendGoogleLogin}
+
         className="mt-4 w-full bg-cyan-500 text-white rounded p-2"
       >
         Submit
