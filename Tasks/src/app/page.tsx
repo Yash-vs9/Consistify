@@ -72,26 +72,10 @@ const Home: React.FC = () => {
       {/* Footer */}
       <footer className="w-full min-h-[40vh] flex justify-center items-center bg-[#020a13] relative z-10">
   <div className="flex space-x-8">
-    {/* Instagram */}
-    <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
-      className="group h-20 w-20 rounded-full flex justify-center items-center bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500 hover:scale-110 transition duration-300 shadow-lg"
-      aria-label="Instagram"
-    >
-      <svg className="w-10 h-10 fill-white group-hover:fill-pink-200 transition" viewBox="0 0 24 24">
-        <path d="M7.75 2A5.75 5.75 0 002 7.75v8.5A5.75 5.75 0 007.75 22h8.5A5.75 5.75 0 0022 16.25v-8.5A5.75 5.75 0 0016.25 2h-8.5zm0 1.5h8.5c3.025 0 5.25 2.225 5.25 5.25v8.5c0 3.025-2.225 5.25-5.25 5.25h-8.5c-3.025 0-5.25-2.225-5.25-5.25v-8.5c0-3.025 2.225-5.25 5.25-5.25zm8.75 2.75a1 1 0 100 2 1 1 0 000-2zm-4.5 2.5A5.25 5.25 0 108 13.75a5.25 5.25 0 004.25-9.5zm0 1.5a3.75 3.75 0 110 7.5 3.75 3.75 0 010-7.5z"/>
-      </svg>
-    </a>
-    {/* Twitter */}
-    <a href="https://twitter.com" target="_blank" rel="noopener noreferrer"
-      className="group h-20 w-20 rounded-full flex justify-center items-center bg-gradient-to-br from-blue-400 to-blue-600 hover:scale-110 transition duration-300 shadow-lg"
-      aria-label="Twitter"
-    >
-      <svg className="w-10 h-10 fill-white group-hover:fill-blue-100 transition" viewBox="0 0 24 24">
-        <path d="M19.633 7.997c.013.176.013.353.013.53 0 5.386-4.099 11.601-11.61 11.601A11.548 11.548 0 012 18.29a8.18 8.18 0 006.042-1.704 4.1 4.1 0 01-3.828-2.848c.256.038.513.064.783.064.372 0 .744-.05 1.091-.146-3.172-.636-5.564-3.437-5.564-6.802v-.085c.941.522 2.021.837 3.166.875A4.093 4.093 0 012.801 4.4a11.654 11.654 0 008.447 4.287 4.623 4.623 0 01-.101-.939A4.098 4.098 0 0115.191 3a8.17 8.17 0 002.595-.988A4.117 4.117 0 0121.18 2.2c-.31.448-.698.845-1.146 1.093A8.235 8.235 0 0023 3.254a8.266 8.266 0 01-2.367 2.456z" />
-      </svg>
-    </a>
+  
+
     {/* LinkedIn */}
-    <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer"
+    <a href="https://www.linkedin.com/in/yash-vardhan-shukla-b0a71331b/" target="_blank" rel="noopener noreferrer"
       className="group h-20 w-20 rounded-full flex justify-center items-center bg-gradient-to-br from-blue-800 to-cyan-400 hover:scale-110 transition duration-300 shadow-lg"
       aria-label="LinkedIn"
     >
@@ -99,17 +83,9 @@ const Home: React.FC = () => {
         <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zM8.666 20h-3v-10h3v10zm-1.44-11.218c-.982 0-1.78-.796-1.78-1.782 0-.983.797-1.782 1.78-1.782.979 0 1.778.799 1.778 1.782 0 .986-.799 1.782-1.778 1.782zm13.107 11.219h-3v-5.326c0-1.27-.025-2.902-1.765-2.902-1.77 0-2.044 1.382-2.044 2.807v5.421h-3v-10h2.879v1.367h.041c.404-.767 1.392-1.576 2.863-1.576 3.064 0 3.631 2.017 3.631 4.641v5.568z"/>
       </svg>
     </a>
-    {/* Facebook */}
-    <a href="https://facebook.com" target="_blank" rel="noopener noreferrer"
-      className="group h-20 w-20 rounded-full flex justify-center items-center bg-gradient-to-br from-blue-700 to-blue-900 hover:scale-110 transition duration-300 shadow-lg"
-      aria-label="Facebook"
-    >
-      <svg className="w-10 h-10 fill-white group-hover:fill-blue-200 transition" viewBox="0 0 24 24">
-        <path d="M22.675 0h-21.35C.6 0 0 .6 0 1.326V22.674C0 23.4.6 24 1.326 24h11.495v-9.294H9.692V11.27h3.129V8.69c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.462.099 2.797.143v3.24h-1.918c-1.504 0-1.797.716-1.797 1.763v2.311h3.587l-.467 3.436h-3.12V24h6.116c.725 0 1.325-.6 1.325-1.326V1.326C24 .601 23.4 0 22.675 0z" />
-      </svg>
-    </a>
+   
     {/* GitHub */}
-    <a href="https://github.com" target="_blank" rel="noopener noreferrer"
+    <a href="https://github.com/Yash-vs9" target="_blank" rel="noopener noreferrer"
       className="group h-20 w-20 rounded-full flex justify-center items-center bg-gradient-to-br from-gray-700 to-gray-900 hover:scale-110 transition duration-300 shadow-lg"
       aria-label="GitHub"
     >
