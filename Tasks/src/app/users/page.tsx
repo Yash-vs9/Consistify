@@ -289,13 +289,7 @@ const Friends: React.FC = () => {
                     >
                       <span className="font-semibold">{username}</span>
                       <div className="flex gap-3">
-                        <button
-                          onClick={() => router.push(`/profile/${username}`)}
-                          title="View Profile"
-                          className="p-2 bg-cyan-600 rounded-full hover:bg-cyan-700"
-                        >
-                          <UserCircle className="text-white" size={20} />
-                        </button>
+                        
                         <button
                           onClick={(e) => goToChat(e, username)}
                           title="Chat"
