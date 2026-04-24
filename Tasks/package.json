@@ -1,43 +1,43 @@
 {
-    "name": "tasks",
-    "version": "0.1.0",
-    "private": true,
-    "scripts": {
-        "dev": "next dev",
-        "build": "next build",
-        "start": "next start",
-        "lint": "next lint"
-    },
-    "dependencies": {
-        "@botpress/webchat": "^1.1.1",
-        "@stomp/stompjs": "^7.2.1",
-        "@supabase/auth-ui-react": "^0.4.7",
-        "@supabase/auth-ui-shared": "^0.1.8",
-        "@supabase/supabase-js": "^2.58.0",
-        "dotenv": "^17.2.1",
-        "expo-auth-session": "^6.2.1",
-        "framer-motion": "^12.23.12",
-        "lucide-react": "^0.525.0",
-        "next": "15.4.2",
-        "react": "19.1.0",
-        "react-dom": "19.1.0",
-        "react-toastify": "^11.0.5",
-        "sockjs-client": "^1.6.1",
-        "stompjs": "^2.3.3"
-    },
-    "devDependencies": {
-        "@eslint/eslintrc": "^3",
-        "@tailwindcss/postcss": "^4",
-        "@types/node": "^20",
-        "@types/react": "^19",
-        "@types/react-dom": "^19",
-        "@types/sockjs-client": "^1.5.4",
-        "@types/stompjs": "^2.3.9",
-        "autoprefixer": "^10.4.21",
-        "eslint": "^9",
-        "eslint-config-next": "15.4.2",
-        "postcss": "^8.5.6",
-        "tailwindcss": "^3.4.1",
-        "typescript": "^5"
-    }
+  "name": "tasks",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@botpress/webchat": "^1.1.1",
+    "@stomp/stompjs": "^7.2.1",
+    "@supabase/auth-ui-react": "^0.4.7",
+    "@supabase/auth-ui-shared": "^0.1.8",
+    "@supabase/supabase-js": "^2.58.0",
+    "dotenv": "^17.2.1",
+    "expo-auth-session": "^6.2.1",
+    "framer-motion": "^12.23.12",
+    "lucide-react": "^0.525.0",
+    "next": "15.4.10",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-toastify": "^11.0.5",
+    "sockjs-client": "^1.6.1",
+    "stompjs": "^2.3.3"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/sockjs-client": "^1.5.4",
+    "@types/stompjs": "^2.3.9",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9",
+    "eslint-config-next": "15.4.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
 }
